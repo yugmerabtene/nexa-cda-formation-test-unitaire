@@ -1,0 +1,308 @@
+name: CI/CD - NEXA Formation Tests & Sécurité
+
+on:
+  push:
+    branches: [main, master, develop]
+  pull_request:
+    branches: [main, master]
+  workflow_dispatch:
+
+env:
+  SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+  SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+  DOCKER_REGISTRY: ${{ secrets.DOCKER_REGISTRY }}
+
+jobs:
+  sonarqube-check:
+    name: SonarQube Analysis
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: 'maven'
+
+      - name: Cache SonarQube packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
+
+      - name: Build and analyze
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+        run: |
+          mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:3.10.0.2594:sonar \
+            -Dsonar.projectKey=nexa-cda-formation \
+            -Dsonar.projectName="NEXA CDA Formation Tests Unitaires et Sécurité" \
+            -Dsonar.host.url=$SONAR_HOST_URL \
+            -Dsonar.token=$SONAR_TOKEN \
+            -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml \
+            -Dsonar.java.binaries=target/classes
+
+  test-jour1:
+    name: Tests Jour 1 - Tests Unitaires
+    runs-on: ubuntu-latest
+    needs: sonarqube-check
+    if: always()
+    strategy:
+      fail-fast: false
+      matrix:
+        lab:
+          - lab01-fondamentaux
+          - lab02-parametres-avances
+          - lab03-mocking
+          - lab04-tdd-banque
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: 'maven'
+
+      - name: Run Tests - ${{ matrix.lab }}
+        working-directory: jour1-tests-unitaires/${{ matrix.lab }}
+        run: |
+          mvn -B clean test
+          mvn -B jacoco:report
+
+      - name: Upload Test Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-jour1-${{ matrix.lab }}
+          path: |
+            jour1-tests-unitaires/${{ matrix.lab }}/target/surefire-reports/
+            jour1-tests-unitaires/${{ matrix.lab }}/target/site/jacoco/
+
+      - name: Publish Test Report
+        if: always()
+        uses: dorny/test-reporter@v1
+        with:
+          name: Tests ${{ matrix.lab }}
+          path: jour1-tests-unitaires/${{ matrix.lab }}/target/surefire-reports/TEST-*.xml
+          reporter: java-junit
+
+  test-jour2:
+    name: Tests Jour 2 - Sécurité
+    runs-on: ubuntu-latest
+    needs: sonarqube-check
+    if: always()
+    strategy:
+      fail-fast: false
+      matrix:
+        lab:
+          - lab05-owasp-java
+          - lab06-intro-spring
+          - lab07-spring-security
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: 'maven'
+
+      - name: Run Tests - ${{ matrix.lab }}
+        working-directory: jour2-securite/${{ matrix.lab }}
+        run: |
+          mvn -B clean test
+          mvn -B jacoco:report
+
+      - name: Upload Test Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-jour2-${{ matrix.lab }}
+          path: |
+            jour2-securite/${{ matrix.lab }}/target/surefire-reports/
+            jour2-securite/${{ matrix.lab }}/target/site/jacoco/
+
+      - name: Publish Test Report
+        if: always()
+        uses: dorny/test-reporter@v1
+        with:
+          name: Tests ${{ matrix.lab }}
+          path: jour2-securite/${{ matrix.lab }}/target/surefire-reports/TEST-*.xml
+          reporter: java-junit
+
+  test-lab08:
+    name: Tests Lab08 - Projet Final
+    runs-on: ubuntu-latest
+    needs: sonarqube-check
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: nexa
+          POSTGRES_PASSWORD: nexa123
+          POSTGRES_DB: usermanager
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: 'maven'
+
+      - name: Unit Tests
+        working-directory: lab08-app-gestion-utilisateurs
+        run: mvn -B test
+
+      - name: Integration Tests
+        working-directory: lab08-app-gestion-utilisateurs
+        run: mvn -B failsafe:integration-test failsafe:verify
+        env:
+          SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/usermanager
+          SPRING_DATASOURCE_USERNAME: nexa
+          SPRING_DATASOURCE_PASSWORD: nexa123
+
+      - name: JaCoCo Coverage Report
+        working-directory: lab08-app-gestion-utilisateurs
+        run: mvn -B jacoco:report
+
+      - name: Check Coverage Threshold
+        working-directory: lab08-app-gestion-utilisateurs
+        run: mvn -B jacoco:check
+
+      - name: Mutation Tests (PITest)
+        working-directory: lab08-app-gestion-utilisateurs
+        run: mvn -B org.pitest:pitest-maven:mutationCoverage
+
+      - name: Upload Test Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-lab08
+          path: |
+            lab08-app-gestion-utilisateurs/target/surefire-reports/
+            lab08-app-gestion-utilisateurs/target/failsafe-reports/
+            lab08-app-gestion-utilisateurs/target/site/jacoco/
+            lab08-app-gestion-utilisateurs/target/pit-reports/
+
+      - name: Publish Test Report
+        if: always()
+        uses: dorny/test-reporter@v1
+        with:
+          name: Tests Lab08 Final
+          path: |
+            lab08-app-gestion-utilisateurs/target/surefire-reports/TEST-*.xml
+            lab08-app-gestion-utilisateurs/target/failsafe-reports/TEST-*.xml
+          reporter: java-junit
+
+  owasp-dependency-check:
+    name: OWASP Dependency Check
+    runs-on: ubuntu-latest
+    needs: test-lab08
+    if: always()
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: 'maven'
+
+      - name: OWASP Dependency Check
+        working-directory: lab08-app-gestion-utilisateurs
+        run: |
+          mvn -B org.owasp:dependency-check-maven:check \
+            -DfailBuildOnCVSS=7 \
+            -Dformat=HTML \
+            -DprettyPrint=true
+
+      - name: Upload Dependency Check Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dependency-check-report
+          path: lab08-app-gestion-utilisateurs/target/dependency-check-report.html
+
+  docker-build:
+    name: Build & Push Docker Image
+    runs-on: ubuntu-latest
+    needs: [test-lab08, owasp-dependency-check]
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Docker Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ secrets.DOCKER_REGISTRY }}
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: ./lab08-app-gestion-utilisateurs
+          push: true
+          tags: |
+            ${{ secrets.DOCKER_REGISTRY }}/nexa-user-manager:latest
+            ${{ secrets.DOCKER_REGISTRY }}/nexa-user-manager:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  zap-security-scan:
+    name: ZAP API Security Scan
+    runs-on: ubuntu-latest
+    needs: test-lab08
+    if: always()
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: ZAP Baseline Scan
+        uses: zaproxy/action-baseline@v0.12.0
+        with:
+          target: 'http://localhost:8080'
+          rules_file_name: '.zap/rules.tsv'
+          cmd_options: '-a -j -T 60'
+
+  notify:
+    name: Notification finale
+    runs-on: ubuntu-latest
+    needs: [test-jour1, test-jour2, test-lab08, docker-build, zap-security-scan]
+    if: always()
+    steps:
+      - name: Résumé CI/CD
+        run: |
+          echo "═══════════════════════════════════════════════════"
+          echo "  Pipeline CI/CD NEXA - Formation Tests & Sécurité"
+          echo "═══════════════════════════════════════════════════"
+          echo ""
+          echo "  ✅ Tests unitaires Jour 1 : ${{ needs.test-jour1.result }}"
+          echo "  ✅ Tests sécurité Jour 2  : ${{ needs.test-jour2.result }}"
+          echo "  ✅ Projet Final Lab08     : ${{ needs.test-lab08.result }}"
+          echo "  ✅ OWASP Dependency Check : ${{ needs.owasp-dependency-check.result }}"
+          echo "  ✅ Build Docker           : ${{ needs.docker-build.result }}"
+          echo "  ✅ ZAP Security Scan      : ${{ needs.zap-security-scan.result }}"
+          echo ""
+          echo "═══════════════════════════════════════════════════"

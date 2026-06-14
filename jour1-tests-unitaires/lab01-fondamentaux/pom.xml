@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.nexa</groupId>
+    <artifactId>lab01-fondamentaux</artifactId>
+    <version>1.0.0</version>
+    <packaging>jar</packaging>
+
+    <name>Lab01 - Fondamentaux JUnit 5</name>
+    <description>Premiers pas avec JUnit 5 : assertions, cycle de vie, conventions</description>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <java.version>17</java.version>
+        <junit.version>5.10.2</junit.version>
+        <maven-surefire.version>3.2.5</maven-surefire.version>
+        <jacoco.version>0.8.11</jacoco.version>
+    </properties>
+
+    <!--
+    ┌─────────────────────────────────────────────────────────────────┐
+    │  SECTION : Dépendances                                           │
+    │                                                                  │
+    │  <dependencies> : bloc XML qui déclare toutes les bibliothèques  │
+    │  externes nécessaires au projet. Maven les télécharge            │
+    │  automatiquement depuis Maven Central et les ajoute au CLASSPATH. │
+    │                                                                  │
+    │  Chaque dépendance est définie par 3 coordonnées (GAV) :         │
+    │    - groupId    : identifiant de l'organisation (ex: org.junit)  │
+    │    - artifactId : nom de la bibliothèque (ex: junit-jupiter)     │
+    │    - version    : numéro de version (ex: 5.10.2)                 │
+    │                                                                  │
+    │  <scope>test</scope> signifie que la dépendance n'est disponible │
+    │  QUE pendant la phase de test (non embarquée en production).     │
+    └─────────────────────────────────────────────────────────────────┘
+    -->
+    <dependencies>
+        <!--
+        junit-jupiter : le cœur de JUnit 5.
+        Contient :
+          - L'API pour écrire les tests (@Test, assertions, etc.)
+          - Le moteur d'exécution (Jupiter Test Engine)
+          - Les extensions intégrées
+        -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <!--
+    ┌─────────────────────────────────────────────────────────────────┐
+    │  SECTION : Plugins Maven                                         │
+    │                                                                  │
+    │  Les plugins étendent les capacités de Maven. Ils s'exécutent    │
+    │  à des phases spécifiques du cycle de vie (compile, test, etc.). │
+    └─────────────────────────────────────────────────────────────────┘
+    -->
+    <build>
+        <plugins>
+            <!--
+            maven-compiler-plugin : configure la version de Java utilisée
+            pour compiler les sources (src/main/java) et les tests (src/test/java).
+            -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.12.1</version>
+                <configuration>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                </configuration>
+            </plugin>
+
+            <!--
+            maven-surefire-plugin : le plugin qui EXÉCUTE les tests unitaires.
+            Il s'exécute automatiquement à la phase `test` du cycle Maven.
+            Par défaut, il cherche les classes qui contiennent `Test` dans leur nom
+            ou qui sont dans les répertoires `src/test/java`.
+            -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${maven-surefire.version}</version>
+            </plugin>
+
+            <!--
+            jacoco-maven-plugin : outil de mesure de la couverture de code.
+            Il instrumente le bytecode pour suivre quelles lignes/branches
+            sont exécutées pendant les tests.
+            -->
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>${jacoco.version}</version>
+                <executions>
+                    <execution>
+                        <id>prepare-agent</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>report</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>

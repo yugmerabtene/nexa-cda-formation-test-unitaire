@@ -1,0 +1,11 @@
+telephone,valide
+0612345678,true
+0612345678,true
+0612345678,true
++33612345678,true
+06 12 34 56 78,true
+0123456789,true
+999999,false
+061234567,false
+06123456789,false
+abc,false

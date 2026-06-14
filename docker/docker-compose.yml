@@ -1,0 +1,60 @@
+version: '3.8'
+
+services:
+  sonarqube:
+    image: sonarqube:10.5-community
+    container_name: nexa-sonarqube
+    ports:
+      - "9000:9000"
+    environment:
+      - SONAR_JDBC_URL=jdbc:postgresql://postgres-sonar:5432/sonar
+      - SONAR_JDBC_USERNAME=sonar
+      - SONAR_JDBC_PASSWORD=sonar
+    depends_on:
+      - postgres-sonar
+    volumes:
+      - sonarqube_data:/opt/sonarqube/data
+      - sonarqube_logs:/opt/sonarqube/logs
+      - sonarqube_extensions:/opt/sonarqube/extensions
+
+  postgres-sonar:
+    image: postgres:15
+    container_name: nexa-postgres-sonar
+    environment:
+      - POSTGRES_USER=sonar
+      - POSTGRES_PASSWORD=sonar
+      - POSTGRES_DB=sonar
+    volumes:
+      - postgres_sonar_data:/var/lib/postgresql/data
+
+  postgres-app:
+    image: postgres:15
+    container_name: nexa-postgres-app
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=nexa
+      - POSTGRES_PASSWORD=nexa123
+      - POSTGRES_DB=usermanager
+    volumes:
+      - postgres_app_data:/var/lib/postgresql/data
+
+  lab-runner:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: nexa-lab-runner
+    volumes:
+      - ..:/workspace
+      - maven_repo:/root/.m2
+    working_dir: /workspace
+    stdin_open: true
+    tty: true
+
+volumes:
+  sonarqube_data:
+  sonarqube_logs:
+  sonarqube_extensions:
+  postgres_sonar_data:
+  postgres_app_data:
+  maven_repo:
