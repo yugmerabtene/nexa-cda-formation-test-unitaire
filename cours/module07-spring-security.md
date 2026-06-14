@@ -10,7 +10,7 @@
 
 ## Objectifs pédagogiques
 
-À la fin de ce module, les stagiaires sauront :
+À l'issue de ce module, vous serez capable de :
 
 1. Expliquer l'architecture de Spring Security (chaîne de filtres)
 2. Configurer un `SecurityFilterChain` pour une API REST stateless
@@ -23,9 +23,7 @@
 
 ---
 
-──────────────────────────────────────────
-PARTIE 1 — THÉORIE (30 min)
-──────────────────────────────────────────
+## PARTIE 1 -- THEORIE (30 min)
 
 ## 1. Pourquoi sécuriser une API REST ?
 
@@ -57,31 +55,19 @@ Spring Security est un framework qui s'intercale dans le traitement des requête
 
 ```
 REQUÊTE HTTP
-    │
-    ▼
-┌──────────────────────────────────────────────────────────┐
-│                SECURITY FILTER CHAIN                      │
-│                                                          │
-│  ┌─────────────┐   ┌──────────────┐   ┌──────────────┐   │
-│  │ JwtAuth-    │   │  Username-   │   │  Exception-  │   │
-│  │ entication  │──▶│  Password    │──▶│  Translation │...│  │
-│  │ Filter (*)  │   │  AuthFilter  │   │  Filter      │   │
-│  └─────────────┘   └──────────────┘   └──────────────┘   │
-│                          │                               │
-│                          ▼                               │
-│                   ┌──────────────┐                       │
-│                   │  Authentica- │                       │
-│                   │  tionManager │                       │
-│                   └──────┬───────┘                       │
-│                          │                               │
-│                          ▼                               │
-│                   ┌──────────────┐                       │
-│                   │ UserDetails- │                       │
-│                   │   Service    │                       │
-│                   └──────────────┘                       │
-└──────────────────────────────────────────────────────────┘
-    │
-    ▼
+
+ SECURITY FILTER CHAIN
+
+ JwtAuth- Username- Exception-
+ entication Password Translation ...
+ Filter (*) AuthFilter Filter
+
+ Authentica-
+ tionManager
+
+ UserDetails-
+ Service
+
 CONTRÔLEUR (@RestController)
 ```
 
@@ -110,13 +96,13 @@ On utilise `BCryptPasswordEncoder` qui implémente l'algorithme **BCrypt** :
 
 ```
 Mot de passe : "admin123"
-    │
-    ▼ BCryptPasswordEncoder.encode()
+
+ BCryptPasswordEncoder.encode()
 Hash : $2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy
-        │    │                                         │
-        │    │                                         └─ Hash (31 caractères)
-        │    └─ Coût (2^10 = 1024 itérations)
-        └─ Algorithme (2a = BCrypt)
+
+ Hash (31 caractères)
+ Coût (2^10 = 1024 itérations)
+ Algorithme (2a = BCrypt)
 ```
 
 ## 3. Les annotations de configuration
@@ -138,9 +124,9 @@ Cette annotation ouvre plusieurs possibilités :
 
 ```java
 @EnableMethodSecurity(
-    prePostEnabled = true,   // Active @PreAuthorize / @PostAuthorize
-    securedEnabled = true,    // Active @Secured
-    jsr250Enabled = true      // Active @RolesAllowed
+ prePostEnabled = true, // Active @PreAuthorize / @PostAuthorize
+ securedEnabled = true, // Active @Secured
+ jsr250Enabled = true // Active @RolesAllowed
 )
 ```
 
@@ -166,7 +152,7 @@ Pour une **API REST stateless (sans session serveur)**, la protection CSRF est *
 .csrf(csrf -> csrf.disable())
 ```
 
-> ⚠️ **Ne jamais désactiver CSRF pour une application web avec sessions (Thymeleaf, JSP).**
+> **Ne jamais désactiver CSRF pour une application web avec sessions (Thymeleaf, JSP).**
 > La désactivation est **spécifique aux APIs REST stateless.**
 
 ### 4.2 `sessionManagement()`
@@ -195,12 +181,12 @@ Définit les **règles de contrôle d'accès** par URL et méthode HTTP.
 
 ```java
 .authorizeHttpRequests(auth -> auth
-    .requestMatchers("/api/auth/**").permitAll()
-    .requestMatchers(HttpMethod.GET, "/api/produits/**").permitAll()
-    .requestMatchers(HttpMethod.POST, "/api/produits/**").hasRole("ADMIN")
-    .requestMatchers(HttpMethod.PUT, "/api/produits/**").hasRole("ADMIN")
-    .requestMatchers(HttpMethod.DELETE, "/api/produits/**").hasRole("ADMIN")
-    .anyRequest().authenticated()
+ .requestMatchers("/api/auth/**").permitAll()
+ .requestMatchers(HttpMethod.GET, "/api/produits/**").permitAll()
+ .requestMatchers(HttpMethod.POST, "/api/produits/**").hasRole("ADMIN")
+ .requestMatchers(HttpMethod.PUT, "/api/produits/**").hasRole("ADMIN")
+ .requestMatchers(HttpMethod.DELETE, "/api/produits/**").hasRole("ADMIN")
+ .anyRequest().authenticated()
 )
 ```
 
@@ -253,17 +239,17 @@ séparées par des points :
 
 ```
 eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcwMDAwMDAwMCwiZXhwIjoxNzAwMDAzNjAwfQ.3Kx8L7mN2pQ9rS4tV6wX1yZ0aB3cD5eF7gH8iJ9kL0
-│                    │                                                                                              │
-│    HEADER          │    PAYLOAD                                                                                    │    SIGNATURE
-│                    │                                                                                              │
-└─ Base64 encodé ───┴─ Base64 encodé ────────────────────────────────────────────────────────────────────────────┴─ Base64 encodé
+
+ HEADER PAYLOAD SIGNATURE
+
+ Base64 encodé Base64 encodé Base64 encodé
 ```
 
 #### Header (en-tête)
 ```json
 {
-  "alg": "HS256",
-  "typ": "JWT"
+ "alg": "HS256",
+ "typ": "JWT"
 }
 ```
 
@@ -273,10 +259,10 @@ eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcwMDAwMDA
 #### Payload (corps)
 ```json
 {
-  "sub": "admin",
-  "role": "ADMIN",
-  "iat": 1700000000,
-  "exp": 1700003600
+ "sub": "admin",
+ "role": "ADMIN",
+ "iat": 1700000000,
+ "exp": 1700003600
 }
 ```
 
@@ -288,8 +274,8 @@ eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcwMDAwMDA
 #### Signature
 ```
 HMACSHA256(
-    base64UrlEncode(header) + "." + base64UrlEncode(payload),
-    secret
+ base64UrlEncode(header) + "." + base64UrlEncode(payload),
+ secret
 )
 ```
 
@@ -314,25 +300,25 @@ Un des avantages majeurs de JWT est le **stateless** :
 
 ```
 Architecture AVEC sessions (stateful) :
-┌──────────┐     ┌──────────┐     ┌──────────────┐
-│ Client   │────▶│ Serveur  │────▶│ Base de       │
-│          │     │ Session  │     │ sessions      │
-└──────────┘     │ Map      │     │ (Redis/DB)    │
-                 └──────────┘     └──────────────┘
+
+ Client Serveur Base de
+ Session sessions
+ Map (Redis/DB)
+
 Problème : le serveur doit stocker les sessions → pas scalable
 
 Architecture JWT (stateless) :
-┌──────────┐     ┌──────────┐
-│ Client   │────▶│ Serveur  │
-│ Stocke   │     │ Vérifie  │  Aucune base de sessions nécessaire
-│ le JWT   │     │ le JWT   │
-└──────────┘     └──────────┘
+
+ Client Serveur
+ Stocke Vérifie Aucune base de sessions nécessaire
+ le JWT le JWT
+
 Avantage : n'importe quel serveur peut traiter la requête → scalable
 ```
 
 ### 5.4 Sécurité : encodé ≠ chiffré
 
-> ⚠️ **ATTENTION : le payload JWT est encodé en Base64, PAS chiffré.**
+> **ATTENTION : le payload JWT est encodé en Base64, PAS chiffré.**
 
 Base64 est un **encodage**, pas un chiffrement. N'importe qui peut décoder le payload
 et lire son contenu :
@@ -354,25 +340,25 @@ echo "eyJzdWIiOiJhZG1pbiIsInJvbGUiOiJBRE1JTiJ9" | base64 -d
 ```xml
 <!-- API JJWT (compile) -->
 <dependency>
-    <groupId>io.jsonwebtoken</groupId>
-    <artifactId>jjwt-api</artifactId>
-    <version>0.12.5</version>
+ <groupId>io.jsonwebtoken</groupId>
+ <artifactId>jjwt-api</artifactId>
+ <version>0.12.5</version>
 </dependency>
 
 <!-- Implémentation (runtime) -->
 <dependency>
-    <groupId>io.jsonwebtoken</groupId>
-    <artifactId>jjwt-impl</artifactId>
-    <version>0.12.5</version>
-    <scope>runtime</scope>
+ <groupId>io.jsonwebtoken</groupId>
+ <artifactId>jjwt-impl</artifactId>
+ <version>0.12.5</version>
+ <scope>runtime</scope>
 </dependency>
 
 <!-- Sérialisation JSON (runtime) -->
 <dependency>
-    <groupId>io.jsonwebtoken</groupId>
-    <artifactId>jjwt-jackson</artifactId>
-    <version>0.12.5</version>
-    <scope>runtime</scope>
+ <groupId>io.jsonwebtoken</groupId>
+ <artifactId>jjwt-jackson</artifactId>
+ <version>0.12.5</version>
+ <scope>runtime</scope>
 </dependency>
 ```
 
@@ -382,120 +368,118 @@ echo "eyJzdWIiOiJhZG1pbiIsInJvbGUiOiJBRE1JTiJ9" | base64 -d
 
 ---
 
-──────────────────────────────────────────
-PARTIE 2 — PRATIQUE PAS À PAS (40 min)
-──────────────────────────────────────────
+## PARTIE 2 -- PRATIQUE PAS A PAS (40 min)
 
-## 📁 Structure du projet
+## Structure du projet
 
 ```
 lab07-spring-security/
-├── pom.xml
-└── src/
-    ├── main/
-    │   ├── java/com/nexa/secu/
-    │   │   ├── SpringSecurityApplication.java
-    │   │   ├── config/
-    │   │   │   ├── SecurityConfig.java
-    │   │   │   └── AppConfig.java
-    │   │   ├── entity/
-    │   │   │   └── Utilisateur.java
-    │   │   ├── repository/
-    │   │   │   └── UtilisateurRepository.java
-    │   │   ├── service/
-    │   │   │   └── UtilisateurService.java
-    │   │   ├── controller/
-    │   │   │   ├── AuthController.java
-    │   │   │   └── ProduitController.java
-    │   │   └── security/
-    │   │       ├── JwtUtil.java
-    │   │       └── JwtAuthenticationFilter.java
-    │   └── resources/
-    │       └── application.properties
-    └── test/
-        └── java/com/nexa/secu/
-            ├── security/
-            │   └── JwtUtilTest.java
-            └── controller/
-                └── SecurityIntegrationTest.java
+ pom.xml
+ src/
+ main/
+ java/com/nexa/secu/
+ SpringSecurityApplication.java
+ config/
+ SecurityConfig.java
+ AppConfig.java
+ entity/
+ Utilisateur.java
+ repository/
+ UtilisateurRepository.java
+ service/
+ UtilisateurService.java
+ controller/
+ AuthController.java
+ ProduitController.java
+ security/
+ JwtUtil.java
+ JwtAuthenticationFilter.java
+ resources/
+ application.properties
+ test/
+ java/com/nexa/secu/
+ security/
+ JwtUtilTest.java
+ controller/
+ SecurityIntegrationTest.java
 ```
 
 ---
 
-## 📁 pom.xml — Dépendances clés
+## pom.xml — Dépendances clés
 
 ```xml
 <parent>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-parent</artifactId>
-    <version>3.2.5</version>
+ <groupId>org.springframework.boot</groupId>
+ <artifactId>spring-boot-starter-parent</artifactId>
+ <version>3.2.5</version>
 </parent>
 
 <properties>
-    <java.version>17</java.version>
-    <jjwt.version>0.12.5</jjwt.version>
+ <java.version>17</java.version>
+ <jjwt.version>0.12.5</jjwt.version>
 </properties>
 
 <dependencies>
-    <!-- Web : REST controllers, embedded Tomcat -->
-    <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-web</artifactId>
-    </dependency>
+ <!-- Web : REST controllers, embedded Tomcat -->
+ <dependency>
+ <groupId>org.springframework.boot</groupId>
+ <artifactId>spring-boot-starter-web</artifactId>
+ </dependency>
 
-    <!-- Security : authentification, autorisation, filtres -->
-    <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-security</artifactId>
-    </dependency>
+ <!-- Security : authentification, autorisation, filtres -->
+ <dependency>
+ <groupId>org.springframework.boot</groupId>
+ <artifactId>spring-boot-starter-security</artifactId>
+ </dependency>
 
-    <!-- JPA + H2 : persistance des utilisateurs -->
-    <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-data-jpa</artifactId>
-    </dependency>
-    <dependency>
-        <groupId>com.h2database</groupId>
-        <artifactId>h2</artifactId>
-        <scope>runtime</scope>
-    </dependency>
+ <!-- JPA + H2 : persistance des utilisateurs -->
+ <dependency>
+ <groupId>org.springframework.boot</groupId>
+ <artifactId>spring-boot-starter-data-jpa</artifactId>
+ </dependency>
+ <dependency>
+ <groupId>com.h2database</groupId>
+ <artifactId>h2</artifactId>
+ <scope>runtime</scope>
+ </dependency>
 
-    <!-- Validation : @NotBlank, @Size, etc. -->
-    <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-validation</artifactId>
-    </dependency>
+ <!-- Validation : @NotBlank, @Size, etc. -->
+ <dependency>
+ <groupId>org.springframework.boot</groupId>
+ <artifactId>spring-boot-starter-validation</artifactId>
+ </dependency>
 
-    <!-- JJWT : génération et validation de tokens JWT -->
-    <dependency>
-        <groupId>io.jsonwebtoken</groupId>
-        <artifactId>jjwt-api</artifactId>
-        <version>${jjwt.version}</version>
-    </dependency>
-    <dependency>
-        <groupId>io.jsonwebtoken</groupId>
-        <artifactId>jjwt-impl</artifactId>
-        <version>${jjwt.version}</version>
-        <scope>runtime</scope>
-    </dependency>
-    <dependency>
-        <groupId>io.jsonwebtoken</groupId>
-        <artifactId>jjwt-jackson</artifactId>
-        <version>${jjwt.version}</version>
-        <scope>runtime</scope>
-    </dependency>
+ <!-- JJWT : génération et validation de tokens JWT -->
+ <dependency>
+ <groupId>io.jsonwebtoken</groupId>
+ <artifactId>jjwt-api</artifactId>
+ <version>${jjwt.version}</version>
+ </dependency>
+ <dependency>
+ <groupId>io.jsonwebtoken</groupId>
+ <artifactId>jjwt-impl</artifactId>
+ <version>${jjwt.version}</version>
+ <scope>runtime</scope>
+ </dependency>
+ <dependency>
+ <groupId>io.jsonwebtoken</groupId>
+ <artifactId>jjwt-jackson</artifactId>
+ <version>${jjwt.version}</version>
+ <scope>runtime</scope>
+ </dependency>
 
-    <!-- Tests -->
-    <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-test</artifactId>
-        <scope>test</scope>
-    </dependency>
-    <dependency>
-        <groupId>org.springframework.security</groupId>
-        <artifactId>spring-security-test</artifactId>
-        <scope>test</scope>
-    </dependency>
+ <!-- Tests -->
+ <dependency>
+ <groupId>org.springframework.boot</groupId>
+ <artifactId>spring-boot-starter-test</artifactId>
+ <scope>test</scope>
+ </dependency>
+ <dependency>
+ <groupId>org.springframework.security</groupId>
+ <artifactId>spring-security-test</artifactId>
+ <scope>test</scope>
+ </dependency>
 </dependencies>
 ```
 
@@ -506,9 +490,9 @@ lab07-spring-security/
 
 ---
 
-## 📁 SecurityConfig.java — Décortication ligne par ligne
+## SecurityConfig.java — Décortication ligne par ligne
 
-📁 `labs/lab07-spring-security/src/main/java/com/nexa/secu/config/SecurityConfig.java`
+ `labs/lab07-spring-security/src/main/java/com/nexa/secu/config/SecurityConfig.java`
 
 ```java
 package com.nexa.secu.config;
@@ -541,19 +525,19 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableMethodSecurity
 public class SecurityConfig {
 
-    private final JwtAuthenticationFilter jwtFilter;
+ private final JwtAuthenticationFilter jwtFilter;
 
-    // Injection par constructeur du filtre JWT
-    public SecurityConfig(JwtAuthenticationFilter jwtFilter) {
-        this.jwtFilter = jwtFilter;
-    }
+ // Injection par constructeur du filtre JWT
+ public SecurityConfig(JwtAuthenticationFilter jwtFilter) {
+ this.jwtFilter = jwtFilter;
+ }
 ```
 
 ### La méthode `filterChain()` — le cœur de la configuration
 
 ```java
-    @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+ @Bean
+ public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 ```
 
 `HttpSecurity http` est un objet builder qui permet de configurer la sécurité web.
@@ -562,8 +546,8 @@ Chaque méthode retourne `http` pour le chaînage (pattern builder).
 #### Étape 1 : Désactiver CSRF
 
 ```java
-        http
-            .csrf(csrf -> csrf.disable())
+ http
+ .csrf(csrf -> csrf.disable())
 ```
 
 **Pourquoi désactiver CSRF ?**
@@ -578,8 +562,8 @@ le navigateur envoie automatiquement les cookies de session. Dans une API REST a
 #### Étape 2 : Session Stateless
 
 ```java
-            .sessionManagement(session ->
-                session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+ .sessionManagement(session ->
+ session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 ```
 
 **Pourquoi STATELESS ?**
@@ -590,14 +574,14 @@ le navigateur envoie automatiquement les cookies de session. Dans une API REST a
 #### Étape 3 : Règles d'autorisation
 
 ```java
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/auth/**").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/produits/**").permitAll()
-                .requestMatchers(HttpMethod.POST, "/api/produits/**").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.PUT, "/api/produits/**").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.DELETE, "/api/produits/**").hasRole("ADMIN")
-                .anyRequest().authenticated()
-            )
+ .authorizeHttpRequests(auth -> auth
+ .requestMatchers("/api/auth/**").permitAll()
+ .requestMatchers(HttpMethod.GET, "/api/produits/**").permitAll()
+ .requestMatchers(HttpMethod.POST, "/api/produits/**").hasRole("ADMIN")
+ .requestMatchers(HttpMethod.PUT, "/api/produits/**").hasRole("ADMIN")
+ .requestMatchers(HttpMethod.DELETE, "/api/produits/**").hasRole("ADMIN")
+ .anyRequest().authenticated()
+ )
 ```
 
 **Analyse de chaque règle :**
@@ -623,7 +607,7 @@ avant `anyRequest()`.
 #### Étape 4 : Insérer le filtre JWT
 
 ```java
-            .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+ .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 ```
 
 Ajoute le filtre JWT **avant** le filtre d'authentification standard.
@@ -633,17 +617,17 @@ Spring Security ne tente l'authentification par formulaire.
 #### Étape 5 : Construire et retourner
 
 ```java
-        return http.build();
-    }
+ return http.build();
+ }
 ```
 
 ### Le bean PasswordEncoder
 
 ```java
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+ @Bean
+ public PasswordEncoder passwordEncoder() {
+ return new BCryptPasswordEncoder();
+ }
 }
 ```
 
@@ -656,9 +640,9 @@ Spring Security ne tente l'authentification par formulaire.
 
 ---
 
-## 📁 JwtUtil.java — Explication ligne par ligne
+## JwtUtil.java — Explication ligne par ligne
 
-📁 `labs/lab07-spring-security/src/main/java/com/nexa/secu/security/JwtUtil.java`
+ `labs/lab07-spring-security/src/main/java/com/nexa/secu/security/JwtUtil.java`
 
 ```java
 package com.nexa.secu.security;
@@ -688,40 +672,40 @@ On pourra faire `@Autowired private JwtUtil jwtUtil;` n'importe où.
 ### Constantes et clé secrète
 
 ```java
-    private static final String SECRET =
-        "cette-cle-est-un-secret-tres-long-dau-moins-256-bits-pour-hs256";
-    private static final long EXPIRATION_MS = 3600000; // 1 heure en millisecondes
+ private static final String SECRET =
+ "cette-cle-est-un-secret-tres-long-dau-moins-256-bits-pour-hs256";
+ private static final long EXPIRATION_MS = 3600000; // 1 heure en millisecondes
 
-    private final SecretKey key;
+ private final SecretKey key;
 
-    public JwtUtil() {
-        this.key = Keys.hmacShaKeyFor(SECRET.getBytes(StandardCharsets.UTF_8));
-    }
+ public JwtUtil() {
+ this.key = Keys.hmacShaKeyFor(SECRET.getBytes(StandardCharsets.UTF_8));
+ }
 ```
 
 **Analyse :**
 
 - `SECRET` : la clé secrète partagée. Elle doit faire **au moins 256 bits** (32 octets) pour HS256.
-  Cette chaîne de 56 caractères UTF-8 produit 56 octets (448 bits), ce qui est largement suffisant.
-  **En production, cette clé doit être externalisée** (variable d'environnement, Vault, etc.)
+ Cette chaîne de 56 caractères UTF-8 produit 56 octets (448 bits), ce qui est largement suffisant.
+ **En production, cette clé doit être externalisée** (variable d'environnement, Vault, etc.)
 
 - `EXPIRATION_MS = 3600000` : 1 heure. Pour 1h : `60 * 60 * 1000 = 3 600 000 ms`
 
 - `Keys.hmacShaKeyFor()` : fabrique une `SecretKey` à partir des bytes de la chaîne.
-  Cette clé sera utilisée pour **signer** et **vérifier** les tokens.
+ Cette clé sera utilisée pour **signer** et **vérifier** les tokens.
 
 ### Méthode `genererToken()`
 
 ```java
-    public String genererToken(String username, String role) {
-        return Jwts.builder()
-            .subject(username)
-            .claim("role", role)
-            .issuedAt(new Date())
-            .expiration(new Date(System.currentTimeMillis() + EXPIRATION_MS))
-            .signWith(key)
-            .compact();
-    }
+ public String genererToken(String username, String role) {
+ return Jwts.builder()
+ .subject(username)
+ .claim("role", role)
+ .issuedAt(new Date())
+ .expiration(new Date(System.currentTimeMillis() + EXPIRATION_MS))
+ .signWith(key)
+ .compact();
+ }
 ```
 
 Décortiquons chaque étape du **builder pattern** :
@@ -752,9 +736,9 @@ par défaut (HS256). La signature est calculée automatiquement.
 ### Méthode `extraireUsername()`
 
 ```java
-    public String extraireUsername(String token) {
-        return parseToken(token).getPayload().getSubject();
-    }
+ public String extraireUsername(String token) {
+ return parseToken(token).getPayload().getSubject();
+ }
 ```
 
 **Chaîne d'appels :**
@@ -765,9 +749,9 @@ par défaut (HS256). La signature est calculée automatiquement.
 ### Méthode `extraireRole()`
 
 ```java
-    public String extraireRole(String token) {
-        return parseToken(token).getPayload().get("role", String.class);
-    }
+ public String extraireRole(String token) {
+ return parseToken(token).getPayload().get("role", String.class);
+ }
 ```
 
 `.get("role", String.class)` : extrait un claim personnalisé par son nom, avec le type attendu.
@@ -776,14 +760,14 @@ Contrairement à `getSubject()` qui est standard, `"role"` est un claim personna
 ### Méthode `estTokenValide()`
 
 ```java
-    public boolean estTokenValide(String token) {
-        try {
-            parseToken(token);
-            return true;
-        } catch (JwtException | IllegalArgumentException e) {
-            return false;
-        }
-    }
+ public boolean estTokenValide(String token) {
+ try {
+ parseToken(token);
+ return true;
+ } catch (JwtException | IllegalArgumentException e) {
+ return false;
+ }
+ }
 ```
 
 **Pourquoi try/catch ?** `parseToken()` lève des exceptions si :
@@ -807,13 +791,13 @@ La méthode retourne simplement `true`/`false` au lieu de laisser l'exception se
 ### Méthode privée `parseToken()`
 
 ```java
-    private Claims parseToken(String token) {
-        return Jwts.parser()
-            .verifyWith(key)
-            .build()
-            .parseSignedClaims(token)
-            .getPayload();
-    }
+ private Claims parseToken(String token) {
+ return Jwts.parser()
+ .verifyWith(key)
+ .build()
+ .parseSignedClaims(token)
+ .getPayload();
+ }
 ```
 
 **Étapes :**
@@ -823,7 +807,7 @@ La méthode retourne simplement `true`/`false` au lieu de laisser l'exception se
 4. `.parseSignedClaims(token)` → parse et vérifie le token → retourne un `Jws<Claims>`
 5. `.getPayload()` → extrait le payload
 
-> ⚠️ Avec JJWT 0.12.x, l'API a changé par rapport à 0.11.x :
+> Avec JJWT 0.12.x, l'API a changé par rapport à 0.11.x :
 > - `parserBuilder()` → `parser()`
 > - `setSigningKey()` → `verifyWith()`
 > - `parseClaimsJws()` → `parseSignedClaims()`
@@ -831,9 +815,9 @@ La méthode retourne simplement `true`/`false` au lieu de laisser l'exception se
 
 ---
 
-## 📁 JwtAuthenticationFilter.java — Explication ligne par ligne
+## JwtAuthenticationFilter.java — Explication ligne par ligne
 
-📁 `labs/lab07-spring-security/src/main/java/com/nexa/secu/security/JwtAuthenticationFilter.java`
+ `labs/lab07-spring-security/src/main/java/com/nexa/secu/security/JwtAuthenticationFilter.java`
 
 ```java
 package com.nexa.secu.security;
@@ -871,11 +855,11 @@ si celle-ci est forwardée. `OncePerRequestFilter` s'en assure.
 ### Constructeur
 
 ```java
-    private final JwtUtil jwtUtil;
+ private final JwtUtil jwtUtil;
 
-    public JwtAuthenticationFilter(JwtUtil jwtUtil) {
-        this.jwtUtil = jwtUtil;
-    }
+ public JwtAuthenticationFilter(JwtUtil jwtUtil) {
+ this.jwtUtil = jwtUtil;
+ }
 ```
 
 Injection par constructeur du service JwtUtil. Spring injecte automatiquement le bean `@Component`.
@@ -883,11 +867,11 @@ Injection par constructeur du service JwtUtil. Spring injecte automatiquement le
 ### Méthode `doFilterInternal()`
 
 ```java
-    @Override
-    protected void doFilterInternal(HttpServletRequest request,
-                                    HttpServletResponse response,
-                                    FilterChain filterChain)
-                                    throws ServletException, IOException {
+ @Override
+ protected void doFilterInternal(HttpServletRequest request,
+ HttpServletResponse response,
+ FilterChain filterChain)
+ throws ServletException, IOException {
 ```
 
 C'est la méthode principale. Elle est appelée pour **chaque requête HTTP**.
@@ -895,7 +879,7 @@ C'est la méthode principale. Elle est appelée pour **chaque requête HTTP**.
 #### Étape 1 : Extraire le header Authorization
 
 ```java
-        String authHeader = request.getHeader("Authorization");
+ String authHeader = request.getHeader("Authorization");
 ```
 
 Le client envoie le token dans le header HTTP :
@@ -906,7 +890,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9...
 #### Étape 2 : Vérifier la présence d'un token Bearer
 
 ```java
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+ if (authHeader != null && authHeader.startsWith("Bearer ")) {
 ```
 
 Deux conditions :
@@ -919,20 +903,20 @@ Deux conditions :
 #### Étape 3 : Extraire le token
 
 ```java
-            String token = authHeader.substring(7);
+ String token = authHeader.substring(7);
 ```
 
 `"Bearer "` fait 7 caractères (B-e-a-r-e-r-espace). On extrait tout ce qui suit.
 
 ```
 "Bearer eyJhbGciOiJIUzI1NiJ9..."
-        └─────────── substring(7) ───────────┘
+ substring(7)
 ```
 
 #### Étape 4 : Valider le token
 
 ```java
-            if (jwtUtil.estTokenValide(token)) {
+ if (jwtUtil.estTokenValide(token)) {
 ```
 
 Vérifie que le token est syntaxiquement correct, signé avec la bonne clé, et non expiré.
@@ -940,8 +924,8 @@ Vérifie que le token est syntaxiquement correct, signé avec la bonne clé, et 
 #### Étape 5 : Extraire les informations
 
 ```java
-                String username = jwtUtil.extraireUsername(token);
-                String role = jwtUtil.extraireRole(token);
+ String username = jwtUtil.extraireUsername(token);
+ String role = jwtUtil.extraireRole(token);
 ```
 
 Extrait le username (subject) et le rôle (claim personnalisé) du token.
@@ -949,12 +933,12 @@ Extrait le username (subject) et le rôle (claim personnalisé) du token.
 #### Étape 6 : Créer l'objet Authentication
 
 ```java
-                UsernamePasswordAuthenticationToken authentication =
-                    new UsernamePasswordAuthenticationToken(
-                        username,
-                        null,
-                        List.of(new SimpleGrantedAuthority("ROLE_" + role))
-                    );
+ UsernamePasswordAuthenticationToken authentication =
+ new UsernamePasswordAuthenticationToken(
+ username,
+ null,
+ List.of(new SimpleGrantedAuthority("ROLE_" + role))
+ );
 ```
 
 **`UsernamePasswordAuthenticationToken` :** C'est l'implémentation standard de l'interface
@@ -978,7 +962,7 @@ Dans notre cas, un utilisateur a un seul rôle.
 #### Étape 7 : Enregistrer dans le SecurityContext
 
 ```java
-                SecurityContextHolder.getContext().setAuthentication(authentication);
+ SecurityContextHolder.getContext().setAuthentication(authentication);
 ```
 
 **`SecurityContextHolder`** est le conteneur global qui stocke le contexte de sécurité
@@ -994,10 +978,10 @@ Spring Security utilisera cette information pour :
 #### Étape 8 : Continuer la chaîne
 
 ```java
-        }
+ }
 
-        filterChain.doFilter(request, response);
-    }
+ filterChain.doFilter(request, response);
+ }
 }
 ```
 
@@ -1010,27 +994,27 @@ Si aucun token valide n'est trouvé :
 
 ---
 
-## 📁 AppConfig.java — Configuration des beans
+## AppConfig.java — Configuration des beans
 
-📁 `labs/lab07-spring-security/src/main/java/com/nexa/secu/config/AppConfig.java`
+ `labs/lab07-spring-security/src/main/java/com/nexa/secu/config/AppConfig.java`
 
 ```java
 @Configuration
 public class AppConfig {
 
-    @Bean
-    public UserDetailsService userDetailsService(UtilisateurRepository repo) {
-        return username -> {
-            Utilisateur u = repo.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException(
-                    "Utilisateur introuvable : " + username));
-            return org.springframework.security.core.userdetails.User.builder()
-                .username(u.getUsername())
-                .password(u.getPassword())
-                .roles(u.getRole())
-                .build();
-        };
-    }
+ @Bean
+ public UserDetailsService userDetailsService(UtilisateurRepository repo) {
+ return username -> {
+ Utilisateur u = repo.findByUsername(username)
+ .orElseThrow(() -> new UsernameNotFoundException(
+ "Utilisateur introuvable : " + username));
+ return org.springframework.security.core.userdetails.User.builder()
+ .username(u.getUsername())
+ .password(u.getPassword())
+ .roles(u.getRole())
+ .build();
+ };
+ }
 ```
 
 **`UserDetailsService` :** Interface fonctionnelle avec une seule méthode
@@ -1046,11 +1030,11 @@ un utilisateur lors du login.
 | `.roles(u.getRole())` | `"ADMIN"` | Rôle (préfixé ROLE_ automatiquement) |
 
 ```java
-    @Bean
-    public AuthenticationManager authenticationManager(
-            AuthenticationConfiguration config) throws Exception {
-        return config.getAuthenticationManager();
-    }
+ @Bean
+ public AuthenticationManager authenticationManager(
+ AuthenticationConfiguration config) throws Exception {
+ return config.getAuthenticationManager();
+ }
 ```
 
 **`AuthenticationManager` :** Bean nécessaire pour le login programmatique (dans AuthController).
@@ -1058,18 +1042,18 @@ un utilisateur lors du login.
 par défaut qui utilise notre `UserDetailsService` et notre `PasswordEncoder`.
 
 ```java
-    @Bean
-    public CommandLineRunner initUsers(UtilisateurRepository repo,
-                                       PasswordEncoder encoder) {
-        return args -> {
-            if (!repo.existsByUsername("admin")) {
-                repo.save(new Utilisateur("admin", encoder.encode("admin123"), "ADMIN"));
-            }
-            if (!repo.existsByUsername("user")) {
-                repo.save(new Utilisateur("user", encoder.encode("user123"), "USER"));
-            }
-        };
-    }
+ @Bean
+ public CommandLineRunner initUsers(UtilisateurRepository repo,
+ PasswordEncoder encoder) {
+ return args -> {
+ if (!repo.existsByUsername("admin")) {
+ repo.save(new Utilisateur("admin", encoder.encode("admin123"), "ADMIN"));
+ }
+ if (!repo.existsByUsername("user")) {
+ repo.save(new Utilisateur("user", encoder.encode("user123"), "USER"));
+ }
+ };
+ }
 }
 ```
 
@@ -1086,30 +1070,30 @@ de test en base si ils n'existent pas déjà.
 
 ---
 
-## 📁 Utilisateur.java — L'entité JPA
+## Utilisateur.java — L'entité JPA
 
-📁 `labs/lab07-spring-security/src/main/java/com/nexa/secu/entity/Utilisateur.java`
+ `labs/lab07-spring-security/src/main/java/com/nexa/secu/entity/Utilisateur.java`
 
 ```java
 @Entity
 @Table(name = "utilisateurs")
 public class Utilisateur {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+ @Id
+ @GeneratedValue(strategy = GenerationType.IDENTITY)
+ private Long id;
 
-    @Column(unique = true, nullable = false)
-    private String username;
+ @Column(unique = true, nullable = false)
+ private String username;
 
-    @Column(nullable = false)
-    private String password;
+ @Column(nullable = false)
+ private String password;
 
-    @Column(nullable = false)
-    private String role;
+ @Column(nullable = false)
+ private String role;
 
-    private boolean actif = true;
-    // ... constructeurs, getters, setters
+ private boolean actif = true;
+ // ... constructeurs, getters, setters
 }
 ```
 
@@ -1125,14 +1109,14 @@ public class Utilisateur {
 
 ---
 
-## 📁 UtilisateurRepository.java — Accès aux données
+## UtilisateurRepository.java — Accès aux données
 
-📁 `labs/lab07-spring-security/src/main/java/com/nexa/secu/repository/UtilisateurRepository.java`
+ `labs/lab07-spring-security/src/main/java/com/nexa/secu/repository/UtilisateurRepository.java`
 
 ```java
 public interface UtilisateurRepository extends JpaRepository<Utilisateur, Long> {
-    Optional<Utilisateur> findByUsername(String username);
-    boolean existsByUsername(String username);
+ Optional<Utilisateur> findByUsername(String username);
+ boolean existsByUsername(String username);
 }
 ```
 
@@ -1145,24 +1129,24 @@ public interface UtilisateurRepository extends JpaRepository<Utilisateur, Long> 
 
 ---
 
-## 📁 UtilisateurService.java — Logique métier
+## UtilisateurService.java — Logique métier
 
-📁 `labs/lab07-spring-security/src/main/java/com/nexa/secu/service/UtilisateurService.java`
+ `labs/lab07-spring-security/src/main/java/com/nexa/secu/service/UtilisateurService.java`
 
 ```java
 @Service
 public class UtilisateurService {
 
-    private final UtilisateurRepository repository;
-    private final PasswordEncoder passwordEncoder;
+ private final UtilisateurRepository repository;
+ private final PasswordEncoder passwordEncoder;
 
-    public Utilisateur creer(String username, String password, String role) {
-        if (repository.existsByUsername(username)) {
-            throw new IllegalArgumentException("Nom d'utilisateur déjà pris");
-        }
-        Utilisateur u = new Utilisateur(username, passwordEncoder.encode(password), role);
-        return repository.save(u);
-    }
+ public Utilisateur creer(String username, String password, String role) {
+ if (repository.existsByUsername(username)) {
+ throw new IllegalArgumentException("Nom d'utilisateur déjà pris");
+ }
+ Utilisateur u = new Utilisateur(username, passwordEncoder.encode(password), role);
+ return repository.save(u);
+ }
 }
 ```
 
@@ -1175,9 +1159,9 @@ public class UtilisateurService {
 
 ---
 
-## 📁 AuthController.java — Le flux de login
+## AuthController.java — Le flux de login
 
-📁 `labs/lab07-spring-security/src/main/java/com/nexa/secu/controller/AuthController.java`
+ `labs/lab07-spring-security/src/main/java/com/nexa/secu/controller/AuthController.java`
 
 ### Structure
 
@@ -1186,10 +1170,10 @@ public class UtilisateurService {
 @RequestMapping("/api/auth")
 public class AuthController {
 
-    private final AuthenticationManager authManager;
-    private final JwtUtil jwtUtil;
-    private final UserDetailsService userDetailsService;
-    private final PasswordEncoder passwordEncoder;
+ private final AuthenticationManager authManager;
+ private final JwtUtil jwtUtil;
+ private final UserDetailsService userDetailsService;
+ private final PasswordEncoder passwordEncoder;
 ```
 
 4 dépendances injectées :
@@ -1201,31 +1185,31 @@ public class AuthController {
 ### La méthode `login()`
 
 ```java
-    @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody Map<String, String> request) {
+ @PostMapping("/login")
+ public ResponseEntity<?> login(@RequestBody Map<String, String> request) {
 ```
 
 L'endpoint reçoit un JSON :
 ```json
 {
-    "username": "admin",
-    "password": "admin123"
+ "username": "admin",
+ "password": "admin123"
 }
 ```
 
 #### Étape 1 : Extraire credentials
 
 ```java
-        try {
-            String username = request.get("username");
-            String password = request.get("password");
+ try {
+ String username = request.get("username");
+ String password = request.get("password");
 ```
 
 #### Étape 2 : Authentifier
 
 ```java
-            authManager.authenticate(
-                new UsernamePasswordAuthenticationToken(username, password));
+ authManager.authenticate(
+ new UsernamePasswordAuthenticationToken(username, password));
 ```
 
 **Ce qu'il se passe en interne :**
@@ -1239,10 +1223,10 @@ L'endpoint reçoit un JSON :
 #### Étape 3 : Récupérer le rôle
 
 ```java
-            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-            String role = userDetails.getAuthorities().stream()
-                .findFirst().orElse(new SimpleGrantedAuthority("ROLE_USER"))
-                .getAuthority().replace("ROLE_", "");
+ UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+ String role = userDetails.getAuthorities().stream()
+ .findFirst().orElse(new SimpleGrantedAuthority("ROLE_USER"))
+ .getAuthority().replace("ROLE_", "");
 ```
 
 **Analyse :**
@@ -1255,25 +1239,25 @@ L'endpoint reçoit un JSON :
 #### Étape 4 : Générer le token
 
 ```java
-            String token = jwtUtil.genererToken(username, role);
-            return ResponseEntity.ok(Map.of("token", token));
+ String token = jwtUtil.genererToken(username, role);
+ return ResponseEntity.ok(Map.of("token", token));
 ```
 
 Réponse JSON :
 ```json
 {
-    "token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsInJvbGUiOiJBRE1JTiJ9..."
+ "token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsInJvbGUiOiJBRE1JTiJ9..."
 }
 ```
 
 #### Étape 5 : Gérer l'échec
 
 ```java
-        } catch (AuthenticationException e) {
-            return ResponseEntity.status(401)
-                .body(Map.of("error", "Identifiants invalides"));
-        }
-    }
+ } catch (AuthenticationException e) {
+ return ResponseEntity.status(401)
+ .body(Map.of("error", "Identifiants invalides"));
+ }
+ }
 }
 ```
 
@@ -1301,30 +1285,30 @@ Requêtes suivantes :
 
 ---
 
-## 📁 ProduitController.java — @PreAuthorize
+## ProduitController.java — @PreAuthorize
 
-📁 `labs/lab07-spring-security/src/main/java/com/nexa/secu/controller/ProduitController.java`
+ `labs/lab07-spring-security/src/main/java/com/nexa/secu/controller/ProduitController.java`
 
 ```java
 @RestController
 @RequestMapping("/api/produits")
 public class ProduitController {
 
-    @GetMapping("/public")
-    public Map<String, String> listePublique() {
-        return Map.of("message", "Liste publique des produits accessible à tous");
-    }
+ @GetMapping("/public")
+ public Map<String, String> listePublique() {
+ return Map.of("message", "Liste publique des produits accessible à tous");
+ }
 ```
 
 **Endpoint public :** aucun contrôle d'accès. N'importe qui peut y accéder.
 La règle `permitAll()` dans `SecurityConfig` le permet.
 
 ```java
-    @GetMapping("/admin")
-    @PreAuthorize("hasRole('ADMIN')")
-    public Map<String, String> espaceAdmin() {
-        return Map.of("message", "Espace administration — réservé aux ADMIN");
-    }
+ @GetMapping("/admin")
+ @PreAuthorize("hasRole('ADMIN')")
+ public Map<String, String> espaceAdmin() {
+ return Map.of("message", "Espace administration — réservé aux ADMIN");
+ }
 ```
 
 **`@PreAuthorize("hasRole('ADMIN')")` :**
@@ -1334,11 +1318,11 @@ La règle `permitAll()` dans `SecurityConfig` le permet.
 - Si OK → la méthode s'exécute normalement
 
 ```java
-    @GetMapping("/user")
-    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
-    public Map<String, String> espaceUtilisateur() {
-        return Map.of("message", "Espace utilisateur — accessible aux ADMIN et USER");
-    }
+ @GetMapping("/user")
+ @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
+ public Map<String, String> espaceUtilisateur() {
+ return Map.of("message", "Espace utilisateur — accessible aux ADMIN et USER");
+ }
 }
 ```
 
@@ -1376,15 +1360,15 @@ Exemple de `@PostAuthorize` :
 @GetMapping("/{id}")
 @PostAuthorize("returnObject.createdBy == authentication.name")
 public Document getDocument(@PathVariable Long id) {
-    return documentService.findById(id);
+ return documentService.findById(id);
 }
 ```
 
 ---
 
-## 📁 application.properties — Configuration H2
+## application.properties — Configuration H2
 
-📁 `labs/lab07-spring-security/src/main/resources/application.properties`
+ `labs/lab07-spring-security/src/main/resources/application.properties`
 
 ```properties
 spring.application.name=lab07-spring-security
@@ -1404,9 +1388,9 @@ spring.jpa.show-sql=false
 
 ---
 
-## 📁 Tests — JwtUtilTest.java
+## Tests — JwtUtilTest.java
 
-📁 `labs/lab07-spring-security/src/test/java/com/nexa/secu/security/JwtUtilTest.java`
+ `labs/lab07-spring-security/src/test/java/com/nexa/secu/security/JwtUtilTest.java`
 
 ### Structure du test
 
@@ -1414,7 +1398,7 @@ spring.jpa.show-sql=false
 @DisplayName("Tests du JwtUtil")
 class JwtUtilTest {
 
-    private final JwtUtil jwtUtil = new JwtUtil();
+ private final JwtUtil jwtUtil = new JwtUtil();
 ```
 
 **Pas de mock** : on teste le `JwtUtil` réel. La classe n'a pas de dépendances externes
@@ -1423,18 +1407,18 @@ class JwtUtilTest {
 ### Groupe 1 : Génération et validation
 
 ```java
-    @Nested
-    @DisplayName("Génération et validation de token")
-    class GenerationValidation {
+ @Nested
+ @DisplayName("Génération et validation de token")
+ class GenerationValidation {
 
-        @Test
-        @DisplayName("Un token généré est valide")
-        void tokenGenereEstValide() {
-            String token = jwtUtil.genererToken("alice", "ADMIN");
-            assertNotNull(token);
-            assertFalse(token.isEmpty());
-            assertTrue(jwtUtil.estTokenValide(token));
-        }
+ @Test
+ @DisplayName("Un token généré est valide")
+ void tokenGenereEstValide() {
+ String token = jwtUtil.genererToken("alice", "ADMIN");
+ assertNotNull(token);
+ assertFalse(token.isEmpty());
+ assertTrue(jwtUtil.estTokenValide(token));
+ }
 ```
 
 **Vérifications :**
@@ -1443,23 +1427,23 @@ class JwtUtilTest {
 3. Le token passe la validation (signature OK, pas expiré)
 
 ```java
-        @Test
-        @DisplayName("Extraire le username d'un token valide")
-        void extraireUsername() {
-            String token = jwtUtil.genererToken("bob", "USER");
-            assertEquals("bob", jwtUtil.extraireUsername(token));
-        }
+ @Test
+ @DisplayName("Extraire le username d'un token valide")
+ void extraireUsername() {
+ String token = jwtUtil.genererToken("bob", "USER");
+ assertEquals("bob", jwtUtil.extraireUsername(token));
+ }
 ```
 
 Vérifie l'extraction du sujet (subject → username).
 
 ```java
-        @Test
-        @DisplayName("Extraire le rôle d'un token valide")
-        void extraireRole() {
-            String token = jwtUtil.genererToken("charlie", "ADMIN");
-            assertEquals("ADMIN", jwtUtil.extraireRole(token));
-        }
+ @Test
+ @DisplayName("Extraire le rôle d'un token valide")
+ void extraireRole() {
+ String token = jwtUtil.genererToken("charlie", "ADMIN");
+ assertEquals("ADMIN", jwtUtil.extraireRole(token));
+ }
 ```
 
 Vérifie l'extraction du claim personnalisé `role`.
@@ -1467,53 +1451,53 @@ Vérifie l'extraction du claim personnalisé `role`.
 ### Groupe 2 : Tokens invalides
 
 ```java
-    @Nested
-    @DisplayName("Tokens invalides")
-    class TokensInvalides {
+ @Nested
+ @DisplayName("Tokens invalides")
+ class TokensInvalides {
 
-        @Test
-        @DisplayName("Token vide ou null est invalide")
-        void tokenVideNullInvalide() {
-            assertFalse(jwtUtil.estTokenValide(null));
-            assertFalse(jwtUtil.estTokenValide(""));
-        }
+ @Test
+ @DisplayName("Token vide ou null est invalide")
+ void tokenVideNullInvalide() {
+ assertFalse(jwtUtil.estTokenValide(null));
+ assertFalse(jwtUtil.estTokenValide(""));
+ }
 ```
 
 Test des cas limites : null et chaîne vide. La méthode `estTokenValide` doit retourner
 `false` sans lever d'exception.
 
 ```java
-        @Test
-        @DisplayName("Token modifié (tampered) est invalide")
-        void tokenModifieInvalide() {
-            String token = jwtUtil.genererToken("dave", "USER");
-            String tokenModifie = token.substring(0, token.length() - 3) + "xxx";
-            assertFalse(jwtUtil.estTokenValide(tokenModifie));
-        }
+ @Test
+ @DisplayName("Token modifié (tampered) est invalide")
+ void tokenModifieInvalide() {
+ String token = jwtUtil.genererToken("dave", "USER");
+ String tokenModifie = token.substring(0, token.length() - 3) + "xxx";
+ assertFalse(jwtUtil.estTokenValide(tokenModifie));
+ }
 ```
 
 **Test d'intégrité :** Si quelqu'un modifie le token (ne serait-ce qu'un caractère),
 la signature ne correspondra plus et le token sera rejeté.
 
 ```java
-        @Test
-        @DisplayName("Token aléatoire est invalide")
-        void tokenAleatoireInvalide() {
-            assertFalse(jwtUtil.estTokenValide("eyJhbGciOiJIUzI1NiJ9.abc.def"));
-        }
+ @Test
+ @DisplayName("Token aléatoire est invalide")
+ void tokenAleatoireInvalide() {
+ assertFalse(jwtUtil.estTokenValide("eyJhbGciOiJIUzI1NiJ9.abc.def"));
+ }
 ```
 
 Même un token qui ressemble syntaxiquement à un JWT mais avec un contenu aléatoire
 doit être rejeté.
 
 ```java
-        @Test
-        @DisplayName("Tokens différents pour le même utilisateur")
-        void tokensDifferentsPourMemeUtilisateur() {
-            String t1 = jwtUtil.genererToken("eve", "USER");
-            String t2 = jwtUtil.genererToken("eve", "USER");
-            assertNotEquals(t1, t2);
-        }
+ @Test
+ @DisplayName("Tokens différents pour le même utilisateur")
+ void tokensDifferentsPourMemeUtilisateur() {
+ String t1 = jwtUtil.genererToken("eve", "USER");
+ String t2 = jwtUtil.genererToken("eve", "USER");
+ assertNotEquals(t1, t2);
+ }
 ```
 
 **Pourquoi les tokens sont différents ?** Le claim `iat` (issued at) change à chaque
@@ -1521,9 +1505,9 @@ appel car il contient le timestamp courant. Donc le hash global est différent.
 
 ---
 
-## 📁 Tests — SecurityIntegrationTest.java
+## Tests — SecurityIntegrationTest.java
 
-📁 `labs/lab07-spring-security/src/test/java/com/nexa/secu/controller/SecurityIntegrationTest.java`
+ `labs/lab07-spring-security/src/test/java/com/nexa/secu/controller/SecurityIntegrationTest.java`
 
 ### Configuration du test
 
@@ -1533,8 +1517,8 @@ appel car il contient le timestamp courant. Donc le hash global est différent.
 @DisplayName("Tests de sécurité — intégration")
 class SecurityIntegrationTest {
 
-    @Autowired private MockMvc mockMvc;
-    @Autowired private JwtUtil jwtUtil;
+ @Autowired private MockMvc mockMvc;
+ @Autowired private JwtUtil jwtUtil;
 ```
 
 **Annotations :**
@@ -1545,30 +1529,30 @@ class SecurityIntegrationTest {
 ### Groupe 1 : Accès public
 
 ```java
-    @Nested
-    @DisplayName("Accès public")
-    class AccesPublic {
+ @Nested
+ @DisplayName("Accès public")
+ class AccesPublic {
 
-        @Test
-        @DisplayName("Sans token : l'endpoint public est accessible")
-        void sansTokenPublicAccessible() throws Exception {
-            mockMvc.perform(get("/api/produits/public"))
-                .andExpect(status().isOk());
-        }
+ @Test
+ @DisplayName("Sans token : l'endpoint public est accessible")
+ void sansTokenPublicAccessible() throws Exception {
+ mockMvc.perform(get("/api/produits/public"))
+ .andExpect(status().isOk());
+ }
 ```
 
 **Ce test vérifie :** l'endpoint `/api/produits/public` est bien accessible sans aucune
 authentification. La règle `permitAll()` fonctionne.
 
 ```java
-        @Test
-        @DisplayName("Avec token USER : l'endpoint public est accessible")
-        void avecTokenUserPublicAccessible() throws Exception {
-            String token = jwtUtil.genererToken("user", "USER");
-            mockMvc.perform(get("/api/produits/public")
-                    .header("Authorization", "Bearer " + token))
-                .andExpect(status().isOk());
-        }
+ @Test
+ @DisplayName("Avec token USER : l'endpoint public est accessible")
+ void avecTokenUserPublicAccessible() throws Exception {
+ String token = jwtUtil.genererToken("user", "USER");
+ mockMvc.perform(get("/api/produits/public")
+ .header("Authorization", "Bearer " + token))
+ .andExpect(status().isOk());
+ }
 ```
 
 Même avec un token, l'endpoint public reste accessible. Pas de régression.
@@ -1576,58 +1560,58 @@ Même avec un token, l'endpoint public reste accessible. Pas de régression.
 ### Groupe 2 : Contrôle d'accès par rôle
 
 ```java
-    @Nested
-    @DisplayName("Contrôle d'accès par rôle")
-    class ControleAcces {
+ @Nested
+ @DisplayName("Contrôle d'accès par rôle")
+ class ControleAcces {
 
-        @Test
-        @DisplayName("Token ADMIN peut accéder à l'espace admin")
-        void adminAccedeAdmin() throws Exception {
-            String token = jwtUtil.genererToken("admin", "ADMIN");
-            mockMvc.perform(get("/api/produits/admin")
-                    .header("Authorization", "Bearer " + token))
-                .andExpect(status().isOk());
-        }
+ @Test
+ @DisplayName("Token ADMIN peut accéder à l'espace admin")
+ void adminAccedeAdmin() throws Exception {
+ String token = jwtUtil.genererToken("admin", "ADMIN");
+ mockMvc.perform(get("/api/produits/admin")
+ .header("Authorization", "Bearer " + token))
+ .andExpect(status().isOk());
+ }
 ```
 
 **ADMIN accède à l'espace admin** : token avec rôle ADMIN → `@PreAuthorize("hasRole('ADMIN')")` → OK.
 
 ```java
-        @Test
-        @DisplayName("Token USER ne peut PAS accéder à l'espace admin → 403")
-        void userNePeutPasAccederAdmin() throws Exception {
-            String token = jwtUtil.genererToken("user", "USER");
-            mockMvc.perform(get("/api/produits/admin")
-                    .header("Authorization", "Bearer " + token))
-                .andExpect(status().isForbidden());
-        }
+ @Test
+ @DisplayName("Token USER ne peut PAS accéder à l'espace admin → 403")
+ void userNePeutPasAccederAdmin() throws Exception {
+ String token = jwtUtil.genererToken("user", "USER");
+ mockMvc.perform(get("/api/produits/admin")
+ .header("Authorization", "Bearer " + token))
+ .andExpect(status().isForbidden());
+ }
 ```
 
 **USER ne peut pas accéder à l'espace admin** : token USER → `hasRole('ADMIN')` → 403 Forbidden.
 C'est le test de contrôle d'accès le plus important.
 
 ```java
-        @Test
-        @DisplayName("Token USER peut accéder à l'espace user")
-        void userAccedeUser() throws Exception {
-            String token = jwtUtil.genererToken("user", "USER");
-            mockMvc.perform(get("/api/produits/user")
-                    .header("Authorization", "Bearer " + token))
-                .andExpect(status().isOk());
-        }
+ @Test
+ @DisplayName("Token USER peut accéder à l'espace user")
+ void userAccedeUser() throws Exception {
+ String token = jwtUtil.genererToken("user", "USER");
+ mockMvc.perform(get("/api/produits/user")
+ .header("Authorization", "Bearer " + token))
+ .andExpect(status().isOk());
+ }
 ```
 
 USER entre dans l'espace user car `hasAnyRole('ADMIN', 'USER')` inclut USER.
 
 ```java
-        @Test
-        @DisplayName("Token ADMIN peut accéder à l'espace user (hasAnyRole)")
-        void adminAccedeUser() throws Exception {
-            String token = jwtUtil.genererToken("admin", "ADMIN");
-            mockMvc.perform(get("/api/produits/user")
-                    .header("Authorization", "Bearer " + token))
-                .andExpect(status().isOk());
-        }
+ @Test
+ @DisplayName("Token ADMIN peut accéder à l'espace user (hasAnyRole)")
+ void adminAccedeUser() throws Exception {
+ String token = jwtUtil.genererToken("admin", "ADMIN");
+ mockMvc.perform(get("/api/produits/user")
+ .header("Authorization", "Bearer " + token))
+ .andExpect(status().isOk());
+ }
 ```
 
 ADMIN entre aussi dans l'espace user car `hasAnyRole('ADMIN', 'USER')` inclut ADMIN.
@@ -1635,52 +1619,52 @@ ADMIN entre aussi dans l'espace user car `hasAnyRole('ADMIN', 'USER')` inclut AD
 ### Groupe 3 : Authentification
 
 ```java
-    @Nested
-    @DisplayName("Authentification")
-    class Authentification {
+ @Nested
+ @DisplayName("Authentification")
+ class Authentification {
 
-        @Test
-        @DisplayName("Sans token : endpoint sécurisé → 403 Forbidden")
-        void sansTokenEndpointSecurise() throws Exception {
-            mockMvc.perform(get("/api/produits/admin"))
-                .andExpect(status().isForbidden());
-        }
+ @Test
+ @DisplayName("Sans token : endpoint sécurisé → 403 Forbidden")
+ void sansTokenEndpointSecurise() throws Exception {
+ mockMvc.perform(get("/api/produits/admin"))
+ .andExpect(status().isForbidden());
+ }
 ```
 
 Aucun token → pas d'authentification → un endpoint protégé retourne 403.
 
 ```java
-        @Test
-        @DisplayName("Token invalide → 403 Forbidden")
-        void tokenInvalide() throws Exception {
-            mockMvc.perform(get("/api/produits/user")
-                    .header("Authorization", "Bearer token_invalide"))
-                .andExpect(status().isForbidden());
-        }
+ @Test
+ @DisplayName("Token invalide → 403 Forbidden")
+ void tokenInvalide() throws Exception {
+ mockMvc.perform(get("/api/produits/user")
+ .header("Authorization", "Bearer token_invalide"))
+ .andExpect(status().isForbidden());
+ }
 ```
 
 Un token invalide est traité comme "pas authentifié" → 403.
 
 ```java
-        @Test
-        @DisplayName("Header Authorization absent → 403")
-        void headerAuthorizationAbsent() throws Exception {
-            mockMvc.perform(get("/api/produits/user"))
-                .andExpect(status().isForbidden());
-        }
+ @Test
+ @DisplayName("Header Authorization absent → 403")
+ void headerAuthorizationAbsent() throws Exception {
+ mockMvc.perform(get("/api/produits/user"))
+ .andExpect(status().isForbidden());
+ }
 ```
 
 Pas de header `Authorization` du tout → 403.
 
 ```java
-        @Test
-        @DisplayName("Header Authorization format incorrect → 403")
-        void headerFormatIncorrect() throws Exception {
-            String token = jwtUtil.genererToken("user", "USER");
-            mockMvc.perform(get("/api/produits/user")
-                    .header("Authorization", token))  // Sans "Bearer "
-                .andExpect(status().isForbidden());
-        }
+ @Test
+ @DisplayName("Header Authorization format incorrect → 403")
+ void headerFormatIncorrect() throws Exception {
+ String token = jwtUtil.genererToken("user", "USER");
+ mockMvc.perform(get("/api/produits/user")
+ .header("Authorization", token)) // Sans "Bearer "
+ .andExpect(status().isForbidden());
+ }
 ```
 
 Le token est valide mais le préfixe `Bearer ` est absent → le filtre ignore le header → 403.
@@ -1702,16 +1686,14 @@ Le token est valide mais le préfixe `Bearer ` est absent → le filtre ignore l
 
 ---
 
-──────────────────────────────────────────
-PARTIE 3 — LAB (20 min)
-──────────────────────────────────────────
+## PARTIE 3 -- LAB (20 min)
 
-## 🎯 Objectif
+## Objectif
 
 Ajouter un rôle **MODERATOR** et un endpoint `/api/produits/moderate` accessible
 uniquement aux rôles **MODERATOR** et **ADMIN**.
 
-## 📋 Consignes
+## Consignes
 
 ### Étape 1 : Créer l'utilisateur MODERATOR
 
@@ -1719,7 +1701,7 @@ Dans `AppConfig.initUsers()`, ajouter un utilisateur de test :
 
 ```java
 if (!repo.existsByUsername("moderator")) {
-    repo.save(new Utilisateur("moderator", encoder.encode("mod123"), "MODERATOR"));
+ repo.save(new Utilisateur("moderator", encoder.encode("mod123"), "MODERATOR"));
 }
 ```
 
@@ -1729,7 +1711,7 @@ if (!repo.existsByUsername("moderator")) {
 @GetMapping("/moderate")
 @PreAuthorize("hasAnyRole('ADMIN', 'MODERATOR')")
 public Map<String, String> espaceModeration() {
-    return Map.of("message", "Espace modération — réservé aux ADMIN et MODERATOR");
+ return Map.of("message", "Espace modération — réservé aux ADMIN et MODERATOR");
 }
 ```
 
@@ -1747,43 +1729,43 @@ Dans `SecurityIntegrationTest`, ajouter une nouvelle classe imbriquée :
 @DisplayName("Rôle MODERATOR")
 class RoleModerator {
 
-    @Test
-    @DisplayName("Token MODERATOR peut accéder à l'espace modération")
-    void moderatorAccedeModeration() throws Exception {
-        String token = jwtUtil.genererToken("moderator", "MODERATOR");
-        mockMvc.perform(get("/api/produits/moderate")
-                .header("Authorization", "Bearer " + token))
-            .andExpect(status().isOk());
-    }
+ @Test
+ @DisplayName("Token MODERATOR peut accéder à l'espace modération")
+ void moderatorAccedeModeration() throws Exception {
+ String token = jwtUtil.genererToken("moderator", "MODERATOR");
+ mockMvc.perform(get("/api/produits/moderate")
+ .header("Authorization", "Bearer " + token))
+ .andExpect(status().isOk());
+ }
 
-    @Test
-    @DisplayName("Token ADMIN peut accéder à l'espace modération")
-    void adminAccedeModeration() throws Exception {
-        String token = jwtUtil.genererToken("admin", "ADMIN");
-        mockMvc.perform(get("/api/produits/moderate")
-                .header("Authorization", "Bearer " + token))
-            .andExpect(status().isOk());
-    }
+ @Test
+ @DisplayName("Token ADMIN peut accéder à l'espace modération")
+ void adminAccedeModeration() throws Exception {
+ String token = jwtUtil.genererToken("admin", "ADMIN");
+ mockMvc.perform(get("/api/produits/moderate")
+ .header("Authorization", "Bearer " + token))
+ .andExpect(status().isOk());
+ }
 
-    @Test
-    @DisplayName("Token USER ne peut PAS accéder à l'espace modération → 403")
-    void userNePeutPasAccederModeration() throws Exception {
-        String token = jwtUtil.genererToken("user", "USER");
-        mockMvc.perform(get("/api/produits/moderate")
-                .header("Authorization", "Bearer " + token))
-            .andExpect(status().isForbidden());
-    }
+ @Test
+ @DisplayName("Token USER ne peut PAS accéder à l'espace modération → 403")
+ void userNePeutPasAccederModeration() throws Exception {
+ String token = jwtUtil.genererToken("user", "USER");
+ mockMvc.perform(get("/api/produits/moderate")
+ .header("Authorization", "Bearer " + token))
+ .andExpect(status().isForbidden());
+ }
 
-    @Test
-    @DisplayName("Sans token : espace modération → 403")
-    void sansTokenModeration() throws Exception {
-        mockMvc.perform(get("/api/produits/moderate"))
-            .andExpect(status().isForbidden());
-    }
+ @Test
+ @DisplayName("Sans token : espace modération → 403")
+ void sansTokenModeration() throws Exception {
+ mockMvc.perform(get("/api/produits/moderate"))
+ .andExpect(status().isForbidden());
+ }
 }
 ```
 
-## ✅ Critères de réussite
+## Critères de réussite
 
 - [ ] L'endpoint `/api/produits/moderate` retourne 200 avec les tokens ADMIN et MODERATOR
 - [ ] L'endpoint retourne 403 avec un token USER
@@ -1793,9 +1775,7 @@ class RoleModerator {
 
 ---
 
-──────────────────────────────────────────
-FICHE MÉMO — Module 7
-──────────────────────────────────────────
+## FICHE MEMO -- Module 7
 
 ## Annotations de configuration Spring Security
 

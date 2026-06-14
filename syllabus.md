@@ -6,7 +6,7 @@
 
 ## Objectifs pédagogiques
 
-À l'issue de cette formation, le stagiaire sera capable de :
+A l'issue de cette formation, vous serez capable de :
 
 1. **Concevoir et rédiger** des tests unitaires de qualité avec JUnit 5 et Mockito
 2. **Appliquer** la méthodologie TDD (Test-Driven Development) en Java
@@ -65,12 +65,12 @@
 - Présentation de JUnit 5 : architecture (Jupiter, Vintage, Platform)
 - L'annotation `@Test` : signature, visibilité, valeur de retour `void`
 - Les assertions fondamentales :
-  - `assertEquals(expected, actual)` — égalité par `equals()`
-  - `assertTrue(condition)` / `assertFalse(condition)` — conditions booléennes
-  - `assertNull(value)` / `assertNotNull(value)` — test de nullité
-  - `assertSame(expected, actual)` — égalité par référence (`==`)
-  - `assertThrows(Class<T>, Executable)` — validation d'exception
-  - `assertAll(Executable...)` — exécution groupée (toutes les assertions s'exécutent même si l'une échoue)
+ - `assertEquals(expected, actual)` — égalité par `equals()`
+ - `assertTrue(condition)` / `assertFalse(condition)` — conditions booléennes
+ - `assertNull(value)` / `assertNotNull(value)` — test de nullité
+ - `assertSame(expected, actual)` — égalité par référence (`==`)
+ - `assertThrows(Class<T>, Executable)` — validation d'exception
+ - `assertAll(Executable...)` — exécution groupée (toutes les assertions s'exécutent même si l'une échoue)
 
 **TP Lab01 — Fondamentaux (45 min) :**
 - Implémenter et tester une classe `Calculatrice`
@@ -88,19 +88,19 @@
 
 **Contenu théorique (45 min) :**
 - Le cycle de vie JUnit 5 :
-  - `@BeforeAll` (static) — exécuté **une fois** avant **tous** les tests de la classe
-  - `@BeforeEach` — exécuté **avant chaque** test
-  - `@AfterEach` — exécuté **après chaque** test
-  - `@AfterAll` (static) — exécuté **une fois** après **tous** les tests de la classe
-  - L'ordre d'exécution : `@BeforeAll` → (`@BeforeEach` → `@Test` → `@AfterEach`) × N → `@AfterAll`
+ - `@BeforeAll` (static) — exécuté **une fois** avant **tous** les tests de la classe
+ - `@BeforeEach` — exécuté **avant chaque** test
+ - `@AfterEach` — exécuté **après chaque** test
+ - `@AfterAll` (static) — exécuté **une fois** après **tous** les tests de la classe
+ - L'ordre d'exécution : `@BeforeAll` → (`@BeforeEach` → `@Test` → `@AfterEach`) × N → `@AfterAll`
 - Tests paramétrés :
-  - `@ParameterizedTest` — remplace `@Test` pour les tests paramétrés
-  - `@ValueSource(ints = {1, 2, 3})` — source de valeurs simples
-  - `@CsvSource({"1, 2, 3", "4, 5, 9"})` — tuples de paramètres
-  - `@CsvFileSource(resources = "/test-data.csv")` — fichier CSV
-  - `@EnumSource(MyEnum.class)` — toutes les valeurs d'un enum
-  - `@MethodSource("nomMethode")` — méthode fournissant les arguments
-  - `@NullSource`, `@EmptySource`, `@NullAndEmptySource` — valeurs nulles/vides
+ - `@ParameterizedTest` — remplace `@Test` pour les tests paramétrés
+ - `@ValueSource(ints = {1, 2, 3})` — source de valeurs simples
+ - `@CsvSource({"1, 2, 3", "4, 5, 9"})` — tuples de paramètres
+ - `@CsvFileSource(resources = "/test-data.csv")` — fichier CSV
+ - `@EnumSource(MyEnum.class)` — toutes les valeurs d'un enum
+ - `@MethodSource("nomMethode")` — méthode fournissant les arguments
+ - `@NullSource`, `@EmptySource`, `@NullAndEmptySource` — valeurs nulles/vides
 
 **TP Lab02 — Paramétrés avancés (45 min) :**
 - Implémenter un validateur d'email, de numéro de téléphone
@@ -119,16 +119,16 @@
 - Pourquoi mocker ? Isolement, rapidité, contrôle, simulation d'erreurs
 - Mock vs Stub vs Spy vs Fake vs Dummy
 - Mockito Core :
-  - `MockitoExtension.class` — extension JUnit 5 pour Mockito
-  - `@Mock` — crée une instance mockée de la classe/interface
-  - `@InjectMocks` — injecte les mocks dans l'objet testé
-  - `when(mock.methode()).thenReturn(valeur)` — **stubbing** : définit le comportement attendu
-  - `verify(mock).methode()` — **vérification** : vérifie qu'une méthode a été appelée
-  - `verify(mock, times(n)).methode()` — vérifie le nombre d'appels
-  - `verify(mock, never()).methode()` — vérifie que la méthode n'a **jamais** été appelée
-  - `ArgumentCaptor<T>` — capture les arguments passés à un mock
-  - `@Spy` — mock partiel (l'objet réel est utilisé sauf pour les méthodes stubbées)
-  - `doThrow(exception).when(mock).methode()` — simule une exception
+ - `MockitoExtension.class` — extension JUnit 5 pour Mockito
+ - `@Mock` — crée une instance mockée de la classe/interface
+ - `@InjectMocks` — injecte les mocks dans l'objet testé
+ - `when(mock.methode()).thenReturn(valeur)` — **stubbing** : définit le comportement attendu
+ - `verify(mock).methode()` — **vérification** : vérifie qu'une méthode a été appelée
+ - `verify(mock, times(n)).methode()` — vérifie le nombre d'appels
+ - `verify(mock, never()).methode()` — vérifie que la méthode n'a **jamais** été appelée
+ - `ArgumentCaptor<T>` — capture les arguments passés à un mock
+ - `@Spy` — mock partiel (l'objet réel est utilisé sauf pour les méthodes stubbées)
+ - `doThrow(exception).when(mock).methode()` — simule une exception
 
 **TP Lab03 — Mocking (45 min) :**
 - Implémenter `UserService` qui dépend de `UserRepository` et `EmailService`
@@ -146,14 +146,14 @@
 
 **Contenu théorique (30 min) :**
 - TDD : Red → Green → Refactor
-  - **Red** : Écrire un test qui échoue (car le code n'existe pas)
-  - **Green** : Écrire le minimum de code pour que le test passe
-  - **Refactor** : Améliorer le code sans casser les tests
+ - **Red** : Écrire un test qui échoue (car le code n'existe pas)
+ - **Green** : Écrire le minimum de code pour que le test passe
+ - **Refactor** : Améliorer le code sans casser les tests
 - Couverture de code :
-  - JaCoCo : `jacoco-maven-plugin`
-  - Couverture de lignes, branches, méthodes
-  - Objectifs de couverture : 80% lignes, 70% branches
-  - Rapport HTML : `target/site/jacoco/index.html`
+ - JaCoCo : `jacoco-maven-plugin`
+ - Couverture de lignes, branches, méthodes
+ - Objectifs de couverture : 80% lignes, 70% branches
+ - Rapport HTML : `target/site/jacoco/index.html`
 - `@Disabled` — désactive temporairement un test
 - `@Timeout(value = n, unit = TimeUnit.MILLISECONDS)` — test échoue si trop long
 - `@Nested` — organise les tests hiérarchiquement
@@ -161,11 +161,11 @@
 
 **TP Lab04 — TDD Fil Rouge (75 min) :**
 - Développer un service bancaire (`CompteBancaire`) en TDD :
-  1. Création de compte avec solde initial
-  2. Dépôt (montant positif uniquement)
-  3. Retrait (solde suffisant, montant positif)
-  4. Virement entre deux comptes
-  5. Consultation d'historique des transactions
+ 1. Création de compte avec solde initial
+ 2. Dépôt (montant positif uniquement)
+ 3. Retrait (solde suffisant, montant positif)
+ 4. Virement entre deux comptes
+ 5. Consultation d'historique des transactions
 - Chaque étape : test → code → refactor
 - Vérifier la couverture > 90%
 
@@ -183,21 +183,21 @@
 
 **Contenu théorique (45 min) :**
 - OWASP Top 10 (2021) appliqué à Java :
-  1. **Broken Access Control** — Contrôle d'accès défaillant
-  2. **Cryptographic Failures** — Données sensibles exposées
-  3. **Injection** — SQL, XSS, command injection
-  4. **Insecure Design** — Conception non sécurisée
-  5. **Security Misconfiguration** — Mauvaise configuration
-  6. **Vulnerable Components** — Composants obsolètes/vulnérables
-  7. **Authentication Failures** — Authentification faible
-  8. **Software Integrity Failures** — Intégrité logicielle
-  9. **Logging & Monitoring Failures** — Absence de journalisation
-  10. **SSRF** — Server-Side Request Forgery
+ 1. **Broken Access Control** — Contrôle d'accès défaillant
+ 2. **Cryptographic Failures** — Données sensibles exposées
+ 3. **Injection** — SQL, XSS, command injection
+ 4. **Insecure Design** — Conception non sécurisée
+ 5. **Security Misconfiguration** — Mauvaise configuration
+ 6. **Vulnerable Components** — Composants obsolètes/vulnérables
+ 7. **Authentication Failures** — Authentification faible
+ 8. **Software Integrity Failures** — Intégrité logicielle
+ 9. **Logging & Monitoring Failures** — Absence de journalisation
+ 10. **SSRF** — Server-Side Request Forgery
 - Démonstrations en Java pur :
-  - Injection SQL via concaténation de chaînes vs `PreparedStatement`
-  - XSS : échappement vs non-échappement des entrées HTML
-  - Path traversal : `../../../etc/passwd`
-  - Désérialisation non sécurisée
+ - Injection SQL via concaténation de chaînes vs `PreparedStatement`
+ - XSS : échappement vs non-échappement des entrées HTML
+ - Path traversal : `../../../etc/passwd`
+ - Désérialisation non sécurisée
 
 **TP Lab05 — OWASP (45 min) :**
 - Code vulnérable à analyser et corriger
@@ -215,14 +215,14 @@
 **Contenu théorique (45 min) :**
 - Spring Boot : auto-configuration, starters, application.properties
 - Inversion de contrôle et injection de dépendances :
-  - `@Service`, `@Repository`, `@Controller`, `@RestController`
-  - `@Autowired` — injection par le conteneur Spring
+ - `@Service`, `@Repository`, `@Controller`, `@RestController`
+ - `@Autowired` — injection par le conteneur Spring
 - Les slices de test Spring Boot :
-  - `@SpringBootTest` — charge le contexte complet (lourd, pour tests d'intégration)
-  - `@WebMvcTest(UserController.class)` — charge uniquement la couche MVC
-  - `@DataJpaTest` — charge uniquement la couche JPA/repository
-  - `@JsonTest` — teste la sérialisation/désérialisation JSON
-  - `@RestClientTest` — teste les clients REST
+ - `@SpringBootTest` — charge le contexte complet (lourd, pour tests d'intégration)
+ - `@WebMvcTest(UserController.class)` — charge uniquement la couche MVC
+ - `@DataJpaTest` — charge uniquement la couche JPA/repository
+ - `@JsonTest` — teste la sérialisation/désérialisation JSON
+ - `@RestClientTest` — teste les clients REST
 - `MockMvc` — simule les requêtes HTTP sans démarrer le serveur
 - `@MockBean` — remplace un bean Spring par un mock dans le contexte
 
@@ -242,21 +242,21 @@
 
 **Contenu théorique (45 min) :**
 - Spring Security :
-  - `SecurityFilterChain` — chaîne de filtres de sécurité
-  - `@EnableWebSecurity` — active la sécurité web
-  - `@EnableMethodSecurity` — active `@PreAuthorize`, `@PostAuthorize`
-  - `UserDetailsService` — charge les utilisateurs
-  - `PasswordEncoder` (BCrypt) — hachage des mots de passe
+ - `SecurityFilterChain` — chaîne de filtres de sécurité
+ - `@EnableWebSecurity` — active la sécurité web
+ - `@EnableMethodSecurity` — active `@PreAuthorize`, `@PostAuthorize`
+ - `UserDetailsService` — charge les utilisateurs
+ - `PasswordEncoder` (BCrypt) — hachage des mots de passe
 - JWT (JSON Web Token) :
-  - Structure : Header.Payload.Signature
-  - Access Token vs Refresh Token
-  - `OncePerRequestFilter` — filtre JWT personnalisé
+ - Structure : Header.Payload.Signature
+ - Access Token vs Refresh Token
+ - `OncePerRequestFilter` — filtre JWT personnalisé
 - Tests de sécurité :
-  - `@WithMockUser` — simule un utilisateur authentifié
-  - `@WithAnonymousUser` — simule un utilisateur non authentifié
-  - `.with(csrf())` — inclut le token CSRF dans MockMvc
-  - `.with(httpBasic("user", "pass"))` — authentification HTTP Basic
-  - `SecurityMockMvcRequestPostProcessors.jwt()` — simule un JWT
+ - `@WithMockUser` — simule un utilisateur authentifié
+ - `@WithAnonymousUser` — simule un utilisateur non authentifié
+ - `.with(csrf())` — inclut le token CSRF dans MockMvc
+ - `.with(httpBasic("user", "pass"))` — authentification HTTP Basic
+ - `SecurityMockMvcRequestPostProcessors.jwt()` — simule un JWT
 
 **TP Lab07 — Spring Security (45 min) :**
 - Ajouter Spring Security à l'API produits
@@ -282,26 +282,28 @@
 - Hachage BCrypt des mots de passe
 - Audit des actions (création, modification, suppression)
 
-**Matrice de tests exhaustive (>110 tests) :**
+**Matrice de tests (74 tests) :**
 
-| Catégorie | Annotations utilisées | Nombre | Contenu |
+| Classe de test | Couche testee | Type | Nombre |
 |---|---|---|---|
-| **Unitaires Service** | `@ExtendWith(MockitoExtension.class)`, `@Mock`, `@InjectMocks` | ~25 | CRUD métier, validation, exceptions métier |
-| **Unitaires Mapper** | `@Test` | ~10 | User ↔ UserDto mapping |
-| **Repository** | `@DataJpaTest`, `@AutoConfigureTestDatabase` | ~15 | Requêtes JPQL, pagination, contraintes, finders personnalisés |
-| **Controller MVC** | `@WebMvcTest`, `@MockBean`, `@AutoConfigureMockMvc` | ~20 | Statuts HTTP, corps de réponse, headers, validation DTO |
-| **Intégration** | `@SpringBootTest(webEnvironment = RANDOM_PORT)` | ~15 | Flux complet, transactions, rollback |
-| **Sécurité** | `@WithMockUser`, `@WithAnonymousUser` | ~15 | Accès non autorisé, JWT expiré, rôles insuffisants |
-| **Contrat API** | REST Assured | ~10 | Schémas JSON, types, headers |
-| **Mutation** | PITest | — | Mesure de qualité des tests |
-| **Performance** | `@Test`, `System.currentTimeMillis()` | ~5 | Temps de réponse, concurrence |
+| `UserEntityTest` | Entite | Unitaire | 5 |
+| `UserRequestTest` | DTO entree | Unitaire | 1 |
+| `UserResponseTest` | DTO sortie | Unitaire | 4 |
+| `ErrorResponseTest` | DTO erreur | Unitaire | 3 |
+| `ExceptionsTest` | Exceptions | Unitaire | 2 |
+| `GlobalExceptionHandlerTest` | Gestion erreurs | Unitaire | 3 |
+| `UserServiceTest` | Service | Unitaire + Mockito | 15 |
+| `UserControllerTest` | Controleur | MVC | 13 |
+| `UserRepositoryTest` | Repository | JPA | 12 |
+| `JwtUtilTest` | JWT | Unitaire | 6 |
+| `SecurityTests` | Securite | MVC | 10 |
 
-**Annotations récapitulatives du lab08 :**
-- JUnit 5 : `@Test`, `@ParameterizedTest`, `@DisplayName`, `@Nested`, `@Tag`, `@BeforeEach`, `@AfterEach`, `@BeforeAll`, `@AfterAll`, `@Timeout`, `@Disabled`, `@RepeatedTest`, `@CsvSource`, `@ValueSource`, `@MethodSource`, `@EnumSource`, `@NullSource`
+**Annotations couvertes :**
+- JUnit 5 : `@Test`, `@DisplayName`, `@Nested`, `@BeforeEach`, `@AfterEach`, `@Timeout`
 - Mockito : `@ExtendWith(MockitoExtension.class)`, `@Mock`, `@InjectMocks`, `@Spy`, `@Captor`
-- Spring : `@SpringBootTest`, `@WebMvcTest`, `@DataJpaTest`, `@MockBean`, `@AutoConfigureMockMvc`, `@AutoConfigureTestDatabase`, `@TestConfiguration`, `@TestPropertySource`, `@ActiveProfiles("test")`, `@Sql`, `@DynamicPropertySource`
-- Spring Security : `@WithMockUser`, `@WithAnonymousUser`, `@WithUserDetails`
-- Bean Validation : `@Valid`, `@NotNull`, `@NotBlank`, `@Email`, `@Size`, `@Pattern`, `@Min`, `@Max`, `@Positive`
+- Spring : `@WebMvcTest`, `@DataJpaTest`, `@MockBean`, `@AutoConfigureMockMvc`
+- Spring Security : `@WithMockUser`, `@WithAnonymousUser`
+- Bean Validation : `@NotNull`, `@NotBlank`, `@Email`, `@Size`
 
 ---
 

@@ -4,38 +4,35 @@
 
 ## Comment utiliser ces cours
 
-Ces 8 modules de cours sont conçus pour être utilisés **en présentiel** par un formateur.
+Ces 8 modules de cours sont concus pour etre lus et suivis par les etudiants, en autonomie ou en presentiel.
 
 ### Structure de chaque module
 
 ```
-──────────────────────────────────────────
+
 PARTIE 1 — THÉORIE
-──────────────────────────────────────────
-    • Explication des concepts, annotations, outils
-    • Schémas textuels et tableaux récapitulatifs
-    • Durée : 30-45 minutes
 
-──────────────────────────────────────────
+ • Explication des concepts, annotations, outils
+ • Schémas textuels et tableaux récapitulatifs
+ • Durée : 30-45 minutes
+
 PARTIE 2 — PRATIQUE PAS À PAS
-──────────────────────────────────────────
-    • Code commenté ligne par ligne
-    • Chaque annotation décortiquée dans son contexte
-    • Les extraits de code proviennent des dossiers labs/
-    • Durée : 40-60 minutes
 
-──────────────────────────────────────────
+ • Code commenté ligne par ligne
+ • Chaque annotation décortiquée dans son contexte
+ • Les extraits de code proviennent des dossiers labs/
+ • Durée : 40-60 minutes
+
 PARTIE 3 — LAB
-──────────────────────────────────────────
-    • Énoncé de l'exercice
-    • Objectifs et critères de réussite
-    • Correction détaillée
-    • Durée : 30-45 minutes
 
-──────────────────────────────────────────
+ • Énoncé de l'exercice
+ • Objectifs et critères de réussite
+ • Correction détaillée
+ • Durée : 30-45 minutes
+
 FICHE MÉMO
-──────────────────────────────────────────
-    • Tableau synthétique des annotations et méthodes vues
+
+ • Tableau synthétique des annotations et méthodes vues
 ```
 
 ### Dossiers
@@ -71,4 +68,4 @@ bash scripts/run-lab.sh labs/lab01-fondamentaux clean test
 
 - Le code dans `labs/` est **sans commentaire** : propre, concis, fonctionnel.
 - Les explications détaillées de chaque ligne de code sont dans les modules `cours/`.
-- Chaque module référence explicitement les fichiers qu'il couvre avec `📁 labs/labXX/.../Fichier.java`.
+- Chaque module référence explicitement les fichiers qu'il couvre avec ` labs/labXX/.../Fichier.java`.

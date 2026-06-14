@@ -26,7 +26,7 @@
 
 ---
 
-# PARTIE 1 — THÉORIE (45 min)
+## PARTIE 1 -- THEORIE (45 min)
 
 ---
 
@@ -49,9 +49,9 @@ Ou alors tout mettre dans une seule méthode :
 
 ```java
 @Test void emailsValides() {
-    assertTrue(validateur.estEmailValide("test@example.com"));
-    assertTrue(validateur.estEmailValide("user@domain.co"));
-    // Si la première assertion échoue, les autres ne sont jamais exécutées !
+ assertTrue(validateur.estEmailValide("test@example.com"));
+ assertTrue(validateur.estEmailValide("user@domain.co"));
+ // Si la première assertion échoue, les autres ne sont jamais exécutées !
 }
 ```
 
@@ -65,7 +65,7 @@ Un test paramétré permet d'exécuter la **même logique de test** avec **plusi
 @ParameterizedTest
 @ValueSource(strings = {"test@example.com", "user@domain.co", "a@b.co"})
 void emailEstValide(String email) {
-    assertTrue(validateur.estEmailValide(email));
+ assertTrue(validateur.estEmailValide(email));
 }
 ```
 
@@ -116,14 +116,14 @@ Le paramètre `name` de `@ParameterizedTest` permet de contrôler l'affichage du
 @DisplayName("Validation d'emails valides")
 @CsvSource({"test@example.com, true", "pasd'arobase, false"})
 void testEmail(String email, boolean resultatAttendu) {
-    // ...
+ // ...
 }
 ```
 
 Avec `name` personnalisé, le rapport affichera :
 ```
-[1] 1 : email "test@example.com" est valide → true   ✓
-[2] 2 : email "pasd'arobase" est valide → false       ✓
+[1] 1 : email "test@example.com" est valide → true
+[2] 2 : email "pasd'arobase" est valide → false
 ```
 
 Sans `name`, le rapport afficherait simplement `[1] test@example.com, true`, ce qui est moins informatif.
@@ -155,15 +155,15 @@ Sans `name`, le rapport afficherait simplement `[1] test@example.com, true`, ce 
 @ParameterizedTest(name = "{index} : email \"{0}\" est valide → {1}")
 @DisplayName("Validation d'emails valides")
 @ValueSource(strings = {
-    "test@example.com",
-    "user.name@domain.co",
-    "a@b.co",
-    "contact@entreprise.fr",
-    "nom.prenom@site.gouv.fr"
+ "test@example.com",
+ "user.name@domain.co",
+ "a@b.co",
+ "contact@entreprise.fr",
+ "nom.prenom@site.gouv.fr"
 })
 void emailsValides(String email) {
-    assertTrue(validateur.estEmailValide(email),
-        () -> "L'email '" + email + "' devrait être valide");
+ assertTrue(validateur.estEmailValide(email),
+ () -> "L'email '" + email + "' devrait être valide");
 }
 ```
 
@@ -181,16 +181,16 @@ void emailsValides(String email) {
 @ParameterizedTest(name = "\"{0}\" → email INVALIDE")
 @DisplayName("Validation d'emails invalides")
 @ValueSource(strings = {
-    "",
-    "pasd'arobase",
-    "@domaine.com",
-    "user@",
-    "user@domaine",
-    "user@@domaine.com"
+ "",
+ "pasd'arobase",
+ "@domaine.com",
+ "user@",
+ "user@domaine",
+ "user@@domaine.com"
 })
 void emailsInvalides(String email) {
-    assertFalse(validateur.estEmailValide(email),
-        () -> "L'email '" + email + "' devrait être invalide");
+ assertFalse(validateur.estEmailValide(email),
+ () -> "L'email '" + email + "' devrait être invalide");
 }
 ```
 
@@ -212,8 +212,8 @@ void emailsInvalides(String email) {
 
 ```java
 @CsvSource({
-    "valeur1, valeur2, valeur3",   // 3 paramètres pour le test 1
-    "valeur4, valeur5, valeur6"    // 3 paramètres pour le test 2
+ "valeur1, valeur2, valeur3", // 3 paramètres pour le test 1
+ "valeur4, valeur5, valeur6" // 3 paramètres pour le test 2
 })
 ```
 
@@ -235,16 +235,16 @@ Par défaut, le délimiteur est la virgule. Chaque ligne produit une exécution 
 @ParameterizedTest(name = "\"{0}\" → score = {1}/100")
 @DisplayName("Score de robustesse des mots de passe")
 @CsvSource({
-    "abc,              0",
-    "abcd1234,        40",
-    "Abcd1234,        60",
-    "Abcd1234!,        70",
-    "MotDePasseTresLong123!, 100",
-    "12345678,         25"
+ "abc, 0",
+ "abcd1234, 40",
+ "Abcd1234, 60",
+ "Abcd1234!, 70",
+ "MotDePasseTresLong123!, 100",
+ "12345678, 25"
 })
 void scoreMotDePasse(String motDePasse, int scoreAttendu) {
-    assertEquals(scoreAttendu, validateur.scoreMotDePasse(motDePasse),
-        "Score incorrect pour '" + motDePasse + "'");
+ assertEquals(scoreAttendu, validateur.scoreMotDePasse(motDePasse),
+ "Score incorrect pour '" + motDePasse + "'");
 }
 ```
 
@@ -269,11 +269,11 @@ Chaque ligne de `@CsvSource` a deux colonnes : le mot de passe (String) et le sc
 @ParameterizedTest(name = "email = {0} est valide → {1}")
 @DisplayName("Emails : cas limites avec null")
 @CsvSource(value = {
-    "N/A, false",
-    "'', false"
+ "N/A, false",
+ "'', false"
 }, nullValues = "N/A")
 void emailsAvecNull(String email, boolean attendu) {
-    assertEquals(attendu, validateur.estEmailValide(email));
+ assertEquals(attendu, validateur.estEmailValide(email));
 }
 ```
 
@@ -329,8 +329,8 @@ abc,false
 @DisplayName("Validation téléphones via fichier CSV externe")
 @CsvFileSource(resources = "/telephones-test.csv", numLinesToSkip = 1)
 void telephonesDepuisFichier(String telephone, boolean attendu) {
-    assertEquals(attendu, validateur.estTelephoneValide(telephone),
-        "Échec pour le téléphone : " + telephone);
+ assertEquals(attendu, validateur.estTelephoneValide(telephone),
+ "Échec pour le téléphone : " + telephone);
 }
 ```
 
@@ -380,8 +380,8 @@ enum StatutUtilisateur { ACTIF, INACTIF, SUSPENDU, SUPPRIME }
 @DisplayName("Tous les statuts sauf SUPPRIME sont valides")
 @EnumSource(value = StatutUtilisateur.class, mode = EXCLUDE, names = "SUPPRIME")
 void statutsValides(StatutUtilisateur statut) {
-    assertNotEquals(StatutUtilisateur.SUPPRIME, statut,
-        "Tous les statuts sauf SUPPRIME devraient passer");
+ assertNotEquals(StatutUtilisateur.SUPPRIME, statut,
+ "Tous les statuts sauf SUPPRIME devraient passer");
 }
 ```
 
@@ -398,7 +398,7 @@ void statutsValides(StatutUtilisateur statut) {
 @DisplayName("Seuls ACTIF et SUSPENDU sont testés ici")
 @EnumSource(value = StatutUtilisateur.class, mode = INCLUDE, names = {"ACTIF", "SUSPENDU"})
 void statutsSpecifiques(StatutUtilisateur statut) {
-    assertTrue(statut == StatutUtilisateur.ACTIF || statut == StatutUtilisateur.SUSPENDU);
+ assertTrue(statut == StatutUtilisateur.ACTIF || statut == StatutUtilisateur.SUSPENDU);
 }
 ```
 
@@ -429,23 +429,23 @@ void statutsSpecifiques(StatutUtilisateur statut) {
 @DisplayName("Catégorisation par âge (via @MethodSource)")
 @MethodSource("fournirAgesEtCategories")
 void categorisationAge(int age, String categorieAttendue) {
-    assertEquals(categorieAttendue, validateur.categorieAge(age),
-        "Catégorie incorrecte pour l'âge " + age);
+ assertEquals(categorieAttendue, validateur.categorieAge(age),
+ "Catégorie incorrecte pour l'âge " + age);
 }
 
 static Stream<Arguments> fournirAgesEtCategories() {
-    return Stream.of(
-        Arguments.of(0, "MINEUR"),
-        Arguments.of(17, "MINEUR"),
-        Arguments.of(18, "JEUNE_ADULTE"),
-        Arguments.of(24, "JEUNE_ADULTE"),
-        Arguments.of(25, "ADULTE"),
-        Arguments.of(59, "ADULTE"),
-        Arguments.of(60, "SENIOR"),
-        Arguments.of(119, "SENIOR"),
-        Arguments.of(120, "CENTENAIRE"),
-        Arguments.of(150, "CENTENAIRE")
-    );
+ return Stream.of(
+ Arguments.of(0, "MINEUR"),
+ Arguments.of(17, "MINEUR"),
+ Arguments.of(18, "JEUNE_ADULTE"),
+ Arguments.of(24, "JEUNE_ADULTE"),
+ Arguments.of(25, "ADULTE"),
+ Arguments.of(59, "ADULTE"),
+ Arguments.of(60, "SENIOR"),
+ Arguments.of(119, "SENIOR"),
+ Arguments.of(120, "CENTENAIRE"),
+ Arguments.of(150, "CENTENAIRE")
+ );
 }
 ```
 
@@ -454,21 +454,21 @@ static Stream<Arguments> fournirAgesEtCategories() {
 1. **`@MethodSource("fournirAgesEtCategories")`** : le nom de la méthode factory, sous forme de chaîne. JUnit va chercher une méthode `static` avec ce nom dans la classe de test (ou dans une autre classe si on utilise la syntaxe `"NomClasse#methode"`).
 
 2. **La méthode factory** :
-   - Elle est `static` — obligatoire.
-   - Elle retourne `Stream<Arguments>` — un flux de jeux de données.
-   - Chaque `Arguments.of(...)` crée un jeu de paramètres. Les types sont variés : `int`, `String`.
+ - Elle est `static` — obligatoire.
+ - Elle retourne `Stream<Arguments>` — un flux de jeux de données.
+ - Chaque `Arguments.of(...)` crée un jeu de paramètres. Les types sont variés : `int`, `String`.
 
 3. **Les cas testés** :
-   - `0` et `17` → `"MINEUR"` : testent la limite basse et la borne de la condition `age < 18`.
-   - `18` et `24` → `"JEUNE_ADULTE"` : testent l'entrée et la borne de la condition `age < 25`.
-   - `25` et `59` → `"ADULTE"` : testent la condition `age < 60`.
-   - `60` et `119` → `"SENIOR"` : testent la condition `age < 120`.
-   - `120` et `150` → `"CENTENAIRE"` : testent le cas par défaut `return "CENTENAIRE"`.
+ - `0` et `17` → `"MINEUR"` : testent la limite basse et la borne de la condition `age < 18`.
+ - `18` et `24` → `"JEUNE_ADULTE"` : testent l'entrée et la borne de la condition `age < 25`.
+ - `25` et `59` → `"ADULTE"` : testent la condition `age < 60`.
+ - `60` et `119` → `"SENIOR"` : testent la condition `age < 120`.
+ - `120` et `150` → `"CENTENAIRE"` : testent le cas par défaut `return "CENTENAIRE"`.
 
 4. **Stratégie de test** : ce test utilise le **Boundary Value Analysis** (analyse aux bornes). Pour chaque intervalle, on teste la valeur minimale et la valeur maximale :
-   - Intervalle MINEUR : testé à 0 (min) et 17 (max).
-   - Intervalle JEUNE_ADULTE : testé à 18 (min) et 24 (max).
-   - Etc.
+ - Intervalle MINEUR : testé à 0 (min) et 17 (max).
+ - Intervalle JEUNE_ADULTE : testé à 18 (min) et 24 (max).
+ - Etc.
 
 ### Exemple : `@MethodSource` avec un seul paramètre
 
@@ -479,12 +479,12 @@ Quand la méthode factory ne retourne qu'un seul paramètre par jeu de données,
 @DisplayName("Âges valides (via @MethodSource d'entiers)")
 @MethodSource("agesValides")
 void agesValides(int age) {
-    assertTrue(validateur.estAgeValide(age),
-        "L'âge " + age + " devrait être valide");
+ assertTrue(validateur.estAgeValide(age),
+ "L'âge " + age + " devrait être valide");
 }
 
 static Stream<Integer> agesValides() {
-    return Stream.of(18, 25, 30, 60, 100, 120);
+ return Stream.of(18, 25, 30, 60, 100, 120);
 }
 ```
 
@@ -513,7 +513,7 @@ Injecte une valeur `null` dans le test :
 @ParameterizedTest
 @NullSource
 void testAvecNull(String valeur) {
-    // valeur sera null pour cette exécution
+ // valeur sera null pour cette exécution
 }
 ```
 
@@ -530,7 +530,7 @@ Injecte une valeur "vide" adaptée au type du paramètre :
 @ParameterizedTest
 @EmptySource
 void testAvecVide(String valeur) {
-    // valeur sera "" (chaîne vide) pour cette exécution
+ // valeur sera "" (chaîne vide) pour cette exécution
 }
 ```
 
@@ -542,7 +542,7 @@ Combine `@NullSource` et `@EmptySource` :
 @ParameterizedTest
 @NullAndEmptySource
 void testAvecNullEtVide(String valeur) {
-    // Exécuté 2 fois : une fois avec null, une fois avec ""
+ // Exécuté 2 fois : une fois avec null, une fois avec ""
 }
 ```
 
@@ -553,7 +553,7 @@ void testAvecNullEtVide(String valeur) {
 @DisplayName("Email invalide pour null et chaîne vide")
 @NullAndEmptySource
 void emailNullOuVide(String email) {
-    assertFalse(validateur.estEmailValide(email));
+ assertFalse(validateur.estEmailValide(email));
 }
 ```
 
@@ -569,7 +569,7 @@ On peut combiner `@NullAndEmptySource` avec `@ValueSource` pour tester égalemen
 @NullAndEmptySource
 @ValueSource(strings = " ")
 void scoreZeroPourEntreesInvalides(String mdp) {
-    assertEquals(0, validateur.scoreMotDePasse(mdp));
+ assertEquals(0, validateur.scoreMotDePasse(mdp));
 }
 ```
 
@@ -585,7 +585,7 @@ void scoreZeroPourEntreesInvalides(String mdp) {
 @NullSource
 @EmptySource
 void telephoneNullEtVide(String telephone) {
-    assertFalse(validateur.estTelephoneValide(telephone));
+ assertFalse(validateur.estTelephoneValide(telephone));
 }
 ```
 
@@ -624,14 +624,14 @@ JUnit 5 possède un mécanisme puissant de conversion automatique : quand vous d
 @ParameterizedTest
 @DisplayName("Conversion automatique : String → int → boolean")
 @CsvSource({
-    "18, true",
-    "17, false",
-    "120, true",
-    "121, false",
-    "0, false"
+ "18, true",
+ "17, false",
+ "120, true",
+ "121, false",
+ "0, false"
 })
 void conversionAutoTypes(int age, boolean attendu) {
-    assertEquals(attendu, validateur.estAgeValide(age));
+ assertEquals(attendu, validateur.estAgeValide(age));
 }
 ```
 
@@ -647,9 +647,9 @@ void conversionAutoTypes(int age, boolean attendu) {
 
 ```java
 void conversionAutoTypes(String ageStr, String attenduStr) {
-    int age = Integer.parseInt(ageStr);
-    boolean attendu = Boolean.parseBoolean(attenduStr);
-    assertEquals(attendu, validateur.estAgeValide(age));
+ int age = Integer.parseInt(ageStr);
+ boolean attendu = Boolean.parseBoolean(attenduStr);
+ assertEquals(attendu, validateur.estAgeValide(age));
 }
 ```
 
@@ -673,13 +673,13 @@ La conversion automatique élimine ce code boilerplate et rend les tests plus pr
 
 ---
 
-# PARTIE 2 — PRATIQUE PAS À PAS (40 min)
+## PARTIE 2 -- PRATIQUE PAS A PAS (40 min)
 
 ---
 
 ## 2.1 Mise en place du projet
 
-> 📁 `labs/lab02-parametres/pom.xml`
+> `labs/lab02-parametres/pom.xml`
 
 Le `pom.xml` du module 2 est identique dans sa structure à celui du module 1. Il contient les mêmes plugins (`maven-compiler-plugin`, `maven-surefire-plugin`, `jacoco-maven-plugin`) et la même dépendance `junit-jupiter`. La seule différence est l'`artifactId` : `lab02-parametres-avances`.
 
@@ -693,7 +693,7 @@ Nous ne répéterons pas l'explication détaillée de chaque balise (voir module
 
 ## 2.2 La classe ValidateurUtilisateur
 
-> 📁 `labs/lab02-parametres/src/main/java/com/nexa/parametres/ValidateurUtilisateur.java`
+> `labs/lab02-parametres/src/main/java/com/nexa/parametres/ValidateurUtilisateur.java`
 
 ### Code complet
 
@@ -702,61 +702,61 @@ package com.nexa.parametres;
 
 public class ValidateurUtilisateur {
 
-    public boolean estEmailValide(String email) {
-        if (email == null || email.isEmpty()) return false;
-        if (email.length() > 255) return false;
+ public boolean estEmailValide(String email) {
+ if (email == null || email.isEmpty()) return false;
+ if (email.length() > 255) return false;
 
-        int arobaseIndex = email.indexOf('@');
-        if (arobaseIndex <= 0) return false;
+ int arobaseIndex = email.indexOf('@');
+ if (arobaseIndex <= 0) return false;
 
-        if (email.indexOf('@', arobaseIndex + 1) != -1) return false;
+ if (email.indexOf('@', arobaseIndex + 1) != -1) return false;
 
-        String domaine = email.substring(arobaseIndex + 1);
-        return domaine.contains(".") && domaine.length() > 1;
-    }
+ String domaine = email.substring(arobaseIndex + 1);
+ return domaine.contains(".") && domaine.length() > 1;
+ }
 
-    public boolean estTelephoneValide(String telephone) {
-        if (telephone == null || telephone.isEmpty()) return false;
+ public boolean estTelephoneValide(String telephone) {
+ if (telephone == null || telephone.isEmpty()) return false;
 
-        String nettoye = telephone.replaceAll("[\\s.+-]", "");
-        if (nettoye.length() == 12 && nettoye.startsWith("+33")) {
-            nettoye = "0" + nettoye.substring(3);
-        }
-        if (nettoye.length() != 10) return false;
-        if (nettoye.charAt(0) != '0') return false;
-        char deuxieme = nettoye.charAt(1);
-        if (deuxieme < '1' || deuxieme > '9') return false;
+ String nettoye = telephone.replaceAll("[\\s.+-]", "");
+ if (nettoye.length() == 12 && nettoye.startsWith("+33")) {
+ nettoye = "0" + nettoye.substring(3);
+ }
+ if (nettoye.length() != 10) return false;
+ if (nettoye.charAt(0) != '0') return false;
+ char deuxieme = nettoye.charAt(1);
+ if (deuxieme < '1' || deuxieme > '9') return false;
 
-        for (int i = 2; i < nettoye.length(); i++) {
-            if (!Character.isDigit(nettoye.charAt(i))) return false;
-        }
-        return true;
-    }
+ for (int i = 2; i < nettoye.length(); i++) {
+ if (!Character.isDigit(nettoye.charAt(i))) return false;
+ }
+ return true;
+ }
 
-    public int scoreMotDePasse(String motDePasse) {
-        if (motDePasse == null || motDePasse.isEmpty()) return 0;
-        int score = 0;
-        if (motDePasse.length() >= 8) score += 25;
-        if (motDePasse.length() >= 12) score += 15;
-        if (motDePasse.matches(".*[A-Z].*")) score += 20;
-        if (motDePasse.matches(".*[a-z].*")) score += 15;
-        if (motDePasse.matches(".*[0-9].*")) score += 15;
-        if (motDePasse.matches(".*[!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>/?].*")) score += 10;
-        return Math.min(score, 100);
-    }
+ public int scoreMotDePasse(String motDePasse) {
+ if (motDePasse == null || motDePasse.isEmpty()) return 0;
+ int score = 0;
+ if (motDePasse.length() >= 8) score += 25;
+ if (motDePasse.length() >= 12) score += 15;
+ if (motDePasse.matches(".*[A-Z].*")) score += 20;
+ if (motDePasse.matches(".*[a-z].*")) score += 15;
+ if (motDePasse.matches(".*[0-9].*")) score += 15;
+ if (motDePasse.matches(".*[!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>/?].*")) score += 10;
+ return Math.min(score, 100);
+ }
 
-    public boolean estAgeValide(int age) {
-        return age >= 18 && age <= 120;
-    }
+ public boolean estAgeValide(int age) {
+ return age >= 18 && age <= 120;
+ }
 
-    public String categorieAge(int age) {
-        if (age < 0) throw new IllegalArgumentException("L'âge ne peut pas être négatif");
-        if (age < 18) return "MINEUR";
-        if (age < 25) return "JEUNE_ADULTE";
-        if (age < 60) return "ADULTE";
-        if (age < 120) return "SENIOR";
-        return "CENTENAIRE";
-    }
+ public String categorieAge(int age) {
+ if (age < 0) throw new IllegalArgumentException("L'âge ne peut pas être négatif");
+ if (age < 18) return "MINEUR";
+ if (age < 25) return "JEUNE_ADULTE";
+ if (age < 60) return "ADULTE";
+ if (age < 120) return "SENIOR";
+ return "CENTENAIRE";
+ }
 }
 ```
 
@@ -810,7 +810,7 @@ Le plafond `Math.min(score, 100)` empêche le score de dépasser 100, même si u
 
 ```java
 public boolean estAgeValide(int age) {
-    return age >= 18 && age <= 120;
+ return age >= 18 && age <= 120;
 }
 ```
 
@@ -820,12 +820,12 @@ Très simple : âge valide entre 18 et 120 ans (inclus). Cette méthode sert à 
 
 ```java
 public String categorieAge(int age) {
-    if (age < 0) throw new IllegalArgumentException("L'âge ne peut pas être négatif");
-    if (age < 18) return "MINEUR";
-    if (age < 25) return "JEUNE_ADULTE";
-    if (age < 60) return "ADULTE";
-    if (age < 120) return "SENIOR";
-    return "CENTENAIRE";
+ if (age < 0) throw new IllegalArgumentException("L'âge ne peut pas être négatif");
+ if (age < 18) return "MINEUR";
+ if (age < 25) return "JEUNE_ADULTE";
+ if (age < 60) return "ADULTE";
+ if (age < 120) return "SENIOR";
+ return "CENTENAIRE";
 }
 ```
 
@@ -843,7 +843,7 @@ Cette méthode catégorise un âge en texte. Les tranches sont :
 
 ## 2.3 Les tests paramétrés décortiqués
 
-> 📁 `labs/lab02-parametres/src/test/java/com/nexa/parametres/ValidateurUtilisateurTest.java`
+> `labs/lab02-parametres/src/test/java/com/nexa/parametres/ValidateurUtilisateurTest.java`
 
 ### Structure générale
 
@@ -863,7 +863,7 @@ import static org.junit.jupiter.params.provider.EnumSource.Mode.INCLUDE;
 @DisplayName("Tests paramétrés du ValidateurUtilisateur")
 class ValidateurUtilisateurTest {
 
-    private final ValidateurUtilisateur validateur = new ValidateurUtilisateur();
+ private final ValidateurUtilisateur validateur = new ValidateurUtilisateur();
 ```
 
 **Points importants sur les imports** :
@@ -879,15 +879,15 @@ class ValidateurUtilisateurTest {
 @ParameterizedTest(name = "{index} : email \"{0}\" est valide → {1}")
 @DisplayName("Validation d'emails valides")
 @ValueSource(strings = {
-    "test@example.com",
-    "user.name@domain.co",
-    "a@b.co",
-    "contact@entreprise.fr",
-    "nom.prenom@site.gouv.fr"
+ "test@example.com",
+ "user.name@domain.co",
+ "a@b.co",
+ "contact@entreprise.fr",
+ "nom.prenom@site.gouv.fr"
 })
 void emailsValides(String email) {
-    assertTrue(validateur.estEmailValide(email),
-        () -> "L'email '" + email + "' devrait être valide");
+ assertTrue(validateur.estEmailValide(email),
+ () -> "L'email '" + email + "' devrait être valide");
 }
 ```
 
@@ -900,11 +900,11 @@ void emailsValides(String email) {
 
 **Résultat dans le rapport Maven** :
 ```
-[1] 1 : email "test@example.com" est valide →    ✓
-[2] 2 : email "user.name@domain.co" est valide → ✓
-[3] 3 : email "a@b.co" est valide →              ✓
-[4] 4 : email "contact@entreprise.fr" est valide → ✓
-[5] 5 : email "nom.prenom@site.gouv.fr" est valide → ✓
+[1] 1 : email "test@example.com" est valide →
+[2] 2 : email "user.name@domain.co" est valide →
+[3] 3 : email "a@b.co" est valide →
+[4] 4 : email "contact@entreprise.fr" est valide →
+[5] 5 : email "nom.prenom@site.gouv.fr" est valide →
 ```
 
 **Comment `@ValueSource` remplacerait 10 méthodes `@Test` identiques**
@@ -932,16 +932,16 @@ Avec les tests paramétrés : **2 méthodes** au lieu de 12. Gain : 83% de code 
 @ParameterizedTest(name = "\"{0}\" → email INVALIDE")
 @DisplayName("Validation d'emails invalides")
 @ValueSource(strings = {
-    "",
-    "pasd'arobase",
-    "@domaine.com",
-    "user@",
-    "user@domaine",
-    "user@@domaine.com"
+ "",
+ "pasd'arobase",
+ "@domaine.com",
+ "user@",
+ "user@domaine",
+ "user@@domaine.com"
 })
 void emailsInvalides(String email) {
-    assertFalse(validateur.estEmailValide(email),
-        () -> "L'email '" + email + "' devrait être invalide");
+ assertFalse(validateur.estEmailValide(email),
+ () -> "L'email '" + email + "' devrait être invalide");
 }
 ```
 
@@ -961,16 +961,16 @@ void emailsInvalides(String email) {
 @ParameterizedTest(name = "\"{0}\" → score = {1}/100")
 @DisplayName("Score de robustesse des mots de passe")
 @CsvSource({
-    "abc,              0",
-    "abcd1234,        40",
-    "Abcd1234,        60",
-    "Abcd1234!,        70",
-    "MotDePasseTresLong123!, 100",
-    "12345678,         25"
+ "abc, 0",
+ "abcd1234, 40",
+ "Abcd1234, 60",
+ "Abcd1234!, 70",
+ "MotDePasseTresLong123!, 100",
+ "12345678, 25"
 })
 void scoreMotDePasse(String motDePasse, int scoreAttendu) {
-    assertEquals(scoreAttendu, validateur.scoreMotDePasse(motDePasse),
-        "Score incorrect pour '" + motDePasse + "'");
+ assertEquals(scoreAttendu, validateur.scoreMotDePasse(motDePasse),
+ "Score incorrect pour '" + motDePasse + "'");
 }
 ```
 
@@ -996,11 +996,11 @@ Chaque ligne du CSV correspond à un test indépendant. Si on devait écrire cel
 @ParameterizedTest(name = "email = {0} est valide → {1}")
 @DisplayName("Emails : cas limites avec null")
 @CsvSource(value = {
-    "N/A, false",
-    "'', false"
+ "N/A, false",
+ "'', false"
 }, nullValues = "N/A")
 void emailsAvecNull(String email, boolean attendu) {
-    assertEquals(attendu, validateur.estEmailValide(email));
+ assertEquals(attendu, validateur.estEmailValide(email));
 }
 ```
 
@@ -1015,8 +1015,8 @@ void emailsAvecNull(String email, boolean attendu) {
 **Pourquoi `''` ?** Dans le CSV de JUnit, deux apostrophes consécutives `''` représentent une chaîne vide `""`. Sans les apostrophes, le parser pourrait interpréter la valeur comme absente.
 
 **Résultat** : 2 exécutions.
-1. `email = null, attendu = false` → `estEmailValide(null)` → false ✓
-2. `email = "", attendu = false` → `estEmailValide("")` → false ✓
+1. `email = null, attendu = false` → `estEmailValide(null)` → false
+2. `email = "", attendu = false` → `estEmailValide("")` → false
 
 ---
 
@@ -1033,8 +1033,8 @@ Cette énumération est définie DANS la classe de test. C'est une pratique cour
 @DisplayName("Tous les statuts sauf SUPPRIME sont valides")
 @EnumSource(value = StatutUtilisateur.class, mode = EXCLUDE, names = "SUPPRIME")
 void statutsValides(StatutUtilisateur statut) {
-    assertNotEquals(StatutUtilisateur.SUPPRIME, statut,
-        "Tous les statuts sauf SUPPRIME devraient passer");
+ assertNotEquals(StatutUtilisateur.SUPPRIME, statut,
+ "Tous les statuts sauf SUPPRIME devraient passer");
 }
 ```
 
@@ -1048,7 +1048,7 @@ void statutsValides(StatutUtilisateur statut) {
 @DisplayName("Seuls ACTIF et SUSPENDU sont testés ici")
 @EnumSource(value = StatutUtilisateur.class, mode = INCLUDE, names = {"ACTIF", "SUSPENDU"})
 void statutsSpecifiques(StatutUtilisateur statut) {
-    assertTrue(statut == StatutUtilisateur.ACTIF || statut == StatutUtilisateur.SUSPENDU);
+ assertTrue(statut == StatutUtilisateur.ACTIF || statut == StatutUtilisateur.SUSPENDU);
 }
 ```
 
@@ -1069,8 +1069,8 @@ void statutsSpecifiques(StatutUtilisateur statut) {
 @DisplayName("Validation téléphones via fichier CSV externe")
 @CsvFileSource(resources = "/telephones-test.csv", numLinesToSkip = 1)
 void telephonesDepuisFichier(String telephone, boolean attendu) {
-    assertEquals(attendu, validateur.estTelephoneValide(telephone),
-        "Échec pour le téléphone : " + telephone);
+ assertEquals(attendu, validateur.estTelephoneValide(telephone),
+ "Échec pour le téléphone : " + telephone);
 }
 ```
 
@@ -1100,23 +1100,23 @@ void telephonesDepuisFichier(String telephone, boolean attendu) {
 @DisplayName("Catégorisation par âge (via @MethodSource)")
 @MethodSource("fournirAgesEtCategories")
 void categorisationAge(int age, String categorieAttendue) {
-    assertEquals(categorieAttendue, validateur.categorieAge(age),
-        "Catégorie incorrecte pour l'âge " + age);
+ assertEquals(categorieAttendue, validateur.categorieAge(age),
+ "Catégorie incorrecte pour l'âge " + age);
 }
 
 static Stream<Arguments> fournirAgesEtCategories() {
-    return Stream.of(
-        Arguments.of(0, "MINEUR"),
-        Arguments.of(17, "MINEUR"),
-        Arguments.of(18, "JEUNE_ADULTE"),
-        Arguments.of(24, "JEUNE_ADULTE"),
-        Arguments.of(25, "ADULTE"),
-        Arguments.of(59, "ADULTE"),
-        Arguments.of(60, "SENIOR"),
-        Arguments.of(119, "SENIOR"),
-        Arguments.of(120, "CENTENAIRE"),
-        Arguments.of(150, "CENTENAIRE")
-    );
+ return Stream.of(
+ Arguments.of(0, "MINEUR"),
+ Arguments.of(17, "MINEUR"),
+ Arguments.of(18, "JEUNE_ADULTE"),
+ Arguments.of(24, "JEUNE_ADULTE"),
+ Arguments.of(25, "ADULTE"),
+ Arguments.of(59, "ADULTE"),
+ Arguments.of(60, "SENIOR"),
+ Arguments.of(119, "SENIOR"),
+ Arguments.of(120, "CENTENAIRE"),
+ Arguments.of(150, "CENTENAIRE")
+ );
 }
 ```
 
@@ -1134,10 +1134,10 @@ static Stream<Arguments> fournirAgesEtCategories() {
 
 ```java
 @CsvSource({
-    "0, MINEUR",
-    "17, MINEUR",
-    "18, JEUNE_ADULTE",
-    // ... 7 autres lignes ...
+ "0, MINEUR",
+ "17, MINEUR",
+ "18, JEUNE_ADULTE",
+ // ... 7 autres lignes ...
 })
 ```
 
@@ -1156,12 +1156,12 @@ Mais `@MethodSource` offre des avantages :
 @DisplayName("Âges valides (via @MethodSource d'entiers)")
 @MethodSource("agesValides")
 void agesValides(int age) {
-    assertTrue(validateur.estAgeValide(age),
-        "L'âge " + age + " devrait être valide");
+ assertTrue(validateur.estAgeValide(age),
+ "L'âge " + age + " devrait être valide");
 }
 
 static Stream<Integer> agesValides() {
-    return Stream.of(18, 25, 30, 60, 100, 120);
+ return Stream.of(18, 25, 30, 60, 100, 120);
 }
 ```
 
@@ -1180,7 +1180,7 @@ static Stream<Integer> agesValides() {
 @DisplayName("Email invalide pour null et chaîne vide")
 @NullAndEmptySource
 void emailNullOuVide(String email) {
-    assertFalse(validateur.estEmailValide(email));
+ assertFalse(validateur.estEmailValide(email));
 }
 ```
 
@@ -1198,7 +1198,7 @@ void emailNullOuVide(String email) {
 @NullSource
 @EmptySource
 void telephoneNullEtVide(String telephone) {
-    assertFalse(validateur.estTelephoneValide(telephone));
+ assertFalse(validateur.estTelephoneValide(telephone));
 }
 ```
 
@@ -1214,7 +1214,7 @@ Même résultat que `@NullAndEmptySource`, mais avec les deux annotations sépar
 @NullAndEmptySource
 @ValueSource(strings = " ")
 void scoreZeroPourEntreesInvalides(String mdp) {
-    assertEquals(0, validateur.scoreMotDePasse(mdp));
+ assertEquals(0, validateur.scoreMotDePasse(mdp));
 }
 ```
 
@@ -1234,15 +1234,15 @@ void scoreZeroPourEntreesInvalides(String mdp) {
 @ParameterizedTest(name = "Téléphone \"{0}\" doit être valide")
 @DisplayName("Téléphones valides (formats variés)")
 @CsvSource({
-    "0612345678",
-    "06 12 34 56 78",
-    "06.12.34.56.78",
-    "+33612345678",
-    "+33 6 12 34 56 78"
+ "0612345678",
+ "06 12 34 56 78",
+ "06.12.34.56.78",
+ "+33612345678",
+ "+33 6 12 34 56 78"
 })
 void telephonesValidesFormatsVariés(String telephone) {
-    assertTrue(validateur.estTelephoneValide(telephone),
-        "Format attendu valide : " + telephone);
+ assertTrue(validateur.estTelephoneValide(telephone),
+ "Format attendu valide : " + telephone);
 }
 ```
 
@@ -1265,14 +1265,14 @@ Tous ces formats doivent être acceptés car la méthode `estTelephoneValide` ne
 @ParameterizedTest
 @DisplayName("Conversion automatique : String → int → boolean")
 @CsvSource({
-    "18, true",
-    "17, false",
-    "120, true",
-    "121, false",
-    "0, false"
+ "18, true",
+ "17, false",
+ "120, true",
+ "121, false",
+ "0, false"
 })
 void conversionAutoTypes(int age, boolean attendu) {
-    assertEquals(attendu, validateur.estAgeValide(age));
+ assertEquals(attendu, validateur.estAgeValide(age));
 }
 ```
 
@@ -1288,9 +1288,9 @@ Sans conversion automatique, il faudrait écrire :
 
 ```java
 void conversionAutoTypes(String ageStr, String attenduStr) {
-    int age = Integer.parseInt(ageStr);
-    boolean attendu = Boolean.parseBoolean(attenduStr);
-    assertEquals(attendu, validateur.estAgeValide(age));
+ int age = Integer.parseInt(ageStr);
+ boolean attendu = Boolean.parseBoolean(attenduStr);
+ assertEquals(attendu, validateur.estAgeValide(age));
 }
 ```
 
@@ -1333,17 +1333,17 @@ Ouvrez `target/site/jacoco/index.html` pour voir la couverture. Les tests param�
 
 ---
 
-# PARTIE 3 — LAB (45 min)
+## PARTIE 3 -- LAB (45 min)
 
 ---
 
 ## Énoncé
 
-### 🎯 Objectif
+### Objectif
 
 Ajouter deux nouvelles méthodes de validation à la classe `ValidateurUtilisateur` et écrire leurs tests avec les sources paramétrées appropriées.
 
-### 📋 Consignes
+### Consignes
 
 #### 1. Ajouter `estCodePostalValide(String codePostal)`
 
@@ -1355,7 +1355,7 @@ Cette méthode valide un code postal français (5 chiffres). Règles :
 
 ```java
 public boolean estCodePostalValide(String codePostal) {
-    // À implémenter
+ // À implémenter
 }
 ```
 
@@ -1374,7 +1374,7 @@ Cette méthode valide une URL simple. Règles :
 
 ```java
 public boolean estUrlValide(String url) {
-    // À implémenter
+ // À implémenter
 }
 ```
 
@@ -1384,13 +1384,13 @@ public boolean estUrlValide(String url) {
 - Cas à couvrir : `http://`, `https://`, avec `www`, sans `www`, avec chemin, sans chemin, `ftp://` (invalide), pas de protocole, pas de point, null.
 - Utiliser `@NullAndEmptySource` pour les cas null et vide.
 
-### 📂 Fichiers à modifier / créer
+### Fichiers à modifier / créer
 
 - `labs/lab02-parametres/src/main/java/com/nexa/parametres/ValidateurUtilisateur.java` (ajouter les 2 méthodes)
 - `labs/lab02-parametres/src/test/java/com/nexa/parametres/ValidateurUtilisateurTest.java` (ajouter les tests)
 - `labs/lab02-parametres/src/test/resources/codes-postaux-test.csv` (créer le fichier CSV)
 
-### ✅ Critères de réussite
+### Critères de réussite
 
 - Tous les tests passent (`mvn clean test` → BUILD SUCCESS).
 - Au moins 3 sources d'arguments différentes sont utilisées (`@CsvFileSource`, `@MethodSource`, `@NullAndEmptySource`).
@@ -1405,13 +1405,13 @@ public boolean estUrlValide(String url) {
 
 ```java
 public boolean estCodePostalValide(String codePostal) {
-    if (codePostal == null || codePostal.isEmpty()) return false;
-    if (codePostal.length() != 5) return false;
-    if (codePostal.charAt(0) == '0') return false;
-    for (int i = 0; i < codePostal.length(); i++) {
-        if (!Character.isDigit(codePostal.charAt(i))) return false;
-    }
-    return true;
+ if (codePostal == null || codePostal.isEmpty()) return false;
+ if (codePostal.length() != 5) return false;
+ if (codePostal.charAt(0) == '0') return false;
+ for (int i = 0; i < codePostal.length(); i++) {
+ if (!Character.isDigit(codePostal.charAt(i))) return false;
+ }
+ return true;
 }
 ```
 
@@ -1424,13 +1424,13 @@ public boolean estCodePostalValide(String codePostal) {
 
 ```java
 public boolean estUrlValide(String url) {
-    if (url == null || url.isEmpty()) return false;
-    String urlMinuscule = url.toLowerCase();
-    if (!urlMinuscule.startsWith("http://") && !urlMinuscule.startsWith("https://")) {
-        return false;
-    }
-    String sansProtocole = url.substring(url.indexOf("://") + 3);
-    return sansProtocole.contains(".") && sansProtocole.length() > 1;
+ if (url == null || url.isEmpty()) return false;
+ String urlMinuscule = url.toLowerCase();
+ if (!urlMinuscule.startsWith("http://") && !urlMinuscule.startsWith("https://")) {
+ return false;
+ }
+ String sansProtocole = url.substring(url.indexOf("://") + 3);
+ return sansProtocole.contains(".") && sansProtocole.length() > 1;
 }
 ```
 
@@ -1475,8 +1475,8 @@ ABCDE,false
 @DisplayName("Validation codes postaux via fichier CSV")
 @CsvFileSource(resources = "/codes-postaux-test.csv", numLinesToSkip = 1)
 void codesPostauxDepuisFichier(String codePostal, boolean attendu) {
-    assertEquals(attendu, validateur.estCodePostalValide(codePostal),
-        "Échec pour le code postal : " + codePostal);
+ assertEquals(attendu, validateur.estCodePostalValide(codePostal),
+ "Échec pour le code postal : " + codePostal);
 }
 ```
 
@@ -1487,30 +1487,30 @@ void codesPostauxDepuisFichier(String codePostal, boolean attendu) {
 @DisplayName("Validation d'URLs (via @MethodSource)")
 @MethodSource("fournirUrlsEtValidite")
 void urlsValides(String url, boolean attendu) {
-    assertEquals(attendu, validateur.estUrlValide(url),
-        "Échec pour l'URL : " + url);
+ assertEquals(attendu, validateur.estUrlValide(url),
+ "Échec pour l'URL : " + url);
 }
 
 static Stream<Arguments> fournirUrlsEtValidite() {
-    return Stream.of(
-        Arguments.of("http://example.com", true),
-        Arguments.of("https://www.google.fr", true),
-        Arguments.of("http://site.org/path", true),
-        Arguments.of("https://sub.domain.co/page?q=1", true),
-        Arguments.of("http://localhost:8080", true),
-        Arguments.of("https://a.b", true),
-        Arguments.of("ftp://example.com", false),
-        Arguments.of("example.com", false),
-        Arguments.of("http://sanspoint", false),
-        Arguments.of("https://", false)
-    );
+ return Stream.of(
+ Arguments.of("http://example.com", true),
+ Arguments.of("https://www.google.fr", true),
+ Arguments.of("http://site.org/path", true),
+ Arguments.of("https://sub.domain.co/page?q=1", true),
+ Arguments.of("http://localhost:8080", true),
+ Arguments.of("https://a.b", true),
+ Arguments.of("ftp://example.com", false),
+ Arguments.of("example.com", false),
+ Arguments.of("http://sanspoint", false),
+ Arguments.of("https://", false)
+ );
 }
 
 @ParameterizedTest
 @DisplayName("URL invalide pour null et chaîne vide")
 @NullAndEmptySource
 void urlNullOuVide(String url) {
-    assertFalse(validateur.estUrlValide(url));
+ assertFalse(validateur.estUrlValide(url));
 }
 ```
 
@@ -1530,7 +1530,7 @@ void urlNullOuVide(String url) {
 
 ---
 
-# FICHE MÉMO — Module 2
+## FICHE MEMO -- Module 2
 
 ## Annotations de tests paramétrés
 

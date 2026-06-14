@@ -6,7 +6,20 @@
 
 ---
 
-## PARTIE 1 — THÉORIE (35 min)
+## Objectifs pedagogiques
+
+A l'issue de ce module, vous serez capable de :
+
+1. Lister les 10 categories de l'OWASP Top 10 (2021).
+2. Expliquer le mecanisme d'une injection SQL et la corriger avec `PreparedStatement`.
+3. Expliquer le mecanisme d'une XSS et la corriger avec l'echappement HTML.
+4. Exploiter et corriger une faille de path traversal.
+5. Hacher un mot de passe avec BCrypt et verifier le format `sel:hash`.
+6. Ecrire des tests qui prouvent qu'une vulnerabilite est corrigee.
+
+---
+
+## PARTIE 1 -- THEORIE (35 min)
 
 ### 1. L'OWASP et son Top 10 (2021)
 
@@ -39,7 +52,7 @@ Prenons le code vulnérable de notre lab (`RequeteurSQL.java:5-7`) :
 
 ```java
 public String construireRequeteVulnerable(String nom) {
-    return "SELECT * FROM users WHERE nom = '" + nom + "'";
+ return "SELECT * FROM users WHERE nom = '" + nom + "'";
 }
 ```
 
@@ -74,7 +87,7 @@ Le code sécurisé (`RequeteurSQL.java:9-11`) utilise un **paramètre lié** (le
 
 ```java
 public String construireRequeteSecurisee(String nom) {
-    return "SELECT * FROM users WHERE nom = ?";
+ return "SELECT * FROM users WHERE nom = ?";
 }
 ```
 
@@ -89,7 +102,7 @@ Le `LIKE` est plus délicat car les métacaractères `%` et `_` sont valides en 
 ```java
 // Version vulnérable (RequeteurSQL.java:13-15)
 public String construireRechercheVulnerable(String terme) {
-    return "SELECT * FROM produits WHERE nom LIKE '%" + terme + "%'";
+ return "SELECT * FROM produits WHERE nom LIKE '%" + terme + "%'";
 }
 ```
 
@@ -99,11 +112,11 @@ La correction (`RequeteurSQL.java:17-19`) paramétrise la requête, et la métho
 
 ```java
 public String construireRechercheSecurisee() {
-    return "SELECT * FROM produits WHERE nom LIKE ?";
+ return "SELECT * FROM produits WHERE nom LIKE ?";
 }
 
 public String encoderParametrePourLike(String terme) {
-    return "%" + terme.replace("%", "\\%").replace("_", "\\_") + "%";
+ return "%" + terme.replace("%", "\\%").replace("_", "\\_") + "%";
 }
 ```
 
@@ -138,11 +151,11 @@ La méthode `contientScript()` (`SanitizerXSS.java:25-30`) détecte la présence
 
 ```java
 public boolean contientScript(String input) {
-    if (input == null) return false;
-    String lower = input.toLowerCase();
-    return lower.contains("<script") || lower.contains("javascript:")
-        || lower.contains("onerror=") || lower.contains("onload=")
-        || lower.contains("onclick=");
+ if (input == null) return false;
+ String lower = input.toLowerCase();
+ return lower.contains("<script") || lower.contains("javascript:")
+ || lower.contains("onerror=") || lower.contains("onload=")
+ || lower.contains("onclick=");
 }
 ```
 
@@ -164,13 +177,13 @@ Implémentation dans notre lab (`SanitizerXSS.java:15-23`) :
 
 ```java
 public String echapperHtml(String input) {
-    if (input == null) return "";
-    return input
-        .replace("&", "&amp;")
-        .replace("<", "&lt;")
-        .replace(">", "&gt;")
-        .replace("\"", "&quot;")
-        .replace("'", "&#39;");
+ if (input == null) return "";
+ return input
+ .replace("&", "&amp;")
+ .replace("<", "&lt;")
+ .replace(">", "&gt;")
+ .replace("\"", "&quot;")
+ .replace("'", "&#39;");
 }
 ```
 
@@ -178,7 +191,7 @@ Le test `echappementCaracteresSpeciaux` (`SanitizerXSSTest.java:57-60`) vérifie
 
 ```java
 assertEquals("&lt;&gt;&amp;&quot;&#39;",
-    sanitizer.echapperHtml("<>&\"'"));
+ sanitizer.echapperHtml("<>&\"'"));
 ```
 
 Pour la production, utilisez **OWASP Java Encoder** (`org.owasp.encoder:encoder`) qui gère le contexte (HTML body, attribut, JavaScript, CSS, URL).
@@ -194,7 +207,7 @@ Un attaquant manipule le chemin d'un fichier pour sortir du répertoire autoris�
 ```java
 // Vulnérable (SecuriteFichier.java:10-12)
 public String construireCheminVulnerable(String nomFichier) {
-    return REPERTOIRE_AUTORISE + nomFichier;  // "/var/data/" + "../../etc/passwd"
+ return REPERTOIRE_AUTORISE + nomFichier; // "/var/data/" + "../../etc/passwd"
 }
 ```
 
@@ -206,24 +219,24 @@ La version sécurisée (`SecuriteFichier.java:14-30`) applique une **défense en
 
 ```java
 public String construireCheminSecurise(String nomFichier) {
-    // Couche 1 : rejet explicite des caractères dangereux
-    if (nomFichier == null || nomFichier.isEmpty()) {
-        throw new IllegalArgumentException("Nom de fichier invalide");
-    }
-    if (nomFichier.contains("..") || nomFichier.contains("/")
-            || nomFichier.contains("\\")) {
-        throw new IllegalArgumentException("Caractères interdits dans le nom de fichier");
-    }
+ // Couche 1 : rejet explicite des caractères dangereux
+ if (nomFichier == null || nomFichier.isEmpty()) {
+ throw new IllegalArgumentException("Nom de fichier invalide");
+ }
+ if (nomFichier.contains("..") || nomFichier.contains("/")
+ || nomFichier.contains("\\")) {
+ throw new IllegalArgumentException("Caractères interdits dans le nom de fichier");
+ }
 
-    // Couche 2 : normalisation et vérification startsWith
-    Path base = Paths.get(REPERTOIRE_AUTORISE).normalize();
-    Path fichier = base.resolve(nomFichier).normalize();
+ // Couche 2 : normalisation et vérification startsWith
+ Path base = Paths.get(REPERTOIRE_AUTORISE).normalize();
+ Path fichier = base.resolve(nomFichier).normalize();
 
-    if (!fichier.startsWith(base)) {
-        throw new SecurityException("Tentative de path traversal détectée");
-    }
+ if (!fichier.startsWith(base)) {
+ throw new SecurityException("Tentative de path traversal détectée");
+ }
 
-    return fichier.toString();
+ return fichier.toString();
 }
 ```
 
@@ -233,10 +246,10 @@ La détection proactive (`SecuriteFichier.java:32-36`) vérifie les motifs suspe
 
 ```java
 public boolean estTentativePathTraversal(String input) {
-    if (input == null) return false;
-    return input.contains("../") || input.contains("..\\")
-        || input.contains("/..") || input.contains("\\..")
-        || input.startsWith("/") || input.contains("\0");
+ if (input == null) return false;
+ return input.contains("../") || input.contains("..\\")
+ || input.contains("/..") || input.contains("\\..")
+ || input.startsWith("/") || input.contains("\0");
 }
 ```
 
@@ -263,13 +276,13 @@ Notre lab contient deux méthodes côte à côte pour démontrer la différence 
 **Hachage vulnérable** (`GestionnaireMotDePasse.java:10-18`) :
 ```java
 public String hacherVulnerable(String motDePasse) {
-    try {
-        MessageDigest digest = MessageDigest.getInstance("SHA-256");
-        byte[] hash = digest.digest(motDePasse.getBytes());
-        return Base64.getEncoder().encodeToString(hash);
-    } catch (NoSuchAlgorithmException e) {
-        throw new RuntimeException(e);
-    }
+ try {
+ MessageDigest digest = MessageDigest.getInstance("SHA-256");
+ byte[] hash = digest.digest(motDePasse.getBytes());
+ return Base64.getEncoder().encodeToString(hash);
+ } catch (NoSuchAlgorithmException e) {
+ throw new RuntimeException(e);
+ }
 }
 ```
 
@@ -278,7 +291,7 @@ Ce hachage est **déterministe** : `hacherVulnerable("password123")` produit **t
 ```java
 String h1 = gestionnaire.hacherVulnerable("password123");
 String h2 = gestionnaire.hacherVulnerable("password123");
-assertEquals(h1, h2);  // Même entrée → même hash
+assertEquals(h1, h2); // Même entrée → même hash
 ```
 
 Conséquence : un attaquant peut précalculer une **rainbow table** (SHA-256("password123") = X, SHA-256("123456") = Y...) et retrouver instantanément les mots de passe communs.
@@ -286,19 +299,19 @@ Conséquence : un attaquant peut précalculer une **rainbow table** (SHA-256("pa
 **Hachage sécurisé** (`GestionnaireMotDePasse.java:20-34`) :
 ```java
 public String hacherAvecSel(String motDePasse) {
-    try {
-        SecureRandom random = new SecureRandom();
-        byte[] sel = new byte[16];
-        random.nextBytes(sel);
+ try {
+ SecureRandom random = new SecureRandom();
+ byte[] sel = new byte[16];
+ random.nextBytes(sel);
 
-        MessageDigest digest = MessageDigest.getInstance("SHA-256");
-        digest.update(sel);  // Le sel est combiné AVANT le mot de passe
-        byte[] hash = digest.digest(motDePasse.getBytes());
+ MessageDigest digest = MessageDigest.getInstance("SHA-256");
+ digest.update(sel); // Le sel est combiné AVANT le mot de passe
+ byte[] hash = digest.digest(motDePasse.getBytes());
 
-        return Base64.getEncoder().encodeToString(sel) + ":" + Base64.getEncoder().encodeToString(hash);
-    } catch (NoSuchAlgorithmException e) {
-        throw new RuntimeException(e);
-    }
+ return Base64.getEncoder().encodeToString(sel) + ":" + Base64.getEncoder().encodeToString(hash);
+ } catch (NoSuchAlgorithmException e) {
+ throw new RuntimeException(e);
+ }
 }
 ```
 
@@ -307,20 +320,20 @@ Le test prouve la non-déterminisme (`GestionnaireMotDePasseTest.java:28-33`) :
 ```java
 String h1 = gestionnaire.hacherAvecSel("password123");
 String h2 = gestionnaire.hacherAvecSel("password123");
-assertNotEquals(h1, h2);  // Même entrée → hashs différents (sel aléatoire)
+assertNotEquals(h1, h2); // Même entrée → hashs différents (sel aléatoire)
 ```
 
 Format de sortie : `sel:hash` (sel en Base64, suivi de `:`, puis le hash en Base64). La vérification (`GestionnaireMotDePasse.java:36-51`) extrait le sel stocké, recalcule le hash, et compare :
 
 ```java
 public boolean verifierMotDePasse(String motDePasse, String hashStocke) {
-    String[] parties = hashStocke.split(":");
-    byte[] sel = Base64.getDecoder().decode(parties[0]);
-    MessageDigest digest = MessageDigest.getInstance("SHA-256");
-    digest.update(sel);
-    byte[] hashCalcule = digest.digest(motDePasse.getBytes());
-    String hashCalculeB64 = Base64.getEncoder().encodeToString(hashCalcule);
-    return hashCalculeB64.equals(parties[1]);
+ String[] parties = hashStocke.split(":");
+ byte[] sel = Base64.getDecoder().decode(parties[0]);
+ MessageDigest digest = MessageDigest.getInstance("SHA-256");
+ digest.update(sel);
+ byte[] hashCalcule = digest.digest(motDePasse.getBytes());
+ String hashCalculeB64 = Base64.getEncoder().encodeToString(hashCalcule);
+ return hashCalculeB64.equals(parties[1]);
 }
 ```
 
@@ -336,8 +349,8 @@ Tous trois intègrent **nativement** le salage et les itérations. Exemple avec 
 
 ```java
 BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-String hash = encoder.encode("password123");        // $2a$10$...
-boolean ok  = encoder.matches("password123", hash); // true
+String hash = encoder.encode("password123"); // $2a$10$...
+boolean ok = encoder.matches("password123", hash); // true
 ```
 
 ---
@@ -356,9 +369,9 @@ Le test est structuré en tests unitaires simples et tests paramétrés. Trois a
 @Test
 @DisplayName("Requête vulnérable : l'injection SQL est possible")
 void requeteVulnerableInjectionPossible() {
-    String requete = requeteur.construireRequeteVulnerable("' OR '1'='1' --");
-    assertTrue(requete.contains("' OR '1'='1' --"),
-        "Preuve de vulnérabilité : la chaîne d'injection est dans la requête");
+ String requete = requeteur.construireRequeteVulnerable("' OR '1'='1' --");
+ assertTrue(requete.contains("' OR '1'='1' --"),
+ "Preuve de vulnérabilité : la chaîne d'injection est dans la requête");
 }
 ```
 
@@ -370,11 +383,11 @@ void requeteVulnerableInjectionPossible() {
 @Test
 @DisplayName("Requête sécurisée : pas possible d'injecter — le paramètre '?' est utilisé")
 void requeteSecuriseePasInjection() {
-    String requete = requeteur.construireRequeteSecurisee("' OR '1'='1' --");
-    assertTrue(requete.contains("?"),
-        "La requête utilise un paramètre ?");
-    assertFalse(requete.contains("' OR '1'='1'"),
-        "Les données utilisateur NE sont PAS dans la requête");
+ String requete = requeteur.construireRequeteSecurisee("' OR '1'='1' --");
+ assertTrue(requete.contains("?"),
+ "La requête utilise un paramètre ?");
+ assertFalse(requete.contains("' OR '1'='1'"),
+ "Les données utilisateur NE sont PAS dans la requête");
 }
 ```
 
@@ -388,20 +401,20 @@ void requeteSecuriseePasInjection() {
 @ParameterizedTest
 @DisplayName("Détection d'injection sur entrées malveillantes")
 @ValueSource(strings = {
-    "' OR '1'='1",
-    "'; DROP TABLE users; --",
-    "1' UNION SELECT * FROM users --",
-    "admin'--",
-    "' OR 1=1 --"
+ "' OR '1'='1",
+ "'; DROP TABLE users; --",
+ "1' UNION SELECT * FROM users --",
+ "admin'--",
+ "' OR 1=1 --"
 })
 void entréesMalveillantes(String injection) {
-    String vuln = requeteur.construireRequeteVulnerable(injection);
-    assertTrue(vuln.contains(injection),
-        "La version vulnérable injecte directement : " + injection);
+ String vuln = requeteur.construireRequeteVulnerable(injection);
+ assertTrue(vuln.contains(injection),
+ "La version vulnérable injecte directement : " + injection);
 
-    String sec = requeteur.construireRequeteSecurisee(injection);
-    assertFalse(sec.contains(injection),
-        "La version sécurisée n'injecte pas : " + injection);
+ String sec = requeteur.construireRequeteSecurisee(injection);
+ assertFalse(sec.contains(injection),
+ "La version sécurisée n'injecte pas : " + injection);
 }
 ```
 
@@ -417,9 +430,9 @@ void entréesMalveillantes(String injection) {
 @Test
 @DisplayName("Page vulnérable : le script est injecté tel quel")
 void pageVulnerableScriptNonEchappe() {
-    String page = sanitizer.genererPageAccueilVulnerable("<script>alert('XSS')</script>");
-    assertTrue(page.contains("<script>"),
-        "Preuve de vulnérabilité : la balise script est présente");
+ String page = sanitizer.genererPageAccueilVulnerable("<script>alert('XSS')</script>");
+ assertTrue(page.contains("<script>"),
+ "Preuve de vulnérabilité : la balise script est présente");
 }
 ```
 
@@ -431,11 +444,11 @@ Même principe que pour SQL : on vérifie que la balise `<script>` arrive **inta
 @Test
 @DisplayName("Page sécurisée : le script est neutralisé")
 void pageSecuriseeScriptNeutralise() {
-    String page = sanitizer.genererPageAccueilSecurisee("<script>alert('XSS')</script>");
-    assertFalse(page.contains("<script>"),
-        "La balise script est neutralisée : " + page);
-    assertTrue(page.contains("&lt;script&gt;"),
-        "Le script est échappé en entités HTML");
+ String page = sanitizer.genererPageAccueilSecurisee("<script>alert('XSS')</script>");
+ assertFalse(page.contains("<script>"),
+ "La balise script est neutralisée : " + page);
+ assertTrue(page.contains("&lt;script&gt;"),
+ "Le script est échappé en entités HTML");
 }
 ```
 
@@ -449,10 +462,10 @@ void pageSecuriseeScriptNeutralise() {
 @Test
 @DisplayName("Détection de contenu script malveillant")
 void detectionScriptMalveillant() {
-    assertTrue(sanitizer.contientScript("<script>alert(1)</script>"));
-    assertTrue(sanitizer.contientScript("<img src=x onerror=alert(1)>"));
-    assertTrue(sanitizer.contientScript("javascript:void(0)"));
-    assertTrue(sanitizer.contientScript("<body onload=alert(1)>"));
+ assertTrue(sanitizer.contientScript("<script>alert(1)</script>"));
+ assertTrue(sanitizer.contientScript("<img src=x onerror=alert(1)>"));
+ assertTrue(sanitizer.contientScript("javascript:void(0)"));
+ assertTrue(sanitizer.contientScript("<body onload=alert(1)>"));
 }
 ```
 
@@ -464,9 +477,9 @@ La méthode `contientScript` est un **détecteur de signatures**. Elle ne bloque
 @Test
 @DisplayName("Contenu légitime non détecté comme malveillant")
 void contenuLegitimeNonDetecte() {
-    assertFalse(sanitizer.contientScript("Bonjour tout le monde"));
-    assertFalse(sanitizer.contientScript("Je m'appelle Jean"));
-    assertFalse(sanitizer.contientScript(null));
+ assertFalse(sanitizer.contientScript("Bonjour tout le monde"));
+ assertFalse(sanitizer.contientScript("Je m'appelle Jean"));
+ assertFalse(sanitizer.contientScript(null));
 }
 ```
 
@@ -478,17 +491,17 @@ Un détecteur qui crie au loup sur du contenu légitime est inutile. Ce test gar
 @ParameterizedTest
 @DisplayName("Neutralisation de vecteurs XSS connus")
 @ValueSource(strings = {
-    "<script>alert(1)</script>",
-    "<img src=x onerror='alert(1)'>",
-    "\"><script>alert(document.cookie)</script>",
-    "<svg onload=alert(1)>",
-    "'-alert(1)-'",
-    "<body onload='alert(1)'>"
+ "<script>alert(1)</script>",
+ "<img src=x onerror='alert(1)'>",
+ "\"><script>alert(document.cookie)</script>",
+ "<svg onload=alert(1)>",
+ "'-alert(1)-'",
+ "<body onload='alert(1)'>"
 })
 void neutralisationVecteursXSS(String vecteur) {
-    String securise = sanitizer.echapperHtml(vecteur);
-    assertFalse(securise.contains("<script>"), "Script non neutralisé pour : " + vecteur);
-    assertFalse(securise.contains("<script "), "Script avec espace non neutralisé");
+ String securise = sanitizer.echapperHtml(vecteur);
+ assertFalse(securise.contains("<script>"), "Script non neutralisé pour : " + vecteur);
+ assertFalse(securise.contains("<script "), "Script avec espace non neutralisé");
 }
 ```
 
@@ -504,9 +517,9 @@ Chaque vecteur est échappé puis vérifié. Notez le test du `<script ` (avec e
 @Test
 @DisplayName("Chemin vulnérable : le path traversal est possible")
 void cheminVulnerablePathTraversalPossible() {
-    String chemin = securite.construireCheminVulnerable("../../etc/passwd");
-    assertEquals("/var/data/../../etc/passwd", chemin,
-        "Preuve : le ../ est concaténé tel quel");
+ String chemin = securite.construireCheminVulnerable("../../etc/passwd");
+ assertEquals("/var/data/../../etc/passwd", chemin,
+ "Preuve : le ../ est concaténé tel quel");
 }
 ```
 
@@ -518,8 +531,8 @@ Le `../` est présent tel quel dans le résultat. Aucune validation, aucun bloca
 @Test
 @DisplayName("Chemin sécurisé : les ../ sont bloqués")
 void cheminSecurisePathTraversalBloque() {
-    assertThrows(IllegalArgumentException.class,
-        () -> securite.construireCheminSecurise("../../etc/passwd"));
+ assertThrows(IllegalArgumentException.class,
+ () -> securite.construireCheminSecurise("../../etc/passwd"));
 }
 ```
 
@@ -530,11 +543,11 @@ On vérifie qu'une **exception** est levée, pas qu'un chemin modifié est retou
 ```java
 // Chemins absolus
 assertThrows(IllegalArgumentException.class,
-    () -> securite.construireCheminSecurise("/etc/passwd"));
+ () -> securite.construireCheminSecurise("/etc/passwd"));
 
 // Backslash Windows
 assertThrows(IllegalArgumentException.class,
-    () -> securite.construireCheminSecurise("..\\..\\windows\\system32"));
+ () -> securite.construireCheminSecurise("..\\..\\windows\\system32"));
 ```
 
 **Pourquoi tester `\` ?** Même si notre application tourne sous Linux, un attaquant peut cibler un déploiement Windows ou utiliser des techniques cross-platform. La sécurité doit être **indépendante de la plateforme**.
@@ -545,11 +558,11 @@ assertThrows(IllegalArgumentException.class,
 @Test
 @DisplayName("Chemin sécurisé : nom de fichier valide accepté")
 void nomFichierValideAccepte() {
-    String chemin = securite.construireCheminSecurise("rapport.pdf");
-    assertTrue(chemin.endsWith("rapport.pdf"),
-        "Le nom de fichier valide est accepté");
-    assertTrue(chemin.startsWith("/var/data/"),
-        "Le chemin est dans le répertoire autorisé");
+ String chemin = securite.construireCheminSecurise("rapport.pdf");
+ assertTrue(chemin.endsWith("rapport.pdf"),
+ "Le nom de fichier valide est accepté");
+ assertTrue(chemin.startsWith("/var/data/"),
+ "Le chemin est dans le répertoire autorisé");
 }
 ```
 
@@ -561,15 +574,15 @@ Une sécurité qui bloque tout n'est pas une bonne sécurité. On vérifie que l
 @ParameterizedTest
 @DisplayName("Détection positive de path traversal")
 @ValueSource(strings = {
-    "../../etc/passwd",
-    "..\\..\\windows\\system32",
-    "/etc/passwd",
-    "foo/../bar",
-    "file.txt\0.jpg"
+ "../../etc/passwd",
+ "..\\..\\windows\\system32",
+ "/etc/passwd",
+ "foo/../bar",
+ "file.txt\0.jpg"
 })
 void detectionPositive(String input) {
-    assertTrue(securite.estTentativePathTraversal(input),
-        "Devrait détecter une tentative : " + input);
+ assertTrue(securite.estTentativePathTraversal(input),
+ "Devrait détecter une tentative : " + input);
 }
 ```
 
@@ -585,10 +598,10 @@ void detectionPositive(String input) {
 @Test
 @DisplayName("Hachage vulnérable : déterministe, même entrée → même sortie")
 void hachageVulnerableDeterministe() {
-    String h1 = gestionnaire.hacherVulnerable("password123");
-    String h2 = gestionnaire.hacherVulnerable("password123");
-    assertEquals(h1, h2,
-        "Le hachage sans sel produit toujours le même résultat → vulnérable aux rainbow tables");
+ String h1 = gestionnaire.hacherVulnerable("password123");
+ String h2 = gestionnaire.hacherVulnerable("password123");
+ assertEquals(h1, h2,
+ "Le hachage sans sel produit toujours le même résultat → vulnérable aux rainbow tables");
 }
 ```
 
@@ -600,10 +613,10 @@ C'est le test le plus important du module : il **démontre** la vulnérabilité 
 @Test
 @DisplayName("Hachage sécurisé : aléatoire, même entrée → sorties différentes")
 void hachageSecuriseAleatoire() {
-    String h1 = gestionnaire.hacherAvecSel("password123");
-    String h2 = gestionnaire.hacherAvecSel("password123");
-    assertNotEquals(h1, h2,
-        "Avec un sel aléatoire, le même mot de passe produit des hashs différents");
+ String h1 = gestionnaire.hacherAvecSel("password123");
+ String h2 = gestionnaire.hacherAvecSel("password123");
+ assertNotEquals(h1, h2,
+ "Avec un sel aléatoire, le même mot de passe produit des hashs différents");
 }
 ```
 
@@ -629,8 +642,8 @@ La vérification fonctionne dans les deux sens : elle **accepte** le bon mot de 
 @Test
 @DisplayName("Vérification : hash invalide rejeté")
 void verificationHashInvalide() {
-    assertFalse(gestionnaire.verifierMotDePasse("test", "hash_invalide"));
-    assertFalse(gestionnaire.verifierMotDePasse("test", null));
+ assertFalse(gestionnaire.verifierMotDePasse("test", "hash_invalide"));
+ assertFalse(gestionnaire.verifierMotDePasse("test", null));
 }
 ```
 
@@ -642,12 +655,12 @@ Le code doit être robuste face à des entrées corrompues : un hash sans `:`, u
 @Test
 @DisplayName("Hash sécurisé contient le sel (format sel:hash)")
 void hashSecuriseContientSel() {
-    String hash = gestionnaire.hacherAvecSel("test");
-    assertTrue(hash.contains(":"));
-    String[] parties = hash.split(":");
-    assertEquals(2, parties.length);
-    assertFalse(parties[0].isEmpty(), "Le sel ne doit pas être vide");
-    assertFalse(parties[1].isEmpty(), "Le hash ne doit pas être vide");
+ String hash = gestionnaire.hacherAvecSel("test");
+ assertTrue(hash.contains(":"));
+ String[] parties = hash.split(":");
+ assertEquals(2, parties.length);
+ assertFalse(parties[0].isEmpty(), "Le sel ne doit pas être vide");
+ assertFalse(parties[1].isEmpty(), "Le hash ne doit pas être vide");
 }
 ```
 
@@ -657,9 +670,9 @@ Ce test vérifie le **format de stockage**, pas la sécurité cryptographique. L
 
 ## PARTIE 3 — LAB (20 min)
 
-### 🎯 Objectif
+### Objectif
 
-Corriger une classe `Authentificateur` vulnérable fournie par le formateur.
+Corriger une classe `Authentificateur` vulnérable fournie dans le dossier `labs/lab05-owasp-java`.
 
 ### Contexte
 
@@ -670,19 +683,19 @@ Vous recevez une classe `Authentificateur` avec deux méthodes vulnérables :
 ### Travail à réaliser
 
 1. **Corriger l'injection SQL** dans la recherche d'utilisateur :
-   - Remplacer la concaténation par une requête paramétrée avec `?`
-   - Pas de `String.format`, pas de `+`, pas de `StringBuilder`
+ - Remplacer la concaténation par une requête paramétrée avec `?`
+ - Pas de `String.format`, pas de `+`, pas de `StringBuilder`
 
 2. **Corriger le XSS** dans l'affichage du profil :
-   - Échapper les 5 caractères HTML critiques avant de générer la page
-   - Gérer le cas `null` (retourner `""`)
+ - Échapper les 5 caractères HTML critiques avant de générer la page
+ - Gérer le cas `null` (retourner `""`)
 
 3. **Écrire les tests de sécurité** correspondants :
-   - Test d'injection SQL : prouver que la charge utile n'atteint pas la requête
-   - Test XSS : prouver que `<script>` devient `&lt;script&gt;`
-   - Test de non-régression : un login normal fonctionne toujours
+ - Test d'injection SQL : prouver que la charge utile n'atteint pas la requête
+ - Test XSS : prouver que `<script>` devient `&lt;script&gt;`
+ - Test de non-régression : un login normal fonctionne toujours
 
-### ✅ Critères de réussite
+### Critères de réussite
 
 - Tous les tests de sécurité passent au `mvn test`
 - Les tests couvrent au moins 3 vecteurs d'injection SQL
@@ -705,7 +718,7 @@ mvn test jacoco:report -pl lab05-owasp-java
 
 ### Injection SQL
 
-| ❌ À ne pas faire | ✅ À faire |
+| À ne pas faire | À faire |
 |-------------------|-------------|
 | `"SELECT * FROM users WHERE nom = '" + nom + "'"` | `"SELECT * FROM users WHERE nom = ?"` |
 | Concaténer des données utilisateur dans le SQL | Utiliser `PreparedStatement` / paramètres liés |
@@ -714,7 +727,7 @@ mvn test jacoco:report -pl lab05-owasp-java
 
 ### XSS
 
-| ❌ À ne pas faire | ✅ À faire |
+| À ne pas faire | À faire |
 |-------------------|-------------|
 | Afficher du contenu utilisateur sans échappement | `echapperHtml(input)` avant tout affichage |
 | Échapper `&` en dernier | Échapper `&` **en premier** (`&amp;`) |
@@ -735,11 +748,11 @@ Défense en profondeur :
 ### Mots de passe
 
 ```
-❌ SHA-256 sans sel     → déterministe → rainbow tables
-❌ MD5, SHA-1           → cassés
-✅ BCrypt, Argon2, PBKDF2  → sel + itérations intégrés
-✅ Sel unique par utilisateur
-✅ Au moins 600 000 itérations (PBKDF2) ou cost 10-12 (BCrypt)
+ SHA-256 sans sel → déterministe → rainbow tables
+ MD5, SHA-1 → cassés
+ BCrypt, Argon2, PBKDF2 → sel + itérations intégrés
+ Sel unique par utilisateur
+ Au moins 600 000 itérations (PBKDF2) ou cost 10-12 (BCrypt)
 ```
 
 ### Assertions de sécurité — patterns
