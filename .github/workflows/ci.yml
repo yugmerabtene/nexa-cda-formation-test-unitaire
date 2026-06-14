@@ -58,7 +58,7 @@ jobs:
       matrix:
         lab:
           - lab01-fondamentaux
-          - lab02-parametres-avances
+          - lab02-parametres
           - lab03-mocking
           - lab04-tdd-banque
     steps:
@@ -72,7 +72,7 @@ jobs:
           cache: 'maven'
 
       - name: Run Tests - ${{ matrix.lab }}
-        working-directory: jour1-tests-unitaires/${{ matrix.lab }}
+        working-directory: labs/${{ matrix.lab }}
         run: |
           mvn -B clean test
           mvn -B jacoco:report
@@ -83,15 +83,15 @@ jobs:
         with:
           name: test-results-jour1-${{ matrix.lab }}
           path: |
-            jour1-tests-unitaires/${{ matrix.lab }}/target/surefire-reports/
-            jour1-tests-unitaires/${{ matrix.lab }}/target/site/jacoco/
+            labs/${{ matrix.lab }}/target/surefire-reports/
+            labs/${{ matrix.lab }}/target/site/jacoco/
 
       - name: Publish Test Report
         if: always()
         uses: dorny/test-reporter@v1
         with:
           name: Tests ${{ matrix.lab }}
-          path: jour1-tests-unitaires/${{ matrix.lab }}/target/surefire-reports/TEST-*.xml
+          path: labs/${{ matrix.lab }}/target/surefire-reports/TEST-*.xml
           reporter: java-junit
 
   test-jour2:
@@ -104,7 +104,7 @@ jobs:
       matrix:
         lab:
           - lab05-owasp-java
-          - lab06-intro-spring
+          - lab06-spring-intro
           - lab07-spring-security
     steps:
       - uses: actions/checkout@v4
@@ -117,7 +117,7 @@ jobs:
           cache: 'maven'
 
       - name: Run Tests - ${{ matrix.lab }}
-        working-directory: jour2-securite/${{ matrix.lab }}
+        working-directory: labs/${{ matrix.lab }}
         run: |
           mvn -B clean test
           mvn -B jacoco:report
@@ -128,15 +128,15 @@ jobs:
         with:
           name: test-results-jour2-${{ matrix.lab }}
           path: |
-            jour2-securite/${{ matrix.lab }}/target/surefire-reports/
-            jour2-securite/${{ matrix.lab }}/target/site/jacoco/
+            labs/${{ matrix.lab }}/target/surefire-reports/
+            labs/${{ matrix.lab }}/target/site/jacoco/
 
       - name: Publish Test Report
         if: always()
         uses: dorny/test-reporter@v1
         with:
           name: Tests ${{ matrix.lab }}
-          path: jour2-securite/${{ matrix.lab }}/target/surefire-reports/TEST-*.xml
+          path: labs/${{ matrix.lab }}/target/surefire-reports/TEST-*.xml
           reporter: java-junit
 
   test-lab08:
@@ -168,11 +168,11 @@ jobs:
           cache: 'maven'
 
       - name: Unit Tests
-        working-directory: lab08-app-gestion-utilisateurs
+        working-directory: labs/lab08-user-manager
         run: mvn -B test
 
       - name: Integration Tests
-        working-directory: lab08-app-gestion-utilisateurs
+        working-directory: labs/lab08-user-manager
         run: mvn -B failsafe:integration-test failsafe:verify
         env:
           SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/usermanager
@@ -180,15 +180,15 @@ jobs:
           SPRING_DATASOURCE_PASSWORD: nexa123
 
       - name: JaCoCo Coverage Report
-        working-directory: lab08-app-gestion-utilisateurs
+        working-directory: labs/lab08-user-manager
         run: mvn -B jacoco:report
 
       - name: Check Coverage Threshold
-        working-directory: lab08-app-gestion-utilisateurs
+        working-directory: labs/lab08-user-manager
         run: mvn -B jacoco:check
 
       - name: Mutation Tests (PITest)
-        working-directory: lab08-app-gestion-utilisateurs
+        working-directory: labs/lab08-user-manager
         run: mvn -B org.pitest:pitest-maven:mutationCoverage
 
       - name: Upload Test Results
@@ -197,10 +197,10 @@ jobs:
         with:
           name: test-results-lab08
           path: |
-            lab08-app-gestion-utilisateurs/target/surefire-reports/
-            lab08-app-gestion-utilisateurs/target/failsafe-reports/
-            lab08-app-gestion-utilisateurs/target/site/jacoco/
-            lab08-app-gestion-utilisateurs/target/pit-reports/
+            labs/lab08-user-manager/target/surefire-reports/
+            labs/lab08-user-manager/target/failsafe-reports/
+            labs/lab08-user-manager/target/site/jacoco/
+            labs/lab08-user-manager/target/pit-reports/
 
       - name: Publish Test Report
         if: always()
@@ -208,8 +208,8 @@ jobs:
         with:
           name: Tests Lab08 Final
           path: |
-            lab08-app-gestion-utilisateurs/target/surefire-reports/TEST-*.xml
-            lab08-app-gestion-utilisateurs/target/failsafe-reports/TEST-*.xml
+            labs/lab08-user-manager/target/surefire-reports/TEST-*.xml
+            labs/lab08-user-manager/target/failsafe-reports/TEST-*.xml
           reporter: java-junit
 
   owasp-dependency-check:
@@ -228,7 +228,7 @@ jobs:
           cache: 'maven'
 
       - name: OWASP Dependency Check
-        working-directory: lab08-app-gestion-utilisateurs
+        working-directory: labs/lab08-user-manager
         run: |
           mvn -B org.owasp:dependency-check-maven:check \
             -DfailBuildOnCVSS=7 \
@@ -240,7 +240,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: dependency-check-report
-          path: lab08-app-gestion-utilisateurs/target/dependency-check-report.html
+          path: labs/lab08-user-manager/target/dependency-check-report.html
 
   docker-build:
     name: Build & Push Docker Image
@@ -263,7 +263,7 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
-          context: ./lab08-app-gestion-utilisateurs
+          context: ./labs/lab08-user-manager
           push: true
           tags: |
             ${{ secrets.DOCKER_REGISTRY }}/nexa-user-manager:latest

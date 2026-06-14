@@ -10,14 +10,14 @@ echo "════════════════════════�
 echo ""
 
 LABS=(
-    "jour1-tests-unitaires/lab01-fondamentaux"
-    "jour1-tests-unitaires/lab02-parametres-avances"
-    "jour1-tests-unitaires/lab03-mocking"
-    "jour1-tests-unitaires/lab04-tdd-banque"
-    "jour2-securite/lab05-owasp-java"
-    "jour2-securite/lab06-intro-spring"
-    "jour2-securite/lab07-spring-security"
-    "lab08-app-gestion-utilisateurs"
+    "labs/lab01-fondamentaux"
+    "labs/lab02-parametres"
+    "labs/lab03-mocking"
+    "labs/lab04-tdd-banque"
+    "labs/lab05-owasp-java"
+    "labs/lab06-spring-intro"
+    "labs/lab07-spring-security"
+    "labs/lab08-user-manager"
 )
 
 PASSED=0
