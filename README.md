@@ -4,6 +4,19 @@
 
 ---
 
+## Sommaire
+
+- [Bienvenue](#bienvenue)
+- [Prerequis](#prerequis)
+- [Installation pas a pas](#installation-pas-a-pas)
+- [Structure du projet](#structure-du-projet)
+- [Parcours de la formation](#parcours-de-la-formation)
+- [Comment utiliser ce depot](#comment-utiliser-ce-depot)
+- [Depannage](#depannage)
+- [Pour aller plus loin](#pour-aller-plus-loin)
+
+---
+
 ## Bienvenue
 
 Cette formation vous apprendra a ecrire des tests unitaires de qualite avec JUnit 5 et Mockito, a appliquer la methode TDD, et a securiser vos applications Java avec Spring Security et JWT.

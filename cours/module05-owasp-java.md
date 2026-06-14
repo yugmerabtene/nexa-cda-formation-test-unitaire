@@ -6,7 +6,7 @@
 
 ---
 
-## Objectifs pedagogiques
+## Objectifs pédagogiques
 
 A l'issue de ce module, vous serez capable de :
 
@@ -355,7 +355,7 @@ boolean ok = encoder.matches("password123", hash); // true
 
 ---
 
-## PARTIE 2 — PRATIQUE PAS À PAS (35 min)
+## PARTIE 2 -- PRATIQUE PAS A PAS (35 min)
 
 Nous allons décortiquer chaque classe de test du lab pour comprendre **comment** on prouve la sécurité (ou l'insécurité) d'un code Java.
 
@@ -668,7 +668,7 @@ Ce test vérifie le **format de stockage**, pas la sécurité cryptographique. L
 
 ---
 
-## PARTIE 3 — LAB (20 min)
+## PARTIE 3 -- LAB (20 min)
 
 ### Objectif
 
@@ -714,7 +714,7 @@ mvn test jacoco:report -pl lab05-owasp-java
 
 ---
 
-## FICHE MÉMO
+## FICHE MEMO
 
 ### Injection SQL
 

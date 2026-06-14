@@ -370,7 +370,7 @@ echo "eyJzdWIiOiJhZG1pbiIsInJvbGUiOiJBRE1JTiJ9" | base64 -d
 
 ## PARTIE 2 -- PRATIQUE PAS A PAS (40 min)
 
-## Structure du projet
+### Structure du projet
 
 ```
 lab07-spring-security/
@@ -406,7 +406,7 @@ lab07-spring-security/
 
 ---
 
-## pom.xml — Dépendances clés
+### pom.xml — Dépendances clés
 
 ```xml
 <parent>
@@ -490,7 +490,7 @@ lab07-spring-security/
 
 ---
 
-## SecurityConfig.java — Décortication ligne par ligne
+### SecurityConfig.java — Décortication ligne par ligne
 
  `labs/lab07-spring-security/src/main/java/com/nexa/secu/config/SecurityConfig.java`
 
@@ -640,7 +640,7 @@ Spring Security ne tente l'authentification par formulaire.
 
 ---
 
-## JwtUtil.java — Explication ligne par ligne
+### JwtUtil.java — Explication ligne par ligne
 
  `labs/lab07-spring-security/src/main/java/com/nexa/secu/security/JwtUtil.java`
 
@@ -815,7 +815,7 @@ La méthode retourne simplement `true`/`false` au lieu de laisser l'exception se
 
 ---
 
-## JwtAuthenticationFilter.java — Explication ligne par ligne
+### JwtAuthenticationFilter.java — Explication ligne par ligne
 
  `labs/lab07-spring-security/src/main/java/com/nexa/secu/security/JwtAuthenticationFilter.java`
 
@@ -994,7 +994,7 @@ Si aucun token valide n'est trouvé :
 
 ---
 
-## AppConfig.java — Configuration des beans
+### AppConfig.java — Configuration des beans
 
  `labs/lab07-spring-security/src/main/java/com/nexa/secu/config/AppConfig.java`
 
@@ -1070,7 +1070,7 @@ de test en base si ils n'existent pas déjà.
 
 ---
 
-## Utilisateur.java — L'entité JPA
+### Utilisateur.java — L'entité JPA
 
  `labs/lab07-spring-security/src/main/java/com/nexa/secu/entity/Utilisateur.java`
 
@@ -1109,7 +1109,7 @@ public class Utilisateur {
 
 ---
 
-## UtilisateurRepository.java — Accès aux données
+### UtilisateurRepository.java — Accès aux données
 
  `labs/lab07-spring-security/src/main/java/com/nexa/secu/repository/UtilisateurRepository.java`
 
@@ -1129,7 +1129,7 @@ public interface UtilisateurRepository extends JpaRepository<Utilisateur, Long> 
 
 ---
 
-## UtilisateurService.java — Logique métier
+### UtilisateurService.java — Logique métier
 
  `labs/lab07-spring-security/src/main/java/com/nexa/secu/service/UtilisateurService.java`
 
@@ -1159,7 +1159,7 @@ public class UtilisateurService {
 
 ---
 
-## AuthController.java — Le flux de login
+### AuthController.java — Le flux de login
 
  `labs/lab07-spring-security/src/main/java/com/nexa/secu/controller/AuthController.java`
 
@@ -1285,7 +1285,7 @@ Requêtes suivantes :
 
 ---
 
-## ProduitController.java — @PreAuthorize
+### ProduitController.java — @PreAuthorize
 
  `labs/lab07-spring-security/src/main/java/com/nexa/secu/controller/ProduitController.java`
 
@@ -1366,7 +1366,7 @@ public Document getDocument(@PathVariable Long id) {
 
 ---
 
-## application.properties — Configuration H2
+### application.properties — Configuration H2
 
  `labs/lab07-spring-security/src/main/resources/application.properties`
 
@@ -1388,7 +1388,7 @@ spring.jpa.show-sql=false
 
 ---
 
-## Tests — JwtUtilTest.java
+### Tests — JwtUtilTest.java
 
  `labs/lab07-spring-security/src/test/java/com/nexa/secu/security/JwtUtilTest.java`
 
@@ -1505,7 +1505,7 @@ appel car il contient le timestamp courant. Donc le hash global est différent.
 
 ---
 
-## Tests — SecurityIntegrationTest.java
+### Tests — SecurityIntegrationTest.java
 
  `labs/lab07-spring-security/src/test/java/com/nexa/secu/controller/SecurityIntegrationTest.java`
 
@@ -1688,12 +1688,12 @@ Le token est valide mais le préfixe `Bearer ` est absent → le filtre ignore l
 
 ## PARTIE 3 -- LAB (20 min)
 
-## Objectif
+### Objectif
 
 Ajouter un rôle **MODERATOR** et un endpoint `/api/produits/moderate` accessible
 uniquement aux rôles **MODERATOR** et **ADMIN**.
 
-## Consignes
+### Consignes
 
 ### Étape 1 : Créer l'utilisateur MODERATOR
 
@@ -1765,7 +1765,7 @@ class RoleModerator {
 }
 ```
 
-## Critères de réussite
+### Critères de réussite
 
 - [ ] L'endpoint `/api/produits/moderate` retourne 200 avec les tokens ADMIN et MODERATOR
 - [ ] L'endpoint retourne 403 avec un token USER
@@ -1777,7 +1777,7 @@ class RoleModerator {
 
 ## FICHE MEMO -- Module 7
 
-## Annotations de configuration Spring Security
+### Annotations de configuration Spring Security
 
 | Annotation | Rôle |
 |---|---|
@@ -1786,7 +1786,7 @@ class RoleModerator {
 | `@EnableMethodSecurity` | Active `@PreAuthorize` / `@PostAuthorize` |
 | `@Bean` | Déclare un bean géré par Spring |
 
-## Configuration SecurityFilterChain
+### Configuration SecurityFilterChain
 
 | Méthode | Effet |
 |---|---|
@@ -1800,7 +1800,7 @@ class RoleModerator {
 | `anyRequest().authenticated()` | Tout le reste nécessite auth |
 | `addFilterBefore(filter, class)` | Insère un filtre personnalisé |
 
-## JWT avec JJWT 0.12.x
+### JWT avec JJWT 0.12.x
 
 | Opération | Code |
 |---|---|
@@ -1810,7 +1810,7 @@ class RoleModerator {
 | Extraire le sujet | `parseToken(token).getPayload().getSubject()` |
 | Extraire un claim | `parseToken(token).getPayload().get("role", String.class)` |
 
-## Authentification JWT (JwtAuthenticationFilter)
+### Authentification JWT (JwtAuthenticationFilter)
 
 | Étape | Code |
 |---|---|
@@ -1820,7 +1820,7 @@ class RoleModerator {
 | Créer auth | `new UsernamePasswordAuthenticationToken(user, null, List.of(new SimpleGrantedAuthority("ROLE_" + role)))` |
 | Stocker dans contexte | `SecurityContextHolder.getContext().setAuthentication(auth)` |
 
-## Sécurité déclarative
+### Sécurité déclarative
 
 | Annotation | Expression |
 |---|---|
@@ -1828,7 +1828,7 @@ class RoleModerator {
 | `@PreAuthorize("hasAnyRole('ADMIN', 'USER')")` | Un des rôles |
 | `@PostAuthorize("returnObject.owner == authentication.name")` | Vérifié après exécution |
 
-## Tests de sécurité
+### Tests de sécurité
 
 | Annotation/Outil | Usage |
 |---|---|
@@ -1841,7 +1841,7 @@ class RoleModerator {
 | `.andExpect(status().isForbidden())` | Vérifier 403 |
 | `.andExpect(status().isUnauthorized())` | Vérifier 401 |
 
-## Codes HTTP en sécurité
+### Codes HTTP en sécurité
 
 | Code | Signification |
 |---|---|

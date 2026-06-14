@@ -6,7 +6,7 @@
 
 ---
 
-## Objectifs pedagogiques
+## Objectifs pédagogiques
 
 A l'issue de ce module, vous serez capable de :
 

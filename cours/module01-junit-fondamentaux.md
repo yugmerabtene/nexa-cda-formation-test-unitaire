@@ -516,7 +516,7 @@ class CalculatriceTest {
 
 ---
 
-## 2.1 Mise en place du projet
+### 2.1 Mise en place du projet
 
 > `labs/lab01-fondamentaux/pom.xml`
 
@@ -676,7 +676,7 @@ Le rapport affiche :
 
 ---
 
-## 2.2 La classe Calculatrice
+### 2.2 La classe Calculatrice
 
 > `labs/lab01-fondamentaux/src/main/java/com/nexa/fondamentaux/Calculatrice.java`
 
@@ -814,7 +814,7 @@ public int valeurAbsolue(int nombre) {
 
 ---
 
-## 2.3 Écriture du premier test : addition
+### 2.3 Écriture du premier test : addition
 
 > `labs/lab01-fondamentaux/src/test/java/com/nexa/fondamentaux/CalculatriceTest.java`
 
@@ -902,7 +902,7 @@ Décortiquons les trois paramètres de `assertEquals` :
 
 ---
 
-## 2.4 Les autres tests de CalculatriceTest
+### 2.4 Les autres tests de CalculatriceTest
 
 Parcourons maintenant CHAQUE test du fichier complet.
 
@@ -1258,7 +1258,7 @@ void testTableaux() {
 
 ---
 
-## 2.5 Le cycle de vie en pratique
+### 2.5 Le cycle de vie en pratique
 
 > `labs/lab01-fondamentaux/src/test/java/com/nexa/fondamentaux/CycleDeVieTest.java`
 
@@ -1430,7 +1430,7 @@ En pratique, `@BeforeAll` est utile pour :
 
 ---
 
-## 2.6 Exécution des tests
+### 2.6 Exécution des tests
 
 ### Commande de base
 
@@ -1501,7 +1501,7 @@ Ouvrez ce fichier dans un navigateur. Vous verrez :
 
 ---
 
-## Énoncé
+### Énoncé
 
 ### Objectif
 Ajouter 3 nouvelles méthodes à la classe `Calculatrice` et écrire leurs tests unitaires.
@@ -1535,7 +1535,7 @@ Ajouter 3 nouvelles méthodes à la classe `Calculatrice` et écrire leurs tests
 
 ---
 
-## Correction
+### Correction
 
 ### Points clés de la correction
 
@@ -1603,7 +1603,7 @@ void factorielleNegatif() {
 
 ## FICHE MEMO — Module 1
 
-## Annotations JUnit 5
+### Annotations JUnit 5
 
 | Annotation | Rôle | Exemple |
 |---|---|---|
@@ -1614,7 +1614,7 @@ void factorielleNegatif() {
 | `@AfterEach` | Après chaque test | `@AfterEach void tearDown()` |
 | `@AfterAll` | Après tous les tests (static obligatoire) | `@AfterAll static void clean()` |
 
-## Assertions JUnit 5
+### Assertions JUnit 5
 
 | Assertion | Usage |
 |---|---|
@@ -1629,7 +1629,7 @@ void factorielleNegatif() {
 | `assertAll(() -> assert..., () -> assert...)` | Groupe des assertions, continue après échec. |
 | `assertArrayEquals(a1, a2)` | Compare deux tableaux élément par élément. |
 
-## Commandes Maven
+### Commandes Maven
 
 | Commande | Effet |
 |---|---|
@@ -1638,7 +1638,7 @@ void factorielleNegatif() {
 | `mvn jacoco:report` | Génère le rapport de couverture HTML |
 | `mvn clean test jacoco:report` | Nettoie, teste, et génère le rapport en une commande |
 
-## Rappels essentiels
+### Rappels essentiels
 
 - **AAA** : Arrange (préparer) → Act (exécuter) → Assert (vérifier).
 - **Une nouvelle instance par test** : JUnit crée une instance de la classe de test pour chaque `@Test`. Ne comptez jamais sur l'état d'un test précédent.

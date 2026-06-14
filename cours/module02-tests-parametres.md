@@ -677,7 +677,7 @@ La conversion automatique élimine ce code boilerplate et rend les tests plus pr
 
 ---
 
-## 2.1 Mise en place du projet
+### 2.1 Mise en place du projet
 
 > `labs/lab02-parametres/pom.xml`
 
@@ -691,7 +691,7 @@ Nous ne répéterons pas l'explication détaillée de chaque balise (voir module
 
 ---
 
-## 2.2 La classe ValidateurUtilisateur
+### 2.2 La classe ValidateurUtilisateur
 
 > `labs/lab02-parametres/src/main/java/com/nexa/parametres/ValidateurUtilisateur.java`
 
@@ -841,7 +841,7 @@ Cette méthode catégorise un âge en texte. Les tranches sont :
 
 ---
 
-## 2.3 Les tests paramétrés décortiqués
+### 2.3 Les tests paramétrés décortiqués
 
 > `labs/lab02-parametres/src/test/java/com/nexa/parametres/ValidateurUtilisateurTest.java`
 
@@ -1303,7 +1303,7 @@ Ce test couvre les cas suivants pour `estAgeValide` :
 
 ---
 
-## 2.4 Exécution des tests
+### 2.4 Exécution des tests
 
 ### Commande
 
@@ -1337,7 +1337,7 @@ Ouvrez `target/site/jacoco/index.html` pour voir la couverture. Les tests param�
 
 ---
 
-## Énoncé
+### Énoncé
 
 ### Objectif
 
@@ -1399,7 +1399,7 @@ public boolean estUrlValide(String url) {
 
 ---
 
-## Correction
+### Correction
 
 ### Implémentation de `estCodePostalValide`
 
@@ -1532,7 +1532,7 @@ void urlNullOuVide(String url) {
 
 ## FICHE MEMO -- Module 2
 
-## Annotations de tests paramétrés
+### Annotations de tests paramétrés
 
 | Annotation | Rôle | Exemple |
 |---|---|---|
@@ -1546,7 +1546,7 @@ void urlNullOuVide(String url) {
 | `@EmptySource` | Injecte une valeur vide (`""`) | `@EmptySource` |
 | `@NullAndEmptySource` | Injecte `null` puis `""` | `@NullAndEmptySource` |
 
-## Placeholders pour le paramètre `name`
+### Placeholders pour le paramètre `name`
 
 | Placeholder | Signification |
 |-------------|---------------|
@@ -1556,7 +1556,7 @@ void urlNullOuVide(String url) {
 | `{n}` | n-ième paramètre |
 | `{arguments}` | Tous les arguments concaténés |
 
-## Commandes Maven
+### Commandes Maven
 
 | Commande | Effet |
 |---|---|
@@ -1564,7 +1564,7 @@ void urlNullOuVide(String url) {
 | `mvn test` | Compile et exécute les tests (sans nettoyer) |
 | `mvn jacoco:report` | Génère le rapport de couverture HTML |
 
-## Rappels essentiels
+### Rappels essentiels
 
 - **`@ParameterizedTest` remplace `@Test`** : ne mettez pas les deux sur la même méthode.
 - **Une source est obligatoire** : sans `@ValueSource`, `@CsvSource`, etc., JUnit ne sait pas quoi injecter.

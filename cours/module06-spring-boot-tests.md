@@ -6,7 +6,7 @@
 
 ---
 
-## Objectifs pedagogiques
+## Objectifs pédagogiques
 
 A l'issue de ce module, vous serez capable de :
 
@@ -23,7 +23,7 @@ A l'issue de ce module, vous serez capable de :
 
 ### 1. Rappels Spring Boot
 
-Le fichier `pom.xml` du lab (`lab06-spring-intro/pom.xml`) montre les 4 starters utilisés :
+Le fichier `pom.xml` du lab (`labs/lab06-spring-intro/pom.xml`) montre les 4 starters utilisés :
 
 ```xml
 <parent>
@@ -490,7 +490,7 @@ public interface ProduitRepository extends JpaRepository<Produit, Long> {
 
 ---
 
-## PARTIE 2 — PRATIQUE PAS À PAS (45 min)
+## PARTIE 2 -- PRATIQUE PAS A PAS (45 min)
 
 ### 2.1 Produit.java — L'entité
 
@@ -856,7 +856,7 @@ Vérification en deux temps :
 
 ---
 
-## PARTIE 3 — LAB (20 min)
+## PARTIE 3 -- LAB (20 min)
 
 ### Objectif
 
@@ -927,7 +927,7 @@ mvn test -pl lab06-spring-intro
 mvn test jacoco:report -pl lab06-spring-intro
 
 # Ouvrir le rapport de couverture
-firefox lab06-spring-intro/target/site/jacoco/index.html
+firefox labs/lab06-spring-intro/target/site/jacoco/index.html
 
 # Lancer une classe de test spécifique
 mvn test -pl lab06-spring-intro -Dtest=ProduitControllerTest
@@ -935,7 +935,7 @@ mvn test -pl lab06-spring-intro -Dtest=ProduitControllerTest
 
 ---
 
-## FICHE MÉMO
+## FICHE MEMO
 
 ### Hiérarchie des tests Spring Boot
 
