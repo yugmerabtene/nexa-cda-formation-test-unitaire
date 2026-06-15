@@ -39,19 +39,19 @@ Imaginez que vous deviez tester une méthode `estEmailValide(String email)`. Vou
 Avec `@Test`, vous devriez écrire 12 méthodes distinctes :
 
 ```java
-@Test void emailValide1() { assertTrue(validateur.estEmailValide("test@example.com")); }
-@Test void emailValide2() { assertTrue(validateur.estEmailValide("user@domain.co")); }
-@Test void emailValide3() { assertTrue(validateur.estEmailValide("a@b.co")); }
-// ... 9 autres méthodes ...
+@Test void emailValide1() { assertTrue(validateur.estEmailValide("test@example.com")); } // @Test classique : un test par email
+@Test void emailValide2() { assertTrue(validateur.estEmailValide("user@domain.co")); } // Chaque méthode teste un seul cas
+@Test void emailValide3() { assertTrue(validateur.estEmailValide("a@b.co")); } // assertTrue : vérifie que la condition est vraie
+// ... 9 autres méthodes ... // Approche verbeuse : 12 méthodes pour 12 cas
 ```
 
 Ou alors tout mettre dans une seule méthode :
 
 ```java
-@Test void emailsValides() {
- assertTrue(validateur.estEmailValide("test@example.com"));
- assertTrue(validateur.estEmailValide("user@domain.co"));
- // Si la première assertion échoue, les autres ne sont jamais exécutées !
+@Test void emailsValides() { // @Test classique avec plusieurs assertions dans une seule méthode
+ assertTrue(validateur.estEmailValide("test@example.com")); // Vérifie le premier email
+ assertTrue(validateur.estEmailValide("user@domain.co")); // Vérifie le deuxième email
+ // Si la première assertion échoue, les autres ne sont jamais exécutées ! // Problème : pas d'isolation des cas
 }
 ```
 
@@ -62,10 +62,10 @@ Aucune de ces approches n'est satisfaisante. La première est verbeuse, la secon
 Un test paramétré permet d'exécuter la **même logique de test** avec **plusieurs jeux de données**. C'est l'équivalent d'une boucle `for` sur des assertions, mais avec la puissance du framework JUnit : chaque jeu de données est traité comme un test **indépendant**, avec son propre nom, son propre résultat, et si un jeu échoue les autres continuent.
 
 ```java
-@ParameterizedTest
-@ValueSource(strings = {"test@example.com", "user@domain.co", "a@b.co"})
-void emailEstValide(String email) {
- assertTrue(validateur.estEmailValide(email));
+@ParameterizedTest // Remplace @Test : indique que la méthode est un test paramétré (org.junit.jupiter.params.ParameterizedTest)
+@ValueSource(strings = {"test@example.com", "user@domain.co", "a@b.co"}) // Source d'arguments : tableau de chaînes, fournit 3 valeurs
+void emailEstValide(String email) { // La méthode prend un paramètre String, injecté par @ValueSource
+ assertTrue(validateur.estEmailValide(email)); // assertTrue : vérifie que l'email est valide pour chaque valeur injectée
 }
 ```
 
@@ -96,7 +96,7 @@ L'annotation `@ParameterizedTest` remplace `@Test`. Elle vient de `org.junit.jup
 Le paramètre `name` de `@ParameterizedTest` permet de contrôler l'affichage du test dans les rapports :
 
 ```java
-@ParameterizedTest(name = "{index} : email \"{0}\" est valide → {1}")
+@ParameterizedTest(name = "{index} : email \"{0}\" est valide → {1}") // name : personnalise l'affichage du test. {index}=numéro, {0}=1er paramètre, {1}=2ème paramètre
 ```
 
 **Placeholders disponibles** :
@@ -112,11 +112,11 @@ Le paramètre `name` de `@ParameterizedTest` permet de contrôler l'affichage du
 **Exemple concret** :
 
 ```java
-@ParameterizedTest(name = "{index} : email \"{0}\" est valide → {1}")
-@DisplayName("Validation d'emails valides")
-@CsvSource({"test@example.com, true", "pasd'arobase, false"})
-void testEmail(String email, boolean resultatAttendu) {
- // ...
+@ParameterizedTest(name = "{index} : email \"{0}\" est valide → {1}") // {index}=numéro du jeu (débute à 1), {0}=premier paramètre (email), {1}=deuxième paramètre (booléen attendu)
+@DisplayName("Validation d'emails valides") // @DisplayName : nom lisible du test dans les rapports
+@CsvSource({"test@example.com, true", "pasd'arobase, false"}) // @CsvSource : fournit des couples (email, résultatAttendu) au format CSV
+void testEmail(String email, boolean resultatAttendu) { // email = 1ère colonne CSV, resultatAttendu = 2ème colonne CSV (converti String→boolean automatiquement)
+ // ... // Corps du test
 }
 ```
 
@@ -152,18 +152,18 @@ Sans `name`, le rapport afficherait simplement `[1] test@example.com, true`, ce 
 ### Exemple : emails valides
 
 ```java
-@ParameterizedTest(name = "{index} : email \"{0}\" est valide → {1}")
-@DisplayName("Validation d'emails valides")
-@ValueSource(strings = {
- "test@example.com",
- "user.name@domain.co",
- "a@b.co",
- "contact@entreprise.fr",
- "nom.prenom@site.gouv.fr"
+@ParameterizedTest(name = "{index} : email \"{0}\" est valide → {1}") // name : personnalise l'affichage, {index}=numéro, {0}=email
+@DisplayName("Validation d'emails valides") // @DisplayName : nom du test dans le rapport
+@ValueSource(strings = { // @ValueSource : fournit un tableau de 5 chaînes = 5 exécutions du test
+ "test@example.com", // Email valide basique
+ "user.name@domain.co", // Email avec point dans la partie locale
+ "a@b.co", // Email minimal (domaine très court)
+ "contact@entreprise.fr", // Email avec TLD français
+ "nom.prenom@site.gouv.fr" // Email avec sous-domaine et TLD .gouv.fr
 })
-void emailsValides(String email) {
- assertTrue(validateur.estEmailValide(email),
- () -> "L'email '" + email + "' devrait être valide");
+void emailsValides(String email) { // Prend un paramètre String injecté par @ValueSource
+ assertTrue(validateur.estEmailValide(email), // assertTrue : vérifie que l'email est valide (retourne true)
+ () -> "L'email '" + email + "' devrait être valide"); // Supplier<String> : message paresseux, évalué seulement en cas d'échec
 }
 ```
 
@@ -178,19 +178,19 @@ void emailsValides(String email) {
 ### Exemple : emails invalides
 
 ```java
-@ParameterizedTest(name = "\"{0}\" → email INVALIDE")
-@DisplayName("Validation d'emails invalides")
-@ValueSource(strings = {
- "",
- "pasd'arobase",
- "@domaine.com",
- "user@",
- "user@domaine",
- "user@@domaine.com"
+@ParameterizedTest(name = "\"{0}\" → email INVALIDE") // name : personnalise l'affichage, {0}=email testé
+@DisplayName("Validation d'emails invalides") // @DisplayName : nom du test dans le rapport
+@ValueSource(strings = { // @ValueSource : fournit 6 chaînes invalides = 6 exécutions
+ "", // Chaîne vide → test de la condition isEmpty()
+ "pasd'arobase", // Pas de @ → test de arobaseIndex <= 0 (indexOf retourne -1)
+ "@domaine.com", // @ en première position → arobaseIndex == 0 <= 0 → false
+ "user@", // @ en dernière position, domaine vide → pas de point dans le domaine
+ "user@domaine", // Pas de point après le @ → domaine.contains(".") == false
+ "user@@domaine.com" // Double @ → test du deuxième @ détecté par indexOf('@', arobaseIndex + 1)
 })
-void emailsInvalides(String email) {
- assertFalse(validateur.estEmailValide(email),
- () -> "L'email '" + email + "' devrait être invalide");
+void emailsInvalides(String email) { // Paramètre String injecté par @ValueSource
+ assertFalse(validateur.estEmailValide(email), // assertFalse : vérifie que l'email est INVALIDE (retourne false)
+ () -> "L'email '" + email + "' devrait être invalide"); // Supplier<String> : message paresseux, évalué en cas d'échec seulement
 }
 ```
 
@@ -211,8 +211,8 @@ void emailsInvalides(String email) {
 ### Syntaxe
 
 ```java
-@CsvSource({
- "valeur1, valeur2, valeur3", // 3 paramètres pour le test 1
+@CsvSource({ // @CsvSource : source d'arguments au format CSV (Comma-Separated Values)
+ "valeur1, valeur2, valeur3", // 3 paramètres pour le test 1 : chaque colonne = un paramètre de la méthode
  "valeur4, valeur5, valeur6" // 3 paramètres pour le test 2
 })
 ```
@@ -232,19 +232,19 @@ Par défaut, le délimiteur est la virgule. Chaque ligne produit une exécution 
 ### Exemple : score de mot de passe
 
 ```java
-@ParameterizedTest(name = "\"{0}\" → score = {1}/100")
-@DisplayName("Score de robustesse des mots de passe")
-@CsvSource({
- "abc, 0",
- "abcd1234, 40",
- "Abcd1234, 60",
- "Abcd1234!, 70",
- "MotDePasseTresLong123!, 100",
- "12345678, 25"
+@ParameterizedTest(name = "\"{0}\" → score = {1}/100") // name : {0}=motDePasse, {1}=score attendu
+@DisplayName("Score de robustesse des mots de passe") // @DisplayName : nom du test
+@CsvSource({ // @CsvSource : chaque ligne = un couple (motDePasse String, scoreAttendu int)
+ "abc, 0", // 3 caractères, rien de spécial → score = 0
+ "abcd1234, 40", // ≥8 car (+25) + minuscules (+15) → 40
+ "Abcd1234, 60", // ≥8 car (+25) + minuscules (+15) + majuscule (+20) → 60
+ "Abcd1234!, 70", // ≥8 car (+25) + minuscule (+15) + majuscule (+20) + spécial (+10) → 70
+ "MotDePasseTresLong123!, 100", // ≥12 car (+25+15) + tout le reste → 100 (plafonné)
+ "12345678, 25" // ≥8 car (+25) mais <12, pas de lettres → 25
 })
-void scoreMotDePasse(String motDePasse, int scoreAttendu) {
- assertEquals(scoreAttendu, validateur.scoreMotDePasse(motDePasse),
- "Score incorrect pour '" + motDePasse + "'");
+void scoreMotDePasse(String motDePasse, int scoreAttendu) { // motDePasse en String, scoreAttendu en int (conversion auto)
+ assertEquals(scoreAttendu, validateur.scoreMotDePasse(motDePasse), // assertEquals : compare le score calculé au score attendu. Paramètres : (attendu, réel)
+ "Score incorrect pour '" + motDePasse + "'"); // Message en cas d'échec
 }
 ```
 
@@ -266,14 +266,14 @@ Chaque ligne de `@CsvSource` a deux colonnes : le mot de passe (String) et le sc
 ### Exemple avec `nullValues`
 
 ```java
-@ParameterizedTest(name = "email = {0} est valide → {1}")
-@DisplayName("Emails : cas limites avec null")
-@CsvSource(value = {
- "N/A, false",
- "'', false"
-}, nullValues = "N/A")
-void emailsAvecNull(String email, boolean attendu) {
- assertEquals(attendu, validateur.estEmailValide(email));
+@ParameterizedTest(name = "email = {0} est valide → {1}") // name : {0}=email, {1}=booléen attendu
+@DisplayName("Emails : cas limites avec null") // @DisplayName : nom du test
+@CsvSource(value = { // @CsvSource avec option nullValues pour gérer les valeurs null
+ "N/A, false", // "N/A" sera interprété comme null grâce à nullValues
+ "'', false" // '' (deux apostrophes) = chaîne vide "" dans le format CSV JUnit
+}, nullValues = "N/A") // nullValues : définit la chaîne "N/A" comme représentant la valeur null Java
+void emailsAvecNull(String email, boolean attendu) { // email peut être null (via nullValues). attendu = true/false
+ assertEquals(attendu, validateur.estEmailValide(email)); // assertEquals : compare le booléen attendu au résultat de estEmailValide(email)
 }
 ```
 
@@ -325,12 +325,12 @@ abc,false
 **Le test** :
 
 ```java
-@ParameterizedTest(name = "Téléphone \"{0}\" valide → {1}")
-@DisplayName("Validation téléphones via fichier CSV externe")
-@CsvFileSource(resources = "/telephones-test.csv", numLinesToSkip = 1)
-void telephonesDepuisFichier(String telephone, boolean attendu) {
- assertEquals(attendu, validateur.estTelephoneValide(telephone),
- "Échec pour le téléphone : " + telephone);
+@ParameterizedTest(name = "Téléphone \"{0}\" valide → {1}") // name : {0}=téléphone, {1}=booléen attendu
+@DisplayName("Validation téléphones via fichier CSV externe") // @DisplayName : nom du test
+@CsvFileSource(resources = "/telephones-test.csv", numLinesToSkip = 1) // @CsvFileSource : lit le fichier CSV dans src/test/resources/. numLinesToSkip=1 saute l'en-tête
+void telephonesDepuisFichier(String telephone, boolean attendu) { // telephone = 1ère colonne, attendu = 2ème colonne (converti String→boolean)
+ assertEquals(attendu, validateur.estTelephoneValide(telephone), // assertEquals : compare le booléen attendu au résultat de estTelephoneValide()
+ "Échec pour le téléphone : " + telephone); // Message en cas d'échec, inclut le téléphone testé
 }
 ```
 
@@ -370,18 +370,18 @@ void telephonesDepuisFichier(String telephone, boolean attendu) {
 ### L'énumération de démonstration
 
 ```java
-enum StatutUtilisateur { ACTIF, INACTIF, SUSPENDU, SUPPRIME }
+enum StatutUtilisateur { ACTIF, INACTIF, SUSPENDU, SUPPRIME } // Énumération de démonstration : 4 valeurs possibles pour le statut d'un utilisateur
 ```
 
 ### Mode EXCLUDE
 
 ```java
-@ParameterizedTest
-@DisplayName("Tous les statuts sauf SUPPRIME sont valides")
-@EnumSource(value = StatutUtilisateur.class, mode = EXCLUDE, names = "SUPPRIME")
-void statutsValides(StatutUtilisateur statut) {
- assertNotEquals(StatutUtilisateur.SUPPRIME, statut,
- "Tous les statuts sauf SUPPRIME devraient passer");
+@ParameterizedTest // Test paramétré (pas de @Test)
+@DisplayName("Tous les statuts sauf SUPPRIME sont valides") // @DisplayName : nom du test
+@EnumSource(value = StatutUtilisateur.class, mode = EXCLUDE, names = "SUPPRIME") // @EnumSource : itère sur l'énumération. mode=EXCLUDE exclut les noms listés. names="SUPPRIME" = la valeur à exclure
+void statutsValides(StatutUtilisateur statut) { // Paramètre de type StatutUtilisateur, injecté automatiquement pour chaque valeur de l'énumération (sauf SUPPRIME)
+ assertNotEquals(StatutUtilisateur.SUPPRIME, statut, // assertNotEquals : vérifie que le statut N'EST PAS SUPPRIME. Paramètres : (valeurNonAttendue, valeurRéelle)
+ "Tous les statuts sauf SUPPRIME devraient passer"); // Message en cas d'échec
 }
 ```
 
@@ -394,11 +394,11 @@ void statutsValides(StatutUtilisateur statut) {
 ### Mode INCLUDE
 
 ```java
-@ParameterizedTest
-@DisplayName("Seuls ACTIF et SUSPENDU sont testés ici")
-@EnumSource(value = StatutUtilisateur.class, mode = INCLUDE, names = {"ACTIF", "SUSPENDU"})
-void statutsSpecifiques(StatutUtilisateur statut) {
- assertTrue(statut == StatutUtilisateur.ACTIF || statut == StatutUtilisateur.SUSPENDU);
+@ParameterizedTest // Test paramétré
+@DisplayName("Seuls ACTIF et SUSPENDU sont testés ici") // @DisplayName : nom du test
+@EnumSource(value = StatutUtilisateur.class, mode = INCLUDE, names = {"ACTIF", "SUSPENDU"}) // @EnumSource : mode=INCLUDE inclut SEULEMENT les noms listés. names={"ACTIF", "SUSPENDU"} = tableau des valeurs à inclure
+void statutsSpecifiques(StatutUtilisateur statut) { // Paramètre injecté : seulement ACTIF puis SUSPENDU
+ assertTrue(statut == StatutUtilisateur.ACTIF || statut == StatutUtilisateur.SUSPENDU); // assertTrue : vérifie que le statut est bien l'une des deux valeurs incluses
 }
 ```
 
@@ -425,26 +425,26 @@ void statutsSpecifiques(StatutUtilisateur statut) {
 ### Exemple : catégorisation par âge
 
 ```java
-@ParameterizedTest(name = "{0} ans → catégorie \"{1}\"")
-@DisplayName("Catégorisation par âge (via @MethodSource)")
-@MethodSource("fournirAgesEtCategories")
-void categorisationAge(int age, String categorieAttendue) {
- assertEquals(categorieAttendue, validateur.categorieAge(age),
- "Catégorie incorrecte pour l'âge " + age);
+@ParameterizedTest(name = "{0} ans → catégorie \"{1}\"") // name : {0}=âge, {1}=catégorie textuelle attendue
+@DisplayName("Catégorisation par âge (via @MethodSource)") // @DisplayName : nom du test
+@MethodSource("fournirAgesEtCategories") // @MethodSource : référence une méthode factory static qui fournit les arguments
+void categorisationAge(int age, String categorieAttendue) { // age en int, categorieAttendue en String, injectés par la factory
+ assertEquals(categorieAttendue, validateur.categorieAge(age), // assertEquals : compare la catégorie calculée avec la catégorie attendue. Paramètres : (attendu, réel)
+ "Catégorie incorrecte pour l'âge " + age); // Message en cas d'échec
 }
 
-static Stream<Arguments> fournirAgesEtCategories() {
- return Stream.of(
- Arguments.of(0, "MINEUR"),
- Arguments.of(17, "MINEUR"),
- Arguments.of(18, "JEUNE_ADULTE"),
- Arguments.of(24, "JEUNE_ADULTE"),
- Arguments.of(25, "ADULTE"),
- Arguments.of(59, "ADULTE"),
- Arguments.of(60, "SENIOR"),
- Arguments.of(119, "SENIOR"),
- Arguments.of(120, "CENTENAIRE"),
- Arguments.of(150, "CENTENAIRE")
+static Stream<Arguments> fournirAgesEtCategories() { // Méthode factory : static, sans paramètre, retourne Stream<Arguments>
+ return Stream.of( // Stream.of : crée un flux de 10 jeux de données
+ Arguments.of(0, "MINEUR"), // Arguments.of : crée un jeu de 2 arguments (int, String). Âge 0 → MINEUR (limite basse)
+ Arguments.of(17, "MINEUR"), // Âge 17 → MINEUR (dernier âge avant la limite 18)
+ Arguments.of(18, "JEUNE_ADULTE"), // Âge 18 → JEUNE_ADULTE (limite d'entrée)
+ Arguments.of(24, "JEUNE_ADULTE"), // Âge 24 → JEUNE_ADULTE (dernier avant 25)
+ Arguments.of(25, "ADULTE"), // Âge 25 → ADULTE (limite d'entrée)
+ Arguments.of(59, "ADULTE"), // Âge 59 → ADULTE (dernier avant 60)
+ Arguments.of(60, "SENIOR"), // Âge 60 → SENIOR (limite d'entrée)
+ Arguments.of(119, "SENIOR"), // Âge 119 → SENIOR (dernier avant 120)
+ Arguments.of(120, "CENTENAIRE"), // Âge 120 → CENTENAIRE (limite basse centenaire)
+ Arguments.of(150, "CENTENAIRE") // Âge 150 → CENTENAIRE (au-delà de 120, cas par défaut)
  );
 }
 ```
@@ -472,19 +472,17 @@ static Stream<Arguments> fournirAgesEtCategories() {
 
 ### Exemple : `@MethodSource` avec un seul paramètre
 
-Quand la méthode factory ne retourne qu'un seul paramètre par jeu de données, on peut retourner un `Stream` du type directement :
-
 ```java
-@ParameterizedTest
-@DisplayName("Âges valides (via @MethodSource d'entiers)")
-@MethodSource("agesValides")
-void agesValides(int age) {
- assertTrue(validateur.estAgeValide(age),
- "L'âge " + age + " devrait être valide");
+@ParameterizedTest // Test paramétré (pas de @Test)
+@DisplayName("Âges valides (via @MethodSource d'entiers)") // @DisplayName : nom du test
+@MethodSource("agesValides") // @MethodSource : référence la méthode static agesValides() qui retourne Stream<Integer>
+void agesValides(int age) { // Un seul paramètre int, injecté directement depuis le Stream<Integer>
+ assertTrue(validateur.estAgeValide(age), // assertTrue : vérifie que l'âge est valide (entre 18 et 120)
+ "L'âge " + age + " devrait être valide"); // Message en cas d'échec
 }
 
-static Stream<Integer> agesValides() {
- return Stream.of(18, 25, 30, 60, 100, 120);
+static Stream<Integer> agesValides() { // Méthode factory : retourne Stream<Integer> (pas Stream<Arguments>) car 1 seul paramètre
+ return Stream.of(18, 25, 30, 60, 100, 120); // Stream.of : 6 âges valides couvrant différents intervalles (18=limite basse, 120=limite haute)
 }
 ```
 
@@ -510,10 +508,10 @@ Ces trois annotations comblent un besoin très fréquent : tester le comportemen
 Injecte une valeur `null` dans le test :
 
 ```java
-@ParameterizedTest
-@NullSource
-void testAvecNull(String valeur) {
- // valeur sera null pour cette exécution
+@ParameterizedTest // Test paramétré
+@NullSource // @NullSource : injecte une valeur null dans le paramètre du test (1 exécution avec valeur=null)
+void testAvecNull(String valeur) { // Paramètre String qui recevra la valeur null
+ // valeur sera null pour cette exécution // Comportement : le test est exécuté 1 fois avec valeur = null
 }
 ```
 
@@ -527,10 +525,10 @@ Injecte une valeur "vide" adaptée au type du paramètre :
 - Pour `int[]`, `long[]`, etc. : injecte un tableau vide.
 
 ```java
-@ParameterizedTest
-@EmptySource
-void testAvecVide(String valeur) {
- // valeur sera "" (chaîne vide) pour cette exécution
+@ParameterizedTest // Test paramétré
+@EmptySource // @EmptySource : injecte une valeur vide adaptée au type : "" pour String, [] pour tableaux, liste vide pour List/Set/Map
+void testAvecVide(String valeur) { // Paramètre String qui recevra ""
+ // valeur sera "" (chaîne vide) pour cette exécution // 1 exécution avec valeur = ""
 }
 ```
 
@@ -539,21 +537,21 @@ void testAvecVide(String valeur) {
 Combine `@NullSource` et `@EmptySource` :
 
 ```java
-@ParameterizedTest
-@NullAndEmptySource
-void testAvecNullEtVide(String valeur) {
- // Exécuté 2 fois : une fois avec null, une fois avec ""
+@ParameterizedTest // Test paramétré
+@NullAndEmptySource // @NullAndEmptySource : combine @NullSource et @EmptySource, injecte null puis "" (2 exécutions)
+void testAvecNullEtVide(String valeur) { // Paramètre String
+ // Exécuté 2 fois : une fois avec null, une fois avec "" // Ordre : null d'abord, puis chaîne vide
 }
 ```
 
 ### Exemple complet tiré du lab
 
 ```java
-@ParameterizedTest
-@DisplayName("Email invalide pour null et chaîne vide")
-@NullAndEmptySource
-void emailNullOuVide(String email) {
- assertFalse(validateur.estEmailValide(email));
+@ParameterizedTest // Test paramétré
+@DisplayName("Email invalide pour null et chaîne vide") // @DisplayName : nom du test
+@NullAndEmptySource // @NullAndEmptySource : injecte null puis "" (2 exécutions)
+void emailNullOuVide(String email) { // Paramètre String
+ assertFalse(validateur.estEmailValide(email)); // assertFalse : vérifie que estEmailValide() retourne false pour null et pour ""
 }
 ```
 
@@ -564,12 +562,12 @@ Ce test est exécuté **2 fois** : une fois avec `email = null`, une fois avec `
 On peut combiner `@NullAndEmptySource` avec `@ValueSource` pour tester également une valeur supplémentaire (par exemple une chaîne avec un espace) :
 
 ```java
-@ParameterizedTest
-@DisplayName("Score = 0 pour null et chaîne vide")
-@NullAndEmptySource
-@ValueSource(strings = " ")
-void scoreZeroPourEntreesInvalides(String mdp) {
- assertEquals(0, validateur.scoreMotDePasse(mdp));
+@ParameterizedTest // Test paramétré
+@DisplayName("Score = 0 pour null et chaîne vide") // @DisplayName : nom du test
+@NullAndEmptySource // @NullAndEmptySource : injecte null et "" (2 premières exécutions)
+@ValueSource(strings = " ") // @ValueSource : injecte un espace " " (3ème exécution) — combinaison des deux sources
+void scoreZeroPourEntreesInvalides(String mdp) { // Paramètre String
+ assertEquals(0, validateur.scoreMotDePasse(mdp)); // assertEquals : vérifie que le score est 0. Paramètres : (attendu=0, réel=scoreMotDePasse(mdp))
 }
 ```
 
@@ -580,12 +578,12 @@ void scoreZeroPourEntreesInvalides(String mdp) {
 ### Exemple : `@NullSource` et `@EmptySource` séparés
 
 ```java
-@ParameterizedTest
-@DisplayName("Téléphone invalide pour null ET chaîne vide")
-@NullSource
-@EmptySource
-void telephoneNullEtVide(String telephone) {
- assertFalse(validateur.estTelephoneValide(telephone));
+@ParameterizedTest // Test paramétré
+@DisplayName("Téléphone invalide pour null ET chaîne vide") // @DisplayName : nom du test
+@NullSource // @NullSource : injecte null (1ère exécution)
+@EmptySource // @EmptySource : injecte "" (2ème exécution) — même résultat que @NullAndEmptySource mais annotations séparées
+void telephoneNullEtVide(String telephone) { // Paramètre String
+ assertFalse(validateur.estTelephoneValide(telephone)); // assertFalse : vérifie que estTelephoneValide() retourne false pour null et ""
 }
 ```
 
@@ -621,17 +619,17 @@ JUnit 5 possède un mécanisme puissant de conversion automatique : quand vous d
 ### Exemple dans le lab
 
 ```java
-@ParameterizedTest
-@DisplayName("Conversion automatique : String → int → boolean")
-@CsvSource({
- "18, true",
- "17, false",
- "120, true",
- "121, false",
- "0, false"
+@ParameterizedTest // Test paramétré
+@DisplayName("Conversion automatique : String → int → boolean") // @DisplayName : nom du test
+@CsvSource({ // @CsvSource : données au format CSV (chaînes)
+ "18, true", // "18" sera converti en int 18, "true" en boolean true
+ "17, false", // "17" → int 17, "false" → boolean false
+ "120, true", // "120" → int 120, "true" → boolean true
+ "121, false", // "121" → int 121, "false" → boolean false
+ "0, false" // "0" → int 0, "false" → boolean false
 })
-void conversionAutoTypes(int age, boolean attendu) {
- assertEquals(attendu, validateur.estAgeValide(age));
+void conversionAutoTypes(int age, boolean attendu) { // Types déclarés : int et boolean (pas String !) — JUnit convertit automatiquement
+ assertEquals(attendu, validateur.estAgeValide(age)); // assertEquals : compare le booléen attendu au résultat. age est déjà un int grâce à la conversion auto
 }
 ```
 
@@ -646,10 +644,10 @@ void conversionAutoTypes(int age, boolean attendu) {
 **Pourquoi c'est important** : sans cette conversion automatique, il faudrait écrire :
 
 ```java
-void conversionAutoTypes(String ageStr, String attenduStr) {
- int age = Integer.parseInt(ageStr);
- boolean attendu = Boolean.parseBoolean(attenduStr);
- assertEquals(attendu, validateur.estAgeValide(age));
+void conversionAutoTypes(String ageStr, String attenduStr) { // Sans conversion auto : les paramètres restent en String
+ int age = Integer.parseInt(ageStr); // Conversion manuelle String → int avec Integer.parseInt()
+ boolean attendu = Boolean.parseBoolean(attenduStr); // Conversion manuelle String → boolean avec Boolean.parseBoolean()
+ assertEquals(attendu, validateur.estAgeValide(age)); // assertEquals : compare les valeurs après conversion manuelle
 }
 ```
 
@@ -698,64 +696,64 @@ Nous ne répéterons pas l'explication détaillée de chaque balise (voir module
 ### Code complet
 
 ```java
-package com.nexa.parametres;
+package com.nexa.parametres; // Déclaration du package
 
-public class ValidateurUtilisateur {
+public class ValidateurUtilisateur { // Classe contenant les méthodes de validation à tester
 
- public boolean estEmailValide(String email) {
- if (email == null || email.isEmpty()) return false;
- if (email.length() > 255) return false;
+ public boolean estEmailValide(String email) { // Méthode de validation d'email, retourne true si valide
+ if (email == null || email.isEmpty()) return false; // Rejette null et chaîne vide
+ if (email.length() > 255) return false; // Rejette les emails > 255 caractères (limite RFC 5321)
 
- int arobaseIndex = email.indexOf('@');
- if (arobaseIndex <= 0) return false;
+ int arobaseIndex = email.indexOf('@'); // Trouve la position du premier @ (-1 si absent)
+ if (arobaseIndex <= 0) return false; // Rejette si @ absent (index -1) ou en première position (index 0)
 
- if (email.indexOf('@', arobaseIndex + 1) != -1) return false;
+ if (email.indexOf('@', arobaseIndex + 1) != -1) return false; // Rejette si un DEUXIÈME @ est présent (commence la recherche après le premier)
 
- String domaine = email.substring(arobaseIndex + 1);
- return domaine.contains(".") && domaine.length() > 1;
+ String domaine = email.substring(arobaseIndex + 1); // Extrait la partie domaine (tout ce qui suit le @)
+ return domaine.contains(".") && domaine.length() > 1; // Valide si le domaine contient un point et a au moins 2 caractères
  }
 
- public boolean estTelephoneValide(String telephone) {
- if (telephone == null || telephone.isEmpty()) return false;
+ public boolean estTelephoneValide(String telephone) { // Méthode de validation de téléphone français
+ if (telephone == null || telephone.isEmpty()) return false; // Rejette null et chaîne vide
 
- String nettoye = telephone.replaceAll("[\\s.+-]", "");
- if (nettoye.length() == 12 && nettoye.startsWith("+33")) {
- nettoye = "0" + nettoye.substring(3);
+ String nettoye = telephone.replaceAll("[\\s.+-]", ""); // Nettoie : supprime espaces, points, + et -
+ if (nettoye.length() == 12 && nettoye.startsWith("+33")) { // Si format international français (12 chiffres, commence par +33)
+ nettoye = "0" + nettoye.substring(3); // Convertit en format national : remplace +33 par 0
  }
- if (nettoye.length() != 10) return false;
- if (nettoye.charAt(0) != '0') return false;
- char deuxieme = nettoye.charAt(1);
- if (deuxieme < '1' || deuxieme > '9') return false;
+ if (nettoye.length() != 10) return false; // Rejette si le numéro n'a pas exactement 10 chiffres
+ if (nettoye.charAt(0) != '0') return false; // Rejette si le premier chiffre n'est pas 0
+ char deuxieme = nettoye.charAt(1); // Récupère le deuxième chiffre
+ if (deuxieme < '1' || deuxieme > '9') return false; // Rejette si le deuxième chiffre n'est pas entre 1 et 9 (pas de 00...)
 
- for (int i = 2; i < nettoye.length(); i++) {
- if (!Character.isDigit(nettoye.charAt(i))) return false;
+ for (int i = 2; i < nettoye.length(); i++) { // Vérifie les chiffres restants à partir de la position 2
+ if (!Character.isDigit(nettoye.charAt(i))) return false; // Rejette si un caractère n'est pas un chiffre
  }
- return true;
- }
-
- public int scoreMotDePasse(String motDePasse) {
- if (motDePasse == null || motDePasse.isEmpty()) return 0;
- int score = 0;
- if (motDePasse.length() >= 8) score += 25;
- if (motDePasse.length() >= 12) score += 15;
- if (motDePasse.matches(".*[A-Z].*")) score += 20;
- if (motDePasse.matches(".*[a-z].*")) score += 15;
- if (motDePasse.matches(".*[0-9].*")) score += 15;
- if (motDePasse.matches(".*[!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>/?].*")) score += 10;
- return Math.min(score, 100);
+ return true; // Toutes les validations passées : téléphone valide
  }
 
- public boolean estAgeValide(int age) {
- return age >= 18 && age <= 120;
+ public int scoreMotDePasse(String motDePasse) { // Calcule un score de robustesse (0 à 100)
+ if (motDePasse == null || motDePasse.isEmpty()) return 0; // Retourne 0 pour null ou vide
+ int score = 0; // Initialise le score à 0
+ if (motDePasse.length() >= 8) score += 25; // Longueur ≥ 8 : +25 points
+ if (motDePasse.length() >= 12) score += 15; // Longueur ≥ 12 : +15 points supplémentaires (cumulatif)
+ if (motDePasse.matches(".*[A-Z].*")) score += 20; // Contient au moins une majuscule : +20
+ if (motDePasse.matches(".*[a-z].*")) score += 15; // Contient au moins une minuscule : +15
+ if (motDePasse.matches(".*[0-9].*")) score += 15; // Contient au moins un chiffre : +15
+ if (motDePasse.matches(".*[!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>/?].*")) score += 10; // Contient un caractère spécial : +10
+ return Math.min(score, 100); // Plafonne le score à 100 maximum
  }
 
- public String categorieAge(int age) {
- if (age < 0) throw new IllegalArgumentException("L'âge ne peut pas être négatif");
- if (age < 18) return "MINEUR";
- if (age < 25) return "JEUNE_ADULTE";
- if (age < 60) return "ADULTE";
- if (age < 120) return "SENIOR";
- return "CENTENAIRE";
+ public boolean estAgeValide(int age) { // Valide si l'âge est entre 18 et 120 ans (inclus)
+ return age >= 18 && age <= 120; // Retourne true si 18 ≤ age ≤ 120
+ }
+
+ public String categorieAge(int age) { // Catégorise un âge en texte
+ if (age < 0) throw new IllegalArgumentException("L'âge ne peut pas être négatif"); // Lève une exception pour les âges négatifs
+ if (age < 18) return "MINEUR"; // 0-17 : MINEUR
+ if (age < 25) return "JEUNE_ADULTE"; // 18-24 : JEUNE_ADULTE
+ if (age < 60) return "ADULTE"; // 25-59 : ADULTE
+ if (age < 120) return "SENIOR"; // 60-119 : SENIOR
+ return "CENTENAIRE"; // ≥ 120 : CENTENAIRE (cas par défaut)
  }
 }
 ```
@@ -848,22 +846,22 @@ Cette méthode catégorise un âge en texte. Les tranches sont :
 ### Structure générale
 
 ```java
-package com.nexa.parametres;
+package com.nexa.parametres; // Déclaration du package de test
 
-import org.junit.jupiter.api.*;
-import org.junit.jupiter.params.*;
-import org.junit.jupiter.params.provider.*;
+import org.junit.jupiter.api.*; // Importe @Test, @DisplayName, @BeforeEach, @AfterEach, etc.
+import org.junit.jupiter.params.*; // Importe @ParameterizedTest
+import org.junit.jupiter.params.provider.*; // Importe @ValueSource, @CsvSource, @CsvFileSource, @EnumSource, @MethodSource, @NullSource, @EmptySource, @NullAndEmptySource
 
-import java.util.stream.Stream;
+import java.util.stream.Stream; // Import pour Stream utilisé par @MethodSource
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.params.provider.EnumSource.Mode.EXCLUDE;
-import static org.junit.jupiter.params.provider.EnumSource.Mode.INCLUDE;
+import static org.junit.jupiter.api.Assertions.*; // Import statique de toutes les assertions (assertEquals, assertTrue, assertFalse, assertNotEquals, etc.)
+import static org.junit.jupiter.params.provider.EnumSource.Mode.EXCLUDE; // Import statique pour écrire EXCLUDE directement
+import static org.junit.jupiter.params.provider.EnumSource.Mode.INCLUDE; // Import statique pour écrire INCLUDE directement
 
-@DisplayName("Tests paramétrés du ValidateurUtilisateur")
-class ValidateurUtilisateurTest {
+@DisplayName("Tests paramétrés du ValidateurUtilisateur") // @DisplayName sur la classe : nom du groupe de tests dans le rapport
+class ValidateurUtilisateurTest { // Classe de test
 
- private final ValidateurUtilisateur validateur = new ValidateurUtilisateur();
+ private final ValidateurUtilisateur validateur = new ValidateurUtilisateur(); // Instance de la classe à tester, créée une fois par instance de test
 ```
 
 **Points importants sur les imports** :
@@ -876,18 +874,18 @@ class ValidateurUtilisateurTest {
 ### Test 1 : `emailsValides` — `@ValueSource`
 
 ```java
-@ParameterizedTest(name = "{index} : email \"{0}\" est valide → {1}")
-@DisplayName("Validation d'emails valides")
-@ValueSource(strings = {
- "test@example.com",
- "user.name@domain.co",
- "a@b.co",
- "contact@entreprise.fr",
- "nom.prenom@site.gouv.fr"
+@ParameterizedTest(name = "{index} : email \"{0}\" est valide → {1}") // name : {index}=numéro, {0}=email, {1} inutilisé ici (test à 1 paramètre)
+@DisplayName("Validation d'emails valides") // @DisplayName : nom du test
+@ValueSource(strings = { // @ValueSource : 5 chaînes = 5 exécutions du test
+ "test@example.com", // Email basique valide
+ "user.name@domain.co", // Email avec point dans partie locale
+ "a@b.co", // Email minimal (domaine très court de 2 lettres)
+ "contact@entreprise.fr", // Email avec TLD .fr
+ "nom.prenom@site.gouv.fr" // Email avec sous-domaine et TLD .gouv.fr
 })
-void emailsValides(String email) {
- assertTrue(validateur.estEmailValide(email),
- () -> "L'email '" + email + "' devrait être valide");
+void emailsValides(String email) { // Un seul paramètre String injecté par @ValueSource
+ assertTrue(validateur.estEmailValide(email), // assertTrue : vérifie que estEmailValide() retourne true
+ () -> "L'email '" + email + "' devrait être valide"); // Supplier<String> : message paresseux, évalué seulement en cas d'échec
 }
 ```
 
@@ -912,14 +910,14 @@ void emailsValides(String email) {
 Sans tests paramétrés, voici ce qu'il faudrait écrire :
 
 ```java
-@Test void emailValide1() { assertTrue(validateur.estEmailValide("test@example.com")); }
-@Test void emailValide2() { assertTrue(validateur.estEmailValide("user.name@domain.co")); }
-@Test void emailValide3() { assertTrue(validateur.estEmailValide("a@b.co")); }
-@Test void emailValide4() { assertTrue(validateur.estEmailValide("contact@entreprise.fr")); }
-@Test void emailValide5() { assertTrue(validateur.estEmailValide("nom.prenom@site.gouv.fr")); }
-@Test void emailInvalide1() { assertFalse(validateur.estEmailValide("")); }
-@Test void emailInvalide2() { assertFalse(validateur.estEmailValide("pasd'arobase")); }
-// ... 5+ autres méthodes ...
+@Test void emailValide1() { assertTrue(validateur.estEmailValide("test@example.com")); } // @Test classique : 1 méthode = 1 test
+@Test void emailValide2() { assertTrue(validateur.estEmailValide("user.name@domain.co")); } // Chaque méthode teste un seul email
+@Test void emailValide3() { assertTrue(validateur.estEmailValide("a@b.co")); } // Approche verbeuse : il faut 12 méthodes pour 12 cas
+@Test void emailValide4() { assertTrue(validateur.estEmailValide("contact@entreprise.fr")); } // assertTrue : vérifie que l'email est valide
+@Test void emailValide5() { assertTrue(validateur.estEmailValide("nom.prenom@site.gouv.fr")); } // Duplication massive de code
+@Test void emailInvalide1() { assertFalse(validateur.estEmailValide("")); } // assertFalse : vérifie que l'email est invalide
+@Test void emailInvalide2() { assertFalse(validateur.estEmailValide("pasd'arobase")); } // Chaque cas invalide nécessite sa propre méthode
+// ... 5+ autres méthodes ... // Total : 12+ méthodes redondantes
 ```
 
 Avec les tests paramétrés : **2 méthodes** au lieu de 12. Gain : 83% de code en moins, plus lisible, plus maintenable.
@@ -929,19 +927,19 @@ Avec les tests paramétrés : **2 méthodes** au lieu de 12. Gain : 83% de code 
 ### Test 2 : `emailsInvalides` — `@ValueSource`
 
 ```java
-@ParameterizedTest(name = "\"{0}\" → email INVALIDE")
-@DisplayName("Validation d'emails invalides")
-@ValueSource(strings = {
- "",
- "pasd'arobase",
- "@domaine.com",
- "user@",
- "user@domaine",
- "user@@domaine.com"
+@ParameterizedTest(name = "\"{0}\" → email INVALIDE") // name : {0}=email testé
+@DisplayName("Validation d'emails invalides") // @DisplayName : nom du test
+@ValueSource(strings = { // @ValueSource : 6 chaînes invalides = 6 exécutions
+ "", // Chaîne vide → test de isEmpty()
+ "pasd'arobase", // Pas de @ → arobaseIndex = -1 ≤ 0 → false
+ "@domaine.com", // @ en position 0 → arobaseIndex = 0 ≤ 0 → false
+ "user@", // Domaine vide après @ → pas de point → false
+ "user@domaine", // Pas de . dans le domaine → false
+ "user@@domaine.com" // Double @ → détecté par le deuxième indexOf
 })
-void emailsInvalides(String email) {
- assertFalse(validateur.estEmailValide(email),
- () -> "L'email '" + email + "' devrait être invalide");
+void emailsInvalides(String email) { // Paramètre String injecté par @ValueSource
+ assertFalse(validateur.estEmailValide(email), // assertFalse : vérifie que estEmailValide() retourne false
+ () -> "L'email '" + email + "' devrait être invalide"); // Supplier<String> : message paresseux, évalué en cas d'échec
 }
 ```
 
@@ -958,19 +956,19 @@ void emailsInvalides(String email) {
 ### Test 3 : `scoreMotDePasse` — `@CsvSource`
 
 ```java
-@ParameterizedTest(name = "\"{0}\" → score = {1}/100")
-@DisplayName("Score de robustesse des mots de passe")
-@CsvSource({
- "abc, 0",
- "abcd1234, 40",
- "Abcd1234, 60",
- "Abcd1234!, 70",
- "MotDePasseTresLong123!, 100",
- "12345678, 25"
+@ParameterizedTest(name = "\"{0}\" → score = {1}/100") // name : {0}=motDePasse, {1}=score attendu
+@DisplayName("Score de robustesse des mots de passe") // @DisplayName : nom du test
+@CsvSource({ // @CsvSource : chaque ligne = un couple (motDePasse, scoreAttendu)
+ "abc, 0", // 3 caractères, rien de spécial → score = 0
+ "abcd1234, 40", // ≥8 car (+25) + minuscules (+15) → 40
+ "Abcd1234, 60", // ≥8 car (+25) + minuscule (+15) + majuscule (+20) → 60
+ "Abcd1234!, 70", // ≥8 car (+25) + minuscule (+15) + majuscule (+20) + spécial (+10) → 70
+ "MotDePasseTresLong123!, 100", // ≥12 car (+25+15) + tous les critères → 100 (plafonné par Math.min)
+ "12345678, 25" // ≥8 car (+25) mais <12, pas de lettres → 25
 })
-void scoreMotDePasse(String motDePasse, int scoreAttendu) {
- assertEquals(scoreAttendu, validateur.scoreMotDePasse(motDePasse),
- "Score incorrect pour '" + motDePasse + "'");
+void scoreMotDePasse(String motDePasse, int scoreAttendu) { // motDePasse en String, scoreAttendu en int (conversion auto String→int)
+ assertEquals(scoreAttendu, validateur.scoreMotDePasse(motDePasse), // assertEquals : compare le score calculé au score attendu. Paramètres : (attendu, réel)
+ "Score incorrect pour '" + motDePasse + "'"); // Message en cas d'échec
 }
 ```
 
@@ -979,9 +977,9 @@ void scoreMotDePasse(String motDePasse, int scoreAttendu) {
 Chaque ligne du CSV correspond à un test indépendant. Si on devait écrire cela avec `@Test` :
 
 ```java
-@Test void scoreAbc() { assertEquals(0, validateur.scoreMotDePasse("abc")); }
-@Test void scoreAbcd1234() { assertEquals(40, validateur.scoreMotDePasse("abcd1234")); }
-// ... 4 autres méthodes ...
+@Test void scoreAbc() { assertEquals(0, validateur.scoreMotDePasse("abc")); } // @Test classique : 1 méthode par score. assertEquals : vérifie score=0
+@Test void scoreAbcd1234() { assertEquals(40, validateur.scoreMotDePasse("abcd1234")); } // Chaque cas = sa propre méthode = duplication
+// ... 4 autres méthodes ... // 6 méthodes redondantes au lieu d'une seule avec @CsvSource
 ```
 
 **Conversion automatique** : `"40"` (String dans le CSV) → `40` (int dans la méthode). Pas besoin de `Integer.parseInt()`.
@@ -993,14 +991,14 @@ Chaque ligne du CSV correspond à un test indépendant. Si on devait écrire cel
 ### Test 4 : `emailsAvecNull` — `@CsvSource` avec `nullValues`
 
 ```java
-@ParameterizedTest(name = "email = {0} est valide → {1}")
-@DisplayName("Emails : cas limites avec null")
-@CsvSource(value = {
- "N/A, false",
- "'', false"
-}, nullValues = "N/A")
-void emailsAvecNull(String email, boolean attendu) {
- assertEquals(attendu, validateur.estEmailValide(email));
+@ParameterizedTest(name = "email = {0} est valide → {1}") // name : {0}=email, {1}=booléen attendu
+@DisplayName("Emails : cas limites avec null") // @DisplayName : nom du test
+@CsvSource(value = { // @CsvSource avec option nullValues
+ "N/A, false", // "N/A" sera interprété comme null (référence Java) grâce à nullValues
+ "'', false" // '' (deux apostrophes) = chaîne vide "" dans le format CSV JUnit
+}, nullValues = "N/A") // nullValues : définit "N/A" comme représentant la valeur null
+void emailsAvecNull(String email, boolean attendu) { // email peut être null (via nullValues). attendu en boolean
+ assertEquals(attendu, validateur.estEmailValide(email)); // assertEquals : compare le booléen attendu au résultat. Paramètres : (attendu, réel)
 }
 ```
 
@@ -1023,18 +1021,18 @@ void emailsAvecNull(String email, boolean attendu) {
 ### Test 5 et 6 : `@EnumSource` — Modes EXCLUDE et INCLUDE
 
 ```java
-enum StatutUtilisateur { ACTIF, INACTIF, SUSPENDU, SUPPRIME }
+enum StatutUtilisateur { ACTIF, INACTIF, SUSPENDU, SUPPRIME } // Énumération définie dans la classe de test pour démontrer @EnumSource
 ```
 
 Cette énumération est définie DANS la classe de test. C'est une pratique courante pour les besoins des tests : on définit une petite énumération juste pour démontrer `@EnumSource`.
 
 ```java
-@ParameterizedTest
-@DisplayName("Tous les statuts sauf SUPPRIME sont valides")
-@EnumSource(value = StatutUtilisateur.class, mode = EXCLUDE, names = "SUPPRIME")
-void statutsValides(StatutUtilisateur statut) {
- assertNotEquals(StatutUtilisateur.SUPPRIME, statut,
- "Tous les statuts sauf SUPPRIME devraient passer");
+@ParameterizedTest // Test paramétré (remplace @Test)
+@DisplayName("Tous les statuts sauf SUPPRIME sont valides") // @DisplayName : nom du test
+@EnumSource(value = StatutUtilisateur.class, mode = EXCLUDE, names = "SUPPRIME") // @EnumSource : itère sur StatutUtilisateur. mode=EXCLUDE exclut SUPPRIME. Résultat : 3 exécutions (ACTIF, INACTIF, SUSPENDU)
+void statutsValides(StatutUtilisateur statut) { // Paramètre de type StatutUtilisateur injecté automatiquement
+ assertNotEquals(StatutUtilisateur.SUPPRIME, statut, // assertNotEquals : vérifie que le statut n'est PAS SUPPRIME. Paramètres : (valeurNonAttendue, valeurRéelle)
+ "Tous les statuts sauf SUPPRIME devraient passer"); // Message en cas d'échec
 }
 ```
 
@@ -1044,11 +1042,11 @@ void statutsValides(StatutUtilisateur statut) {
 - Résultat : 3 exécutions (ACTIF, INACTIF, SUSPENDU).
 
 ```java
-@ParameterizedTest
-@DisplayName("Seuls ACTIF et SUSPENDU sont testés ici")
-@EnumSource(value = StatutUtilisateur.class, mode = INCLUDE, names = {"ACTIF", "SUSPENDU"})
-void statutsSpecifiques(StatutUtilisateur statut) {
- assertTrue(statut == StatutUtilisateur.ACTIF || statut == StatutUtilisateur.SUSPENDU);
+@ParameterizedTest // Test paramétré
+@DisplayName("Seuls ACTIF et SUSPENDU sont testés ici") // @DisplayName : nom du test
+@EnumSource(value = StatutUtilisateur.class, mode = INCLUDE, names = {"ACTIF", "SUSPENDU"}) // @EnumSource : mode=INCLUDE inclut SEULEMENT ACTIF et SUSPENDU. Résultat : 2 exécutions
+void statutsSpecifiques(StatutUtilisateur statut) { // Paramètre injecté : seulement ACTIF puis SUSPENDU
+ assertTrue(statut == StatutUtilisateur.ACTIF || statut == StatutUtilisateur.SUSPENDU); // assertTrue : vérifie que le statut est l'une des deux valeurs incluses
 }
 ```
 

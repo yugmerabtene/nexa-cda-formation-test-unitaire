@@ -26,34 +26,41 @@ A l'issue de ce module, vous serez capable de :
 Le fichier `pom.xml` du lab (`labs/lab06-spring-intro/pom.xml`) montre les 4 starters utilisés :
 
 ```xml
+<!-- Parent POM Spring Boot : version 3.2.5 avec configuration et dépendances gérées -->
 <parent>
  <groupId>org.springframework.boot</groupId>
  <artifactId>spring-boot-starter-parent</artifactId>
  <version>3.2.5</version>
 </parent>
 
+<!-- Dépendances du projet : starters Spring Boot et H2 en mémoire pour les tests -->
 <dependencies>
+ <!-- Starter Web : permet de créer des API REST avec Tomcat embarqué et Jackson -->
  <dependency>
- <groupId>org.springframework.boot</groupId>
- <artifactId>spring-boot-starter-web</artifactId> <!-- REST + Tomcat embarqué -->
+  <groupId>org.springframework.boot</groupId>
+  <artifactId>spring-boot-starter-web</artifactId> <!-- REST + Tomcat embarqué -->
  </dependency>
+ <!-- Starter Data JPA : intègre JPA et Hibernate pour l'accès aux données -->
  <dependency>
- <groupId>org.springframework.boot</groupId>
- <artifactId>spring-boot-starter-data-jpa</artifactId> <!-- JPA + Hibernate -->
+  <groupId>org.springframework.boot</groupId>
+  <artifactId>spring-boot-starter-data-jpa</artifactId> <!-- JPA + Hibernate -->
  </dependency>
+ <!-- Starter Validation : active Bean Validation avec Hibernate Validator -->
  <dependency>
- <groupId>org.springframework.boot</groupId>
- <artifactId>spring-boot-starter-validation</artifactId> <!-- Bean Validation -->
+  <groupId>org.springframework.boot</groupId>
+  <artifactId>spring-boot-starter-validation</artifactId> <!-- Bean Validation -->
  </dependency>
+ <!-- H2 : base de données embarquée en mémoire, utilisée ici en runtime -->
  <dependency>
- <groupId>com.h2database</groupId>
- <artifactId>h2</artifactId>
- <scope>runtime</scope> <!-- Base en mémoire -->
+  <groupId>com.h2database</groupId>
+  <artifactId>h2</artifactId>
+  <scope>runtime</scope> <!-- Base en mémoire -->
  </dependency>
+ <!-- Starter test : JUnit 5, Mockito, MockMvc, JsonPath pour les tests -->
  <dependency>
- <groupId>org.springframework.boot</groupId>
- <artifactId>spring-boot-starter-test</artifactId> <!-- JUnit 5 + Mockito + MockMvc + JSONassert -->
- <scope>test</scope>
+  <groupId>org.springframework.boot</groupId>
+  <artifactId>spring-boot-starter-test</artifactId> <!-- JUnit 5 + Mockito + MockMvc + JSONassert -->
+  <scope>test</scope>
  </dependency>
 </dependencies>
 ```
@@ -102,26 +109,26 @@ Dans le lab, toutes les injections utilisent le **constructeur** (pas de `@Autow
 
 ```java
 // ProduitService.java:15-18
-@Service
-@Transactional
+@Service // Stéréotype Spring : déclare un bean de service pour la logique métier
+@Transactional // Toutes les méthodes publiques sont transactionnelles (rollback automatique en cas d'exception)
 public class ProduitService {
- private final ProduitRepository repository;
+ private final ProduitRepository repository; // Dépendance injectée, finale donc immuable
 
- public ProduitService(ProduitRepository repository) { // Injection implicite
- this.repository = repository;
+ public ProduitService(ProduitRepository repository) { // Injection implicite : Spring injecte automatiquement le repository via le constructeur
+  this.repository = repository;
  }
 }
 ```
 
 ```java
 // ProduitController.java:16-19
-@RestController
-@RequestMapping("/api/produits")
+@RestController // Stéréotype : combine @Controller + @ResponseBody — les réponses sont directement en JSON
+@RequestMapping("/api/produits") // Préfixe commun à tous les endpoints REST de ce contrôleur
 public class ProduitController {
- private final ProduitService service;
+ private final ProduitService service; // Dépendance métier injectée par le constructeur
 
- public ProduitController(ProduitService service) { // Injection implicite
- this.service = service;
+ public ProduitController(ProduitService service) { // Injection implicite : Spring injecte le bean ProduitService automatiquement
+  this.service = service;
  }
 }
 ```
@@ -137,10 +144,10 @@ public class ProduitController {
 
 ```java
 // SpringIntroApplication.java:6-10
-@SpringBootApplication
+@SpringBootApplication // Méta-annotation = @Configuration + @EnableAutoConfiguration + @ComponentScan
 public class SpringIntroApplication {
  public static void main(String[] args) {
- SpringApplication.run(SpringIntroApplication.class, args);
+  SpringApplication.run(SpringIntroApplication.class, args); // Démarre le conteneur Spring Boot et lance l'application
  }
 }
 ```
@@ -199,16 +206,16 @@ Contexte Spring complet (@SpringBootTest)
 `@WebMvcTest(ProduitController.class)` (`ProduitControllerTest.java:22`) charge **uniquement** la couche MVC de Spring :
 
 ```java
-@WebMvcTest(ProduitController.class)
+@WebMvcTest(ProduitController.class) // Slice de test MVC : ne charge que la couche Web (contôleur, MockMvc, filtres)
 class ProduitControllerTest {
  @Autowired
- private MockMvc mockMvc; // Injecté automatiquement
+ private MockMvc mockMvc; // Injecté automatiquement : simulateur HTTP sans démarrer de serveur
 
  @Autowired
- private ObjectMapper objectMapper; // Jackson pour sérialiser/désérialiser
+ private ObjectMapper objectMapper; // Jackson pour sérialiser/désérialiser le JSON dans les requêtes/réponses
 
  @MockBean
- private ProduitService produitService; // Mock du service — PAS le vrai
+ private ProduitService produitService; // Mock du service — PAS le vrai (remplace le vrai bean dans le contexte Spring)
 }
 ```
 
@@ -226,36 +233,36 @@ class ProduitControllerTest {
 
 Le pattern est toujours le même :
 ```java
-mockMvc.perform( REQUÊTE )
- .andExpect( VÉRIFICATION_1 )
- .andExpect( VÉRIFICATION_2 )
+mockMvc.perform( REQUÊTE ) // Point d'entrée : envoie une requête HTTP simulée
+ .andExpect( VÉRIFICATION_1 ) // Chaîne de vérifications : chaque andExpect() valide un aspect de la réponse
+ .andExpect( VÉRIFICATION_2 ) // On peut enchaîner autant de vérifications que nécessaire
  ...
 ```
 
 Les méthodes de requête sont dans `MockMvcRequestBuilders` (import statique) :
 ```java
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*; // Import statique des méthodes de requête
 
-get("/api/produits") // GET
-post("/api/produits") // POST
-put("/api/produits/1") // PUT
-delete("/api/produits/1") // DELETE
+get("/api/produits") // GET : requête en lecture
+post("/api/produits") // POST : requête en écriture (création)
+put("/api/produits/1") // PUT : requête en écriture (remplacement complet)
+delete("/api/produits/1") // DELETE : requête en écriture (suppression)
 ```
 
 Les vérifications sont dans `MockMvcResultMatchers` (import statique) :
 ```java
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*; // Import statique des vérifications de réponse
 
-status().isOk() // 200
-status().isCreated() // 201
-status().isNoContent() // 204
-status().isBadRequest() // 400
-status().isNotFound() // 404
-status().isInternalServerError() // 500
+status().isOk() // 200 — succès
+status().isCreated() // 201 — création réussie
+status().isNoContent() // 204 — succès sans contenu
+status().isBadRequest() // 400 — requête invalide
+status().isNotFound() // 404 — ressource introuvable
+status().isInternalServerError() // 500 — erreur serveur
 
 content().contentType(MediaType.APPLICATION_JSON) // Content-Type: application/json
-jsonPath("$.nom").value("Ordinateur") // Extraire un champ JSON
-jsonPath("$[0].prix").value(999.99) // Premier élément d'un tableau
+jsonPath("$.nom").value("Ordinateur") // Extraire un champ JSON : $.nom = champ nom de l'objet racine
+jsonPath("$[0].prix").value(999.99) // Premier élément d'un tableau : $[0] = premier élément
 ```
 
 ---
@@ -265,10 +272,10 @@ jsonPath("$[0].prix").value(999.99) // Premier élément d'un tableau
 `@DataJpaTest` (`ProduitRepositoryTest.java:13`) charge **uniquement** la couche JPA :
 
 ```java
-@DataJpaTest
+@DataJpaTest // Slice de test JPA : charge EntityManager, repositories et DataSource H2 en mémoire
 class ProduitRepositoryTest {
  @Autowired
- private ProduitRepository repository; // Vrai repository — pas un mock
+ private ProduitRepository repository; // Vrai repository — pas un mock (interagit avec la vraie base H2 en mémoire)
 }
 ```
 
@@ -289,10 +296,10 @@ class ProduitRepositoryTest {
 La validation est déclenchée par `@Valid` dans les contrôleurs (`ProduitController.java:36`) :
 
 ```java
-@PostMapping
-@ResponseStatus(HttpStatus.CREATED)
-public Produit creer(@Valid @RequestBody Produit produit) {
- return service.creer(produit);
+@PostMapping // Mappe les requêtes HTTP POST sur cette méthode du contrôleur
+@ResponseStatus(HttpStatus.CREATED) // Force le statut HTTP 201 Created en cas de succès (au lieu du 200 par défaut)
+public Produit creer(@Valid @RequestBody Produit produit) { // @Valid déclenche la validation ; @RequestBody désérialise le JSON en objet Produit
+ return service.creer(produit); // Délègue la création au service métier
 }
 ```
 
@@ -301,30 +308,30 @@ Quand Spring voit `@Valid`, il exécute le **Validator** sur l'objet avant d'app
 Les contraintes sont définies directement sur l'entité (`Produit.java`) :
 
 ```java
-@Entity
-@Table(name = "produits")
+@Entity // Marque cette classe comme entité JPA, mappée automatiquement à une table
+@Table(name = "produits") // Nom explicite de la table en base de données (par défaut = nom de la classe)
 public class Produit {
 
- @Id
- @GeneratedValue(strategy = GenerationType.IDENTITY)
+ @Id // Déclare ce champ comme clé primaire
+ @GeneratedValue(strategy = GenerationType.IDENTITY) // Auto-incrément : la base (H2) génère l'ID automatiquement
  private Long id;
 
- @NotBlank(message = "Le nom est obligatoire")
- @Size(min = 2, max = 100, message = "Le nom doit contenir entre 2 et 100 caractères")
- @Column(nullable = false, length = 100)
+ @NotBlank(message = "Le nom est obligatoire") // Validation : champ non null, non vide, pas que des espaces
+ @Size(min = 2, max = 100, message = "Le nom doit contenir entre 2 et 100 caractères") // Validation : longueur entre 2 et 100
+ @Column(nullable = false, length = 100) // DDL : NOT NULL et VARCHAR(100) sur la colonne en base
  private String nom;
 
- @Size(max = 500, message = "La description ne peut pas dépasser 500 caractères")
- @Column(length = 500)
+ @Size(max = 500, message = "La description ne peut pas dépasser 500 caractères") // Validation : max 500 caractères
+ @Column(length = 500) // DDL : VARCHAR(500), nullable par défaut (pas de @NotBlank)
  private String description;
 
- @Positive(message = "Le prix doit être strictement positif")
- @Column(nullable = false)
+ @Positive(message = "Le prix doit être strictement positif") // Validation : prix > 0
+ @Column(nullable = false) // DDL : NOT NULL — le prix est obligatoire
  private double prix;
 
- @Min(value = 0, message = "La quantité ne peut pas être négative")
- @Max(value = 100000, message = "La quantité maximale est 100 000")
- @Column(nullable = false)
+ @Min(value = 0, message = "La quantité ne peut pas être négative") // Validation : quantité >= 0
+ @Max(value = 100000, message = "La quantité maximale est 100 000") // Validation : quantité <= 100000
+ @Column(nullable = false) // DDL : NOT NULL — la quantité est obligatoire
  private int quantite;
 }
 ```
@@ -361,8 +368,8 @@ public class Produit {
 #### `@RestController` (`ProduitController.java:12`)
 
 ```java
-@RestController // = @Controller + @ResponseBody
-@RequestMapping("/api/produits")
+@RestController // = @Controller + @ResponseBody : toutes les réponses sont sérialisées directement en JSON, pas de vue
+@RequestMapping("/api/produits") // Tous les endpoints de ce contrôleur sont préfixés par /api/produits
 public class ProduitController {
 ```
 
@@ -380,7 +387,7 @@ public class ProduitController {
 #### `@RequestMapping` au niveau classe (ligne 13)
 
 ```java
-@RequestMapping("/api/produits")
+@RequestMapping("/api/produits") // Préfixe d'URL : toutes les routes du contrôleur commencent par /api/produits
 ```
 
 Tous les mappings de méthodes sont **relatifs** à ce préfixe :
@@ -391,8 +398,8 @@ Tous les mappings de méthodes sont **relatifs** à ce préfixe :
 #### `@PathVariable` (ligne 28)
 
 ```java
-@GetMapping("/{id}")
-public ResponseEntity<Produit> trouverParId(@PathVariable Long id) {
+@GetMapping("/{id}") // GET /api/produits/{id} — l'ID est extrait du chemin URL
+public ResponseEntity<Produit> trouverParId(@PathVariable Long id) { // @PathVariable lie le segment {id} au paramètre id
 ```
 
 Lie la variable de chemin `{id}` dans l'URL au paramètre `id` de la méthode. Si le nom du paramètre correspond au nom dans l'URL, pas besoin de préciser `@PathVariable("id")` — Spring infère automatiquement.
@@ -400,9 +407,9 @@ Lie la variable de chemin `{id}` dans l'URL au paramètre `id` de la méthode. S
 #### `@RequestBody` (ligne 36)
 
 ```java
-@PostMapping
-@ResponseStatus(HttpStatus.CREATED)
-public Produit creer(@Valid @RequestBody Produit produit) {
+@PostMapping // Mappe les requêtes HTTP POST sur cette méthode
+@ResponseStatus(HttpStatus.CREATED) // Force le statut HTTP 201 Created
+public Produit creer(@Valid @RequestBody Produit produit) { // @Valid déclenche la validation ; @RequestBody désérialise le JSON en Produit
 ```
 
 Désérialise le corps JSON de la requête HTTP en objet Java `Produit`. Jackson (`ObjectMapper`) fait la conversion automatiquement : `{"nom":"Souris","prix":19.99}` → `new Produit("Souris", null, 19.99, 0)`.
@@ -410,8 +417,8 @@ Désérialise le corps JSON de la requête HTTP en objet Java `Produit`. Jackson
 #### `@RequestParam` (ligne 52)
 
 ```java
-@GetMapping("/recherche")
-public List<Produit> rechercher(@RequestParam String nom) {
+@GetMapping("/recherche") // GET /api/produits/recherche?nom=...
+public List<Produit> rechercher(@RequestParam String nom) { // @RequestParam lie le paramètre query ?nom= au paramètre nom
 ```
 
 Lie le paramètre de requête `?nom=Ordi` au paramètre `nom` de la méthode. Par défaut, `@RequestParam` est **obligatoire** (si absent → 400). Pour le rendre optionnel : `@RequestParam(required = false)` ou `@RequestParam(defaultValue = "")`.
@@ -419,17 +426,17 @@ Lie le paramètre de requête `?nom=Ordi` au paramètre `nom` de la méthode. Pa
 #### `@ResponseStatus` (ligne 35, ligne 46)
 
 ```java
-@PostMapping
-@ResponseStatus(HttpStatus.CREATED) // Force le statut HTTP à 201
-public Produit creer(@Valid @RequestBody Produit produit) {
+@PostMapping // Mappe les requêtes HTTP POST
+@ResponseStatus(HttpStatus.CREATED) // Force le statut HTTP à 201 (Created) au lieu du 200 par défaut
+public Produit creer(@Valid @RequestBody Produit produit) { // @Valid déclenche la validation ; @RequestBody désérialise le JSON
 ```
 
 Sans `@ResponseStatus`, Spring renvoie 200 par défaut pour `@PostMapping`. Ici on force 201 Created (convention REST pour une création).
 
 ```java
-@DeleteMapping("/{id}")
-@ResponseStatus(HttpStatus.NO_CONTENT) // Force le statut HTTP à 204
-public void supprimer(@PathVariable Long id) {
+@DeleteMapping("/{id}") // DELETE /api/produits/{id} — supprime une ressource par son ID
+@ResponseStatus(HttpStatus.NO_CONTENT) // Force le statut HTTP à 204 (No Content) car la méthode retourne void
+public void supprimer(@PathVariable Long id) { // @PathVariable extrait l'ID depuis l'URL
 ```
 
 Un `DELETE` réussi retourne 204 No Content (pas de corps de réponse).
@@ -437,11 +444,11 @@ Un `DELETE` réussi retourne 204 No Content (pas de corps de réponse).
 #### `ResponseEntity` (ligne 28-31)
 
 ```java
-@GetMapping("/{id}")
-public ResponseEntity<Produit> trouverParId(@PathVariable Long id) {
- return service.trouverParId(id)
- .map(ResponseEntity::ok) // 200 avec le produit dans le corps
- .orElse(ResponseEntity.notFound().build()); // 404 sans corps
+@GetMapping("/{id}") // GET /api/produits/{id} — recherche par identifiant
+public ResponseEntity<Produit> trouverParId(@PathVariable Long id) { // @PathVariable extrait l'ID du chemin
+ return service.trouverParId(id) // Appelle le service qui retourne un Optional<Produit>
+ .map(ResponseEntity::ok) // 200 avec le produit dans le corps si présent
+ .orElse(ResponseEntity.notFound().build()); // 404 sans corps si Optional.empty()
 }
 ```
 
@@ -453,13 +460,13 @@ public ResponseEntity<Produit> trouverParId(@PathVariable Long id) {
 
 ```java
 // ProduitRepository.java:9-18
-@Repository
-public interface ProduitRepository extends JpaRepository<Produit, Long> {
+@Repository // Stéréotype Spring : déclare un bean de type repository (accès aux données)
+public interface ProduitRepository extends JpaRepository<Produit, Long> { // Hérite des méthodes CRUD standard (findAll, save, delete...)
 
- List<Produit> findByNomContainingIgnoreCase(String nom);
- List<Produit> findByPrixLessThanEqual(double prixMax);
- List<Produit> findByQuantiteGreaterThan(int quantiteMin);
- boolean existsByNomIgnoreCase(String nom);
+ List<Produit> findByNomContainingIgnoreCase(String nom); // Dérivé : WHERE LOWER(nom) LIKE %?1%
+ List<Produit> findByPrixLessThanEqual(double prixMax); // Dérivé : WHERE prix <= ?1
+ List<Produit> findByQuantiteGreaterThan(int quantiteMin); // Dérivé : WHERE quantite > ?1
+ boolean existsByNomIgnoreCase(String nom); // Dérivé : SELECT COUNT(*) > 0 WHERE LOWER(nom) = ?1
 }
 ```
 
@@ -541,11 +548,13 @@ public class Produit {
 #### Test GET /api/produits — Liste de tous les produits (ligne 43-53)
 
 ```java
-@Test
-@DisplayName("GET /api/produits → 200 OK avec la liste des produits")
+@Test // Méthode de test JUnit Jupiter
+@DisplayName("GET /api/produits → 200 OK avec la liste des produits") // Nom lisible dans le rapport de test
 void listerTous() throws Exception {
+ // Arrange : on mocke le service pour retourner une liste contenant un seul produit
  when(produitService.listerTous()).thenReturn(List.of(produit));
 
+ // Act + Assert : on envoie une requête GET et on vérifie le statut, le Content-Type et le corps JSON
  mockMvc.perform(get("/api/produits"))
  .andExpect(status().isOk())
  .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -571,11 +580,13 @@ void listerTous() throws Exception {
 #### Test GET /api/produits/99 → 404 (ligne 67-73)
 
 ```java
-@Test
-@DisplayName("GET /api/produits/99 → 404 Not Found")
+@Test // Méthode de test JUnit Jupiter
+@DisplayName("GET /api/produits/99 → 404 Not Found") // Nom lisible dans le rapport de test
 void trouverParId_inexistant() throws Exception {
+ // Arrange : le mock retourne Optional.empty() pour un ID inexistant
  when(produitService.trouverParId(99L)).thenReturn(Optional.empty());
 
+ // Act + Assert : requête GET sur un ID qui n'existe pas → statut 404
  mockMvc.perform(get("/api/produits/99"))
  .andExpect(status().isNotFound());
 }
@@ -586,14 +597,17 @@ Quand le service retourne `Optional.empty()`, le contrôleur (`ProduitController
 #### Test POST /api/produits → 201 Created (ligne 75-86)
 
 ```java
-@Test
-@DisplayName("POST /api/produits → 201 Created")
+@Test // Méthode de test JUnit Jupiter
+@DisplayName("POST /api/produits → 201 Created") // Nom lisible dans le rapport de test
 void creer_valide() throws Exception {
+ // Arrange : le mock sauvegarde et retourne le produit
  when(produitService.creer(any(Produit.class))).thenReturn(produit);
 
+ // Act : envoi d'une requête POST avec le produit sérialisé en JSON dans le corps
  mockMvc.perform(post("/api/produits")
- .contentType(MediaType.APPLICATION_JSON)
- .content(objectMapper.writeValueAsString(produit)))
+ .contentType(MediaType.APPLICATION_JSON) // Header Content-Type: application/json
+ .content(objectMapper.writeValueAsString(produit))) // Corps JSON sérialisé
+ // Assert : vérification du statut 201 Created et des champs JSON retournés
  .andExpect(status().isCreated())
  .andExpect(jsonPath("$.id").value(1))
  .andExpect(jsonPath("$.nom").value("Ordinateur"));
@@ -608,14 +622,17 @@ void creer_valide() throws Exception {
 #### Test POST avec données invalides → 400 (ligne 88-97)
 
 ```java
-@Test
-@DisplayName("POST /api/produits avec nom vide → 400 Bad Request")
+@Test // Méthode de test JUnit Jupiter
+@DisplayName("POST /api/produits avec nom vide → 400 Bad Request") // Nom lisible dans le rapport de test
 void creer_invalide() throws Exception {
+ // Arrange : création d'un produit invalide (nom vide, prix négatif, quantité négative)
  Produit invalide = new Produit("", "desc", -10, -1);
 
+ // Act : envoi d'une requête POST avec le produit invalide
  mockMvc.perform(post("/api/produits")
  .contentType(MediaType.APPLICATION_JSON)
  .content(objectMapper.writeValueAsString(invalide)))
+ // Assert : la validation échoue → 400 Bad Request (le service n'est jamais appelé)
  .andExpect(status().isBadRequest());
 }
 ```
@@ -634,11 +651,13 @@ C'est ce qu'on appelle la **validation en amont** (fail-fast).
 #### Test DELETE /api/produits/1 → 204 (ligne 112-119)
 
 ```java
-@Test
-@DisplayName("DELETE /api/produits/1 → 204 No Content")
+@Test // Méthode de test JUnit Jupiter
+@DisplayName("DELETE /api/produits/1 → 204 No Content") // Nom lisible dans le rapport de test
 void supprimer() throws Exception {
+ // Arrange : le mock ne fait rien quand supprimer() est appelé (méthode void)
  doNothing().when(produitService).supprimer(1L);
 
+ // Act + Assert : requête DELETE → statut 204 No Content (pas de corps de réponse)
  mockMvc.perform(delete("/api/produits/1"))
  .andExpect(status().isNoContent());
 }
@@ -649,12 +668,14 @@ La méthode `supprimer()` retourne `void`. On utilise `doNothing().when(...)` ca
 #### Test POST avec conflit métier → 500 (ligne 134-143)
 
 ```java
-@Test
-@DisplayName("POST création avec conflit → 500 (géré par le service)")
+@Test // Méthode de test JUnit Jupiter
+@DisplayName("POST création avec conflit → 500 (géré par le service)") // Nom lisible dans le rapport de test
 void creer_conflit() throws Exception {
+ // Arrange : le mock lève une exception quand le service détecte un doublon
  when(produitService.creer(any(Produit.class)))
  .thenThrow(new IllegalArgumentException("Un produit avec ce nom existe déjà"));
 
+ // Act + Assert : la requête POST échoue avec 500 car le contrôleur ne gère pas cette exception
  mockMvc.perform(post("/api/produits")
  .contentType(MediaType.APPLICATION_JSON)
  .content(objectMapper.writeValueAsString(produit)))
@@ -671,12 +692,12 @@ Le service lance `IllegalArgumentException` si le produit existe déjà (`Produi
 Ce test est un test unitaire **pur** — pas de contexte Spring, que du Mockito.
 
 ```java
-@ExtendWith(MockitoExtension.class)
+@ExtendWith(MockitoExtension.class) // Active Mockito pour JUnit Jupiter : initialise les @Mock et @InjectMocks
 class ProduitServiceTest {
- @Mock
+ @Mock // Crée un mock du repository — aucune vraie base de données
  private ProduitRepository repository;
 
- @InjectMocks
+ @InjectMocks // Crée ProduitService et y injecte automatiquement les mocks (@Mock)
  private ProduitService service;
 }
 ```
@@ -688,13 +709,16 @@ class ProduitServiceTest {
 #### Test creer — cas nominal (ligne 36-45)
 
 ```java
-@Test
-@DisplayName("creer : sauvegarde et retourne le produit")
+@Test // Méthode de test JUnit Jupiter
+@DisplayName("creer : sauvegarde et retourne le produit") // Nom lisible dans le rapport de test
 void creer() {
+ // Arrange : le mock indique que le nom n'existe pas et que la sauvegarde réussit
  when(repository.existsByNomIgnoreCase("Clavier")).thenReturn(false);
  when(repository.save(any(Produit.class))).thenReturn(produit);
 
+ // Act : appel de la méthode métier
  Produit resultat = service.creer(produit);
+ // Assert : vérification que le produit est créé et que son nom est correct
  assertNotNull(resultat);
  assertEquals("Clavier", resultat.getNom());
 }
@@ -707,11 +731,14 @@ Deux `when` pour stuber deux appels distincts :
 #### Test creer — doublon (ligne 47-53)
 
 ```java
-@Test
-@DisplayName("creer : échoue si le nom existe déjà")
+@Test // Méthode de test JUnit Jupiter
+@DisplayName("creer : échoue si le nom existe déjà") // Nom lisible dans le rapport de test
 void creer_nomExistant() {
+ // Arrange : le mock indique que le nom existe déjà en base
  when(repository.existsByNomIgnoreCase("Clavier")).thenReturn(true);
+ // Act + Assert : la création doit lever une exception (doublon détecté)
  assertThrows(IllegalArgumentException.class, () -> service.creer(produit));
+ // Assert : on vérifie que save() n'a jamais été appelé (le code s'arrête avant)
  verify(repository, never()).save(any());
 }
 ```
@@ -725,11 +752,14 @@ Ce pattern `verify(..., never())` est crucial pour prouver que le code s'arrête
 #### Test supprimer (ligne 63-69)
 
 ```java
-@Test
-@DisplayName("supprimer : supprime le produit existant")
+@Test // Méthode de test JUnit Jupiter
+@DisplayName("supprimer : supprime le produit existant") // Nom lisible dans le rapport de test
 void supprimer() {
+ // Arrange : le mock indique que le produit existe
  when(repository.existsById(1L)).thenReturn(true);
+ // Act : appel de la méthode de suppression (retour void)
  service.supprimer(1L);
+ // Assert : on vérifie que deleteById() a bien été appelé sur le repository
  verify(repository).deleteById(1L);
 }
 ```
@@ -743,19 +773,19 @@ void supprimer() {
 Ce test utilise `@DataJpaTest` : de vraies interactions avec une base H2 en mémoire. Aucun mock.
 
 ```java
-@DataJpaTest
+@DataJpaTest // Slice de test JPA : EntityManager, repositories et DataSource H2 en mémoire
 class ProduitRepositoryTest {
  @Autowired
- private ProduitRepository repository; // Vrai repository, vraie base
+ private ProduitRepository repository; // Vrai repository, vraie base (pas de mock)
 
- private Produit p1, p2, p3;
+ private Produit p1, p2, p3; // Produits de fixture réutilisés dans chaque test
 
- @BeforeEach
+ @BeforeEach // Exécuté avant chaque test : insère 3 produits en base
  void setUp() {
  p1 = repository.save(new Produit("Ordinateur", "PC", 999.99, 10));
  p2 = repository.save(new Produit("Souris", "Sans fil", 29.99, 100));
  p3 = repository.save(new Produit("Clavier", "Mécanique", 89.99, 50));
- }
+ } // Après chaque test, rollback automatique de la transaction
 }
 ```
 
@@ -764,10 +794,12 @@ class ProduitRepositoryTest {
 #### Test findAll (ligne 30-34)
 
 ```java
-@Test
-@DisplayName("findAll : retourne tous les produits")
+@Test // Méthode de test JUnit Jupiter
+@DisplayName("findAll : retourne tous les produits") // Nom lisible dans le rapport de test
 void findAll() {
+ // Act : on appelle findAll() sur le vrai repository
  List<Produit> produits = repository.findAll();
+ // Assert : les 3 produits insérés dans @BeforeEach sont trouvés
  assertEquals(3, produits.size());
 }
 ```
@@ -777,13 +809,15 @@ Simple et direct : on vérifie que le setup a bien persisté 3 produits.
 #### Test findByNomContainingIgnoreCase — insensibilité à la casse (ligne 45-53)
 
 ```java
-@Test
-@DisplayName("findByNomContainingIgnoreCase : insensible à la casse")
+@Test // Méthode de test JUnit Jupiter
+@DisplayName("findByNomContainingIgnoreCase : insensible à la casse") // Nom lisible dans le rapport de test
 void rechercheInsensibleCasse() {
+ // Act + Assert : recherche en minuscules → trouve "Ordinateur"
  List<Produit> r1 = repository.findByNomContainingIgnoreCase("ordi");
  assertEquals(1, r1.size());
  assertEquals("Ordinateur", r1.get(0).getNom());
 
+ // Act + Assert : recherche en majuscules → trouve aussi "Ordinateur" (IgnoreCase fonctionne dans les deux sens)
  List<Produit> r2 = repository.findByNomContainingIgnoreCase("ORDI");
  assertEquals(1, r2.size());
 }
@@ -798,10 +832,12 @@ Si le test ne faisait qu'un seul cas, on ne saurait pas si c'est l'insensibilit�
 #### Test findByPrixLessThanEqual (ligne 56-60)
 
 ```java
-@Test
-@DisplayName("findByPrixLessThanEqual : filtre par prix max")
+@Test // Méthode de test JUnit Jupiter
+@DisplayName("findByPrixLessThanEqual : filtre par prix max") // Nom lisible dans le rapport de test
 void filtrePrixMax() {
+ // Act : recherche des produits avec prix <= 99.99
  List<Produit> abordables = repository.findByPrixLessThanEqual(99.99);
+ // Assert : seuls Souris (29.99) et Clavier (89.99) sont retournés (2 résultats)
  assertEquals(2, abordables.size());
 }
 ```
@@ -811,10 +847,12 @@ Produits en base : 999.99, 29.99, 89.99. Prix ≤ 99.99 → Souris (29.99) et Cl
 #### Test findByQuantiteGreaterThan (ligne 63-67)
 
 ```java
-@Test
-@DisplayName("findByQuantiteGreaterThan : filtre par quantité min")
+@Test // Méthode de test JUnit Jupiter
+@DisplayName("findByQuantiteGreaterThan : filtre par quantité min") // Nom lisible dans le rapport de test
 void filtreQuantiteMin() {
+ // Act : recherche des produits avec quantité > 49 (condition stricte, pas >=)
  List<Produit> enStock = repository.findByQuantiteGreaterThan(49);
+ // Assert : seuls Souris (100) et Clavier (50) sont retournés (2 résultats)
  assertEquals(2, enStock.size());
 }
 ```
@@ -824,11 +862,14 @@ Quantités en base : 10, 100, 50. Quantité > 49 → Souris (100) et Clavier (50
 #### Test existsByNomIgnoreCase — détection de doublon (ligne 86-91)
 
 ```java
-@Test
-@DisplayName("existsByNomIgnoreCase : détection de doublon")
+@Test // Méthode de test JUnit Jupiter
+@DisplayName("existsByNomIgnoreCase : détection de doublon") // Nom lisible dans le rapport de test
 void existsByNom() {
+ // Assert : le nom exact existe en base
  assertTrue(repository.existsByNomIgnoreCase("Ordinateur"));
+ // Assert : la variante en minuscules existe aussi (IgnoreCase insensible à la casse)
  assertTrue(repository.existsByNomIgnoreCase("ordinateur"));
+ // Assert : un nom inexistant retourne false
  assertFalse(repository.existsByNomIgnoreCase("Tablette"));
 }
 ```
@@ -841,11 +882,14 @@ Ce test est critique pour la logique métier : le service utilise `existsByNomIg
 #### Test deleteById (ligne 79-83)
 
 ```java
-@Test
-@DisplayName("deleteById : supprime un produit")
+@Test // Méthode de test JUnit Jupiter
+@DisplayName("deleteById : supprime un produit") // Nom lisible dans le rapport de test
 void deleteById() {
+ // Act : suppression du produit p1 par son ID
  repository.deleteById(p1.getId());
+ // Assert : le nombre total passe de 3 à 2
  assertEquals(2, repository.count());
+ // Assert : l'ID supprimé n'existe plus en base
  assertFalse(repository.existsById(p1.getId()));
 }
 ```
@@ -872,7 +916,7 @@ L'application existante gère des produits avec un CRUD complet (GET, POST, PUT,
 
 Ajouter dans `ProduitService` :
 ```java
-public Produit mettreAJourPrix(Long id, double nouveauPrix) {
+public Produit mettreAJourPrix(Long id, double nouveauPrix) { // Méthode : mise à jour partielle du prix
  // Trouver le produit ou lever IllegalArgumentException
  // Valider que le prix est > 0
  // Mettre à jour le prix
@@ -884,11 +928,11 @@ public Produit mettreAJourPrix(Long id, double nouveauPrix) {
 
 Ajouter dans `ProduitController` :
 ```java
-@PatchMapping("/{id}/prix")
-public Produit mettreAJourPrix(@PathVariable Long id,
- @RequestBody Map<String, Double> body) {
- double prix = body.get("prix");
- return service.mettreAJourPrix(id, prix);
+@PatchMapping("/{id}/prix") // PATCH /api/produits/{id}/prix — mise à jour partielle du seul champ prix
+public Produit mettreAJourPrix(@PathVariable Long id, // @PathVariable extrait l'ID du produit depuis l'URL
+ @RequestBody Map<String, Double> body) { // @RequestBody reçoit un JSON {"prix": 49.99} dans une Map
+ double prix = body.get("prix"); // Extrait la valeur du prix depuis le corps de la requête
+ return service.mettreAJourPrix(id, prix); // Délègue la mise à jour au service métier
 }
 ```
 
@@ -978,26 +1022,26 @@ Test d'intégration (@SpringBootTest)
 Ces patterns couvrent les 5 opérations REST standard (GET, POST, PUT, DELETE, PATCH). Chaque variante illustre un mécanisme d'injection de paramètres différent : @PathVariable pour les identifiants dans l'URL, @RequestParam pour les filtres en query string, et @RequestBody pour les données JSON.
 
 ```java
-// GET simple
+// GET simple : récupère tous les produits
 mockMvc.perform(get("/api/produits"))
 
-// GET avec path variable
+// GET avec path variable : injecte l'ID dans l'URL via {id}
 mockMvc.perform(get("/api/produits/{id}", 1))
 
-// GET avec query param
+// GET avec query param : ajoute ?nom=Ordi à la requête
 mockMvc.perform(get("/api/produits/recherche").param("nom", "Ordi"))
 
-// POST avec corps JSON
+// POST avec corps JSON : sérialise l'objet et définit le Content-Type
 mockMvc.perform(post("/api/produits")
  .contentType(MediaType.APPLICATION_JSON)
  .content(objectMapper.writeValueAsString(objet)))
 
-// PUT avec corps JSON
+// PUT avec corps JSON : remplacement complet d'une ressource
 mockMvc.perform(put("/api/produits/1")
  .contentType(MediaType.APPLICATION_JSON)
  .content(objectMapper.writeValueAsString(objet)))
 
-// DELETE
+// DELETE : suppression d'une ressource par son ID
 mockMvc.perform(delete("/api/produits/1"))
 ```
 
@@ -1006,15 +1050,15 @@ mockMvc.perform(delete("/api/produits/1"))
 status() valide le contrat HTTP (le code de retour), jsonPath() valide le contenu métier (les champs JSON). La combinaison des deux garantit qu'un endpoint REST respecte à la fois le protocole et le domaine. exists() et doesNotExist() vérifient la présence/absence d'un champ sans vérifier sa valeur.
 
 ```java
-.andExpect(status().isOk()) // 200
-.andExpect(status().isCreated()) // 201
-.andExpect(status().isNoContent()) // 204
-.andExpect(status().isBadRequest()) // 400
-.andExpect(status().isNotFound()) // 404
-.andExpect(content().contentType(MediaType.APPLICATION_JSON))
-.andExpect(jsonPath("$.nom").value("Ordi")) // champ
-.andExpect(jsonPath("$[0].id").value(1)) // tableau
-.andExpect(jsonPath("$.length()").value(3)) // taille tableau
+.andExpect(status().isOk()) // 200 — requête réussie
+.andExpect(status().isCreated()) // 201 — ressource créée
+.andExpect(status().isNoContent()) // 204 — succès sans corps de réponse
+.andExpect(status().isBadRequest()) // 400 — validation échouée ou paramètre invalide
+.andExpect(status().isNotFound()) // 404 — ressource introuvable
+.andExpect(content().contentType(MediaType.APPLICATION_JSON)) // Vérifie le header Content-Type
+.andExpect(jsonPath("$.nom").value("Ordi")) // Vérifie la valeur d'un champ JSON
+.andExpect(jsonPath("$[0].id").value(1)) // Vérifie un champ dans le premier élément d'un tableau
+.andExpect(jsonPath("$.length()").value(3)) // Vérifie la taille d'un tableau JSON
 ```
 
 ### Annotations REST — résumé

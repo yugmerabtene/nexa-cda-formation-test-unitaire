@@ -46,14 +46,18 @@ On écrit un test qui décrit le comportement **attendu** avant même que le cod
 **Exemple concret — Créer un compte bancaire :**
 
 ```java
+// Phase RED : ce test décrit le comportement attendu avant que le code n'existe
 @Test
-@DisplayName("Un compte est créé avec un solde initial correct")
+@DisplayName("Un compte est créé avec un solde initial correct") // @DisplayName : nom lisible dans le rapport de test
 void creationAvecSoldeInitial() {
+ // Arrange : création d'un compte avec ID 1, titulaire "Alice", solde 1000.00€
+ // BigDecimal("1000.00") : précision décimale exacte pour les montants (évite les erreurs de float/double)
  CompteBancaire compte = new CompteBancaire(1L, "Alice", new BigDecimal("1000.00"));
 
+ // Assert : vérification que chaque champ est correctement stocké
  assertEquals(1L, compte.getId());
  assertEquals("Alice", compte.getTitulaire());
- assertEquals(new BigDecimal("1000.00"), compte.getSolde());
+ assertEquals(new BigDecimal("1000.00"), compte.getSolde()); // BigDecimal.compareTo() ou equals() pour comparer
 }
 ```
 
@@ -64,17 +68,19 @@ void creationAvecSoldeInitial() {
 On ecrit **le minimum necessaire** de code pour que le test passe. Pas de fonctionnalites supplementaires, pas d'optimisation, pas de generalisation.
 
 ```java
+// Phase GREEN : strict minimum de code pour satisfaire le test RED précédent
 public class CompteBancaire {
- private final Long id;
- private final String titulaire;
- private BigDecimal solde;
+ private final Long id; // final : l'ID est immuable après création
+ private final String titulaire; // final : le titulaire ne change pas
+ private BigDecimal solde; // non-final : le solde varie avec les opérations
 
- public CompteBancaire(Long id, String titulaire, BigDecimal soldeInitial) {
+ public CompteBancaire(Long id, String titulaire, BigDecimal soldeInitial) { // BigDecimal : type pour montants, précision exacte
  this.id = id;
  this.titulaire = titulaire;
  this.solde = soldeInitial;
  }
 
+ // Getters : minimum requis pour que le test passe
  public Long getId() { return id; }
  public String getTitulaire() { return titulaire; }
  public BigDecimal getSolde() { return solde; }
@@ -101,9 +107,13 @@ void soldeInitialNegatifInterdit() {
 Ce test échoue (RED) car le constructeur accepte un solde négatif. On passe en GREEN en ajoutant la validation :
 
 ```java
+// Phase GREEN : ajout de la validation pour que le test RED (soldeInitialNegatif) passe
 public CompteBancaire(Long id, String titulaire, BigDecimal soldeInitial) {
+ // Validation : le solde doit être >= 0
+ // BigDecimal.compareTo(BigDecimal.ZERO) < 0 signifie "est négatif"
+ // compareTo() retourne -1, 0, ou 1 (jamais == pour comparer des BigDecimal)
  if (soldeInitial.compareTo(BigDecimal.ZERO) < 0) {
- throw new IllegalArgumentException("Le solde initial ne peut pas être négatif");
+  throw new IllegalArgumentException("Le solde initial ne peut pas être négatif");
  }
  this.id = id;
  this.titulaire = titulaire;
@@ -135,19 +145,21 @@ L'annotation `@Nested` permet de créer des **classes internes de test** qui org
 ### Syntaxe
 
 ```java
-@DisplayName("TDD : Compte Bancaire")
+@DisplayName("TDD : Compte Bancaire") // @DisplayName sur la classe : nom du groupe racine
 class CompteBancaireTest {
 
+ // @Nested : classe interne non statique pour organiser les tests hiérarchiquement
+ // Chaque @Nested peut avoir son propre @BeforeEach qui s'exécute en plus du parent
  @Nested
- @DisplayName("Création du compte")
+ @DisplayName("Création du compte") // @DisplayName du @Nested : apparaît comme sous-groupe dans l'IDE
  class CreationCompte {
- // tests...
+  // tests...
  }
 
  @Nested
  @DisplayName("Opérations de dépôt")
  class Depot {
- // tests...
+  // tests...
  }
 }
 ```
@@ -190,12 +202,12 @@ L'annotation `@Tag` permet d'étiqueter les tests pour les filtrer lors de l'ex�
 
 ```java
 @Test
-@Tag("unitaire")
+@Tag("unitaire") // @Tag : étiquette pour filtrer les tests à l'exécution (mvn test -Dgroups="unitaire")
 void testRapide() { ... }
 
 @Test
-@Tag("integration")
-@Tag("lent")
+@Tag("integration") // Un test peut avoir plusieurs @Tag
+@Tag("lent") // @Tag("lent") : exécuté en CI, pas en local
 void testLent() { ... }
 ```
 
@@ -238,8 +250,8 @@ L'annotation `@Timeout` définit une durée maximale pour un test. Si le test d�
 
 ```java
 @Test
-@Timeout(value = 5, unit = TimeUnit.SECONDS)
-void testQuiPourraitBloquer() throws InterruptedException {
+@Timeout(value = 5, unit = TimeUnit.SECONDS) // @Timeout : échoue le test s'il dépasse 5 secondes (protection anti-blocage)
+void testQuiPourraitBloquer() throws InterruptedException { // throws InterruptedException : nécessaire pour latch.await()
  // ...
 }
 ```
@@ -253,15 +265,15 @@ Dans les tests de **concurrence**, un thread peut se bloquer indéfiniment (dead
 Les deux tests de la classe `Concurrence` utilisent `@Timeout(value = 5, unit = TimeUnit.SECONDS)` :
 
 ```java
-@Nested
+@Nested // @Nested : groupe de tests dédié à la concurrence
 @DisplayName("Concurrence et thread-safety")
 class Concurrence {
 
  @Test
  @DisplayName("Dépôts concurrents : le solde final est correct")
- @Timeout(value = 5, unit = TimeUnit.SECONDS)
- void depotsConcurrents() throws InterruptedException {
- // ...
+ @Timeout(value = 5, unit = TimeUnit.SECONDS) // @Timeout : évite que le test bloque indéfiniment si deadlock
+ void depotsConcurrents() throws InterruptedException { // throws InterruptedException : requis pour les appels bloquants (await)
+  // ...
  }
 }
 ```
@@ -283,15 +295,19 @@ L'annotation `@RepeatedTest` exécute le même test **plusieurs fois** de suite.
 ### Syntaxe
 
 ```java
+// @RepeatedTest : remplace @Test, exécute le test N fois pour détecter les flaky tests
+// value = 10 : exécute 10 fois (nouvelle instance de la classe de test à chaque répétition)
+// name : modèle de nommage pour le rapport (chaque répétition a un nom unique)
 @RepeatedTest(value = 10, name = "{displayName} — répétition {currentRepetition}/{totalRepetitions}")
-@DisplayName("Stabilité : le solde après 3 opérations est toujours correct")
+@DisplayName("Stabilité : le solde après 3 opérations est toujours correct") // {displayName} dans le name fait référence à ceci
 void stabiliteSoldeApresOperations() {
- CompteBancaire compte = new CompteBancaire(1L, "Test", new BigDecimal("100.00"));
- compte.deposer(new BigDecimal("50.00"), "Depot");
- compte.retirer(new BigDecimal("30.00"), "Retrait");
+ CompteBancaire compte = new CompteBancaire(1L, "Test", new BigDecimal("100.00")); // BigDecimal("100.00") : précision décimale
+ compte.deposer(new BigDecimal("50.00"), "Depot"); // deposer() : opération de dépôt, utilise BigDecimal
+ compte.retirer(new BigDecimal("30.00"), "Retrait"); // retirer() : opération de retrait
  compte.deposer(new BigDecimal("20.00"), "Depot 2");
+ // 100 + 50 - 30 + 20 = 140.00
  assertEquals(new BigDecimal("140.00"), compte.getSolde(),
- "Après 100+50-30+20 le solde doit toujours être 140.00");
+  "Après 100+50-30+20 le solde doit toujours être 140.00"); // Message d'assertion : visible dans le rapport en cas d'échec
 }
 ```
 
@@ -324,8 +340,8 @@ L'annotation `@Disabled` désactive un test sans le supprimer.
 
 ```java
 @Test
-@Disabled("Bug #4521 : la validation du découvert n'est pas encore implémentée")
-void decouvertAutorise() {
+@Disabled("Bug #4521 : la validation du découvert n'est pas encore implémentée") // @Disabled : désactive le test (apparaît comme "disabled" dans le rapport)
+void decouvertAutorise() { // Le test existe mais n'est pas exécuté tant que le @Disabled est présent
  // ...
 }
 ```
@@ -458,8 +474,9 @@ Nous allons décortiquer chaque groupe de tests du fichier `CompteBancaireTest.j
 ### Groupe 1 : "Création du compte" (3 tests)
 
 ```java
+// @Nested : groupe "Création du compte" — testé en premier dans le cycle TDD (Phase RED)
 @Nested
-@DisplayName("Création du compte")
+@DisplayName("Création du compte") // @DisplayName : nom affiché dans l'arborescence de tests
 class CreationCompte {
 ```
 
@@ -468,14 +485,17 @@ class CreationCompte {
 #### Test 1.1 — `creationAvecSoldeInitial`
 
 ```java
+// Phase RED : écrit avant que CompteBancaire n'existe — test du cas nominal
 @Test
-@DisplayName("Un compte est créé avec un solde initial correct")
+@DisplayName("Un compte est créé avec un solde initial correct") // @DisplayName : description du comportement attendu
 void creationAvecSoldeInitial() {
+ // Arrange : new BigDecimal("1000.00") — le constructeur String garantit la précision décimale exacte
  CompteBancaire compte = new CompteBancaire(1L, "Alice", new BigDecimal("1000.00"));
 
+ // Assert : trois vérifications indépendantes (id, titulaire, solde)
  assertEquals(1L, compte.getId());
  assertEquals("Alice", compte.getTitulaire());
- assertEquals(new BigDecimal("1000.00"), compte.getSolde());
+ assertEquals(new BigDecimal("1000.00"), compte.getSolde()); // BigDecimal : equals() compare la valeur ET l'échelle
 }
 ```
 
@@ -488,11 +508,12 @@ void creationAvecSoldeInitial() {
 #### Test 1.2 — `creationSoldeZero`
 
 ```java
+// Phase RED : cas limite — le solde zéro doit être accepté (validation >= 0, pas > 0)
 @Test
-@DisplayName("Un compte peut être créé avec un solde initial de zéro")
+@DisplayName("Un compte peut être créé avec un solde initial de zéro") // @DisplayName : précise que zéro est valide
 void creationSoldeZero() {
- CompteBancaire compte = new CompteBancaire(2L, "Bob", BigDecimal.ZERO);
- assertEquals(BigDecimal.ZERO, compte.getSolde());
+ CompteBancaire compte = new CompteBancaire(2L, "Bob", BigDecimal.ZERO); // BigDecimal.ZERO : constante pour la valeur 0
+ assertEquals(BigDecimal.ZERO, compte.getSolde()); // compareTo(BigDecimal.ZERO) == 0 est la bonne comparaison
 }
 ```
 
@@ -501,18 +522,23 @@ void creationSoldeZero() {
 #### Test 1.3 — `soldeInitialNegatifInterdit`
 
 ```java
+// Phase RED : test du cas d'erreur — force l'ajout d'une validation
 @Test
-@DisplayName("Le solde initial ne peut pas être négatif")
+@DisplayName("Le solde initial ne peut pas être négatif") // @DisplayName : décrit la règle métier
 void soldeInitialNegatifInterdit() {
+ // assertThrows : vérifie que le code lève bien IllegalArgumentException
+ // Le lambda est exécuté et l'exception attendue est capturée
  assertThrows(IllegalArgumentException.class,
- () -> new CompteBancaire(3L, "Charlie", new BigDecimal("-100.00")));
+  () -> new CompteBancaire(3L, "Charlie", new BigDecimal("-100.00"))); // BigDecimal("-100.00") : valeur négative
 }
 ```
 
 **Cas d'erreur :** le constructeur refuse un solde négatif. Ce test force l'ajout de la validation dans le constructeur :
 
 ```java
-if (soldeInitial.compareTo(BigDecimal.ZERO) < 0) {
+// Phase GREEN : code de validation ajouté pour faire passer le test de solde négatif
+// compareTo() est la méthode de comparaison de BigDecimal (jamais == ni <, >)
+if (soldeInitial.compareTo(BigDecimal.ZERO) < 0) { // compareTo() retourne -1 si inférieur, 0 si égal, 1 si supérieur
  throw new IllegalArgumentException("Le solde initial ne peut pas être négatif");
 }
 ```
@@ -522,8 +548,9 @@ if (soldeInitial.compareTo(BigDecimal.ZERO) < 0) {
 ### Groupe 2 : "Opérations de dépôt" (4 tests)
 
 ```java
+// @Nested : groupe "Opérations de dépôt" — tests de la méthode deposer()
 @Nested
-@DisplayName("Opérations de dépôt")
+@DisplayName("Opérations de dépôt") // @DisplayName : sous-groupe fonctionnel
 class Depot {
 ```
 
@@ -532,12 +559,16 @@ class Depot {
 #### Test 2.1 — `depotAugmenteSolde`
 
 ```java
+// Phase RED : cas nominal du dépôt — solde doit augmenter du montant déposé
 @Test
-@DisplayName("Un dépôt augmente le solde")
+@DisplayName("Un dépôt augmente le solde") // @DisplayName : description du comportement métier
 void depotAugmenteSolde() {
+ // Arrange : création d'un compte avec 500.00€
  CompteBancaire compte = new CompteBancaire(1L, "Alice", new BigDecimal("500.00"));
- compte.deposer(new BigDecimal("150.00"), "Salaire");
- assertEquals(new BigDecimal("650.00"), compte.getSolde());
+ // Act : dépôt de 150.00€
+ compte.deposer(new BigDecimal("150.00"), "Salaire"); // deposer(BigDecimal, String) : montant + description
+ // Assert : 500 + 150 = 650
+ assertEquals(new BigDecimal("650.00"), compte.getSolde()); // BigDecimal : comparaison exacte
 }
 ```
 
@@ -546,12 +577,14 @@ void depotAugmenteSolde() {
 #### Test 2.2 — `depotZeroInterdit`
 
 ```java
+// Phase RED : cas d'erreur — dépôt de zéro interdit (règle métier)
 @Test
-@DisplayName("Dépôt de zéro est interdit")
+@DisplayName("Dépôt de zéro est interdit") // @DisplayName : décrit le cas d'erreur
 void depotZeroInterdit() {
  CompteBancaire compte = new CompteBancaire(1L, "Alice", new BigDecimal("100.00"));
+ // assertThrows : le dépôt de BigDecimal.ZERO doit lever IllegalArgumentException
  assertThrows(IllegalArgumentException.class,
- () -> compte.deposer(BigDecimal.ZERO, "Dépôt nul"));
+  () -> compte.deposer(BigDecimal.ZERO, "Dépôt nul")); // BigDecimal.ZERO : constante représentant 0
 }
 ```
 
@@ -560,12 +593,13 @@ void depotZeroInterdit() {
 #### Test 2.3 — `depotNegatifInterdit`
 
 ```java
+// Phase RED : cas d'erreur — cohérence métier (dépôt négatif = retrait déguisé)
 @Test
-@DisplayName("Dépôt négatif est interdit")
+@DisplayName("Dépôt négatif est interdit") // @DisplayName : règle métier
 void depotNegatifInterdit() {
  CompteBancaire compte = new CompteBancaire(1L, "Alice", new BigDecimal("100.00"));
  assertThrows(IllegalArgumentException.class,
- () -> compte.deposer(new BigDecimal("-50.00"), "Dépôt négatif"));
+  () -> compte.deposer(new BigDecimal("-50.00"), "Dépôt négatif")); // BigDecimal("-50.00") : valeur négative
 }
 ```
 
@@ -574,14 +608,15 @@ void depotNegatifInterdit() {
 #### Test 2.4 — `plusieursDepots`
 
 ```java
+// Phase RED : cas d'accumulation — vérifie que l'état persiste entre les appels
 @Test
-@DisplayName("Plusieurs dépôts successifs")
+@DisplayName("Plusieurs dépôts successifs") // @DisplayName : accumulation de dépôts
 void plusieursDepots() {
- CompteBancaire compte = new CompteBancaire(1L, "Alice", new BigDecimal("100.00"));
- compte.deposer(new BigDecimal("50.00"), "Dépôt 1");
- compte.deposer(new BigDecimal("75.00"), "Dépôt 2");
- compte.deposer(new BigDecimal("25.00"), "Dépôt 3");
- assertEquals(new BigDecimal("250.00"), compte.getSolde());
+ CompteBancaire compte = new CompteBancaire(1L, "Alice", new BigDecimal("100.00")); // Solde initial 100
+ compte.deposer(new BigDecimal("50.00"), "Dépôt 1"); // 100 + 50 = 150
+ compte.deposer(new BigDecimal("75.00"), "Dépôt 2"); // 150 + 75 = 225
+ compte.deposer(new BigDecimal("25.00"), "Dépôt 3"); // 225 + 25 = 250
+ assertEquals(new BigDecimal("250.00"), compte.getSolde()); // Vérification : 100 + 50 + 75 + 25 = 250
 }
 ```
 
@@ -592,8 +627,9 @@ void plusieursDepots() {
 ### Groupe 3 : "Opérations de retrait" (5 tests)
 
 ```java
+// @Nested : groupe "Opérations de retrait" — tests de la méthode retirer()
 @Nested
-@DisplayName("Opérations de retrait")
+@DisplayName("Opérations de retrait") // @DisplayName : sous-groupe fonctionnel dans l'IDE
 class Retrait {
 ```
 
@@ -602,24 +638,26 @@ class Retrait {
 #### Test 3.1 — `retraitDiminueSolde`
 
 ```java
+// Phase RED : cas nominal du retrait — solde doit diminuer
 @Test
-@DisplayName("Un retrait diminue le solde")
+@DisplayName("Un retrait diminue le solde") // @DisplayName : comportement attendu
 void retraitDiminueSolde() {
- CompteBancaire compte = new CompteBancaire(1L, "Alice", new BigDecimal("500.00"));
- compte.retirer(new BigDecimal("200.00"), "Retrait DAB");
- assertEquals(new BigDecimal("300.00"), compte.getSolde());
+ CompteBancaire compte = new CompteBancaire(1L, "Alice", new BigDecimal("500.00")); // Solde initial 500
+ compte.retirer(new BigDecimal("200.00"), "Retrait DAB"); // retirer(BigDecimal, String) : montant + description
+ assertEquals(new BigDecimal("300.00"), compte.getSolde()); // 500 - 200 = 300
 }
 ```
 
 #### Test 3.2 — `retraitTotal`
 
 ```java
+// Phase RED : cas limite — retirer exactement le solde est autorisé (solde atteint 0)
 @Test
-@DisplayName("Retrait de la totalité du solde")
+@DisplayName("Retrait de la totalité du solde") // @DisplayName : description du cas limite
 void retraitTotal() {
- CompteBancaire compte = new CompteBancaire(1L, "Alice", new BigDecimal("100.00"));
- compte.retirer(new BigDecimal("100.00"), "Retrait total");
- assertEquals(BigDecimal.ZERO, compte.getSolde());
+ CompteBancaire compte = new CompteBancaire(1L, "Alice", new BigDecimal("100.00")); // Solde 100
+ compte.retirer(new BigDecimal("100.00"), "Retrait total"); // Retrait de 100 = totalité
+ assertEquals(BigDecimal.ZERO, compte.getSolde()); // BigDecimal.ZERO : solde doit être exactement 0
 }
 ```
 
@@ -628,12 +666,13 @@ void retraitTotal() {
 #### Test 3.3 — `retraitSuperieurAuSolde`
 
 ```java
+// Phase RED : cas d'erreur critique — retrait > solde interdit (pas de découvert par défaut)
 @Test
-@DisplayName("Retrait supérieur au solde est interdit")
+@DisplayName("Retrait supérieur au solde est interdit") // @DisplayName : règle métier du cas d'erreur
 void retraitSuperieurAuSolde() {
- CompteBancaire compte = new CompteBancaire(1L, "Alice", new BigDecimal("100.00"));
+ CompteBancaire compte = new CompteBancaire(1L, "Alice", new BigDecimal("100.00")); // Solde 100
  assertThrows(IllegalArgumentException.class,
- () -> compte.retirer(new BigDecimal("200.00"), "Trop"));
+  () -> compte.retirer(new BigDecimal("200.00"), "Trop")); // Tentative de retrait de 200 avec 100 de solde
 }
 ```
 
@@ -648,8 +687,9 @@ Identiques aux tests de dépôt : `retirer(BigDecimal.ZERO)` et `retirer(new Big
 ### Groupe 4 : "Historique des transactions" (5 tests)
 
 ```java
+// @Nested : groupe "Historique des transactions" — tests du système d'audit
 @Nested
-@DisplayName("Historique des transactions")
+@DisplayName("Historique des transactions") // @DisplayName : sous-groupe pour l'historique
 class Historique {
 ```
 
@@ -658,12 +698,13 @@ class Historique {
 #### Test 4.1 — `compteNeufHistoriqueVide`
 
 ```java
+// Phase RED : état initial — un compte neuf n'a aucune transaction
 @Test
-@DisplayName("Le compte neuf a un historique vide")
+@DisplayName("Le compte neuf a un historique vide") // @DisplayName : état initial
 void compteNeufHistoriqueVide() {
  CompteBancaire compte = new CompteBancaire(1L, "Alice", new BigDecimal("100.00"));
- assertTrue(compte.getHistorique().isEmpty());
- assertEquals(0, compte.getNombreTransactions());
+ assertTrue(compte.getHistorique().isEmpty()); // getHistorique() : retourne la liste des transactions
+ assertEquals(0, compte.getNombreTransactions()); // getNombreTransactions() : 0 transaction à la création
 }
 ```
 
@@ -672,18 +713,19 @@ void compteNeufHistoriqueVide() {
 #### Test 4.2 — `depotCreeTransaction`
 
 ```java
+// Phase RED : un dépôt doit créer une transaction d'audit avec les bonnes valeurs
 @Test
-@DisplayName("Un dépôt crée une transaction dans l'historique")
+@DisplayName("Un dépôt crée une transaction dans l'historique") // @DisplayName : comportement d'audit
 void depotCreeTransaction() {
  CompteBancaire compte = new CompteBancaire(1L, "Alice", new BigDecimal("100.00"));
- compte.deposer(new BigDecimal("50.00"), "Dépôt test");
+ compte.deposer(new BigDecimal("50.00"), "Dépôt test"); // Dépôt de 50€
 
- assertEquals(1, compte.getNombreTransactions());
- Transaction derniere = compte.getDerniereTransaction();
- assertNotNull(derniere);
- assertEquals(Transaction.Type.DEPOT, derniere.getType());
- assertEquals(new BigDecimal("50.00"), derniere.getMontant());
- assertEquals(new BigDecimal("150.00"), derniere.getSoldeApresOperation());
+ assertEquals(1, compte.getNombreTransactions()); // Une seule transaction créée
+ Transaction derniere = compte.getDerniereTransaction(); // getDerniereTransaction() : retourne la dernière transaction
+ assertNotNull(derniere); // Vérifie que la transaction n'est pas null
+ assertEquals(Transaction.Type.DEPOT, derniere.getType()); // Le type doit être DEPOT
+ assertEquals(new BigDecimal("50.00"), derniere.getMontant()); // BigDecimal : montant exact de la transaction
+ assertEquals(new BigDecimal("150.00"), derniere.getSoldeApresOperation()); // BigDecimal : solde après opération = 100 + 50
 }
 ```
 
@@ -696,16 +738,17 @@ Ce test valide que :
 #### Test 4.3 — `retraitCreeTransaction`
 
 ```java
+// Phase RED : symétrique — un retrait crée aussi une transaction
 @Test
-@DisplayName("Un retrait crée une transaction dans l'historique")
+@DisplayName("Un retrait crée une transaction dans l'historique") // @DisplayName : décrit le comportement d'audit
 void retraitCreeTransaction() {
  CompteBancaire compte = new CompteBancaire(1L, "Alice", new BigDecimal("100.00"));
- compte.retirer(new BigDecimal("30.00"), "Retrait test");
+ compte.retirer(new BigDecimal("30.00"), "Retrait test"); // Retrait de 30€
 
- Transaction derniere = compte.getDerniereTransaction();
- assertEquals(Transaction.Type.RETRAIT, derniere.getType());
- assertEquals(new BigDecimal("30.00"), derniere.getMontant());
- assertEquals(new BigDecimal("70.00"), derniere.getSoldeApresOperation());
+ Transaction derniere = compte.getDerniereTransaction(); // getDerniereTransaction() : dernière transaction enregistrée
+ assertEquals(Transaction.Type.RETRAIT, derniere.getType()); // Type RETRAIT (pas DEPOT)
+ assertEquals(new BigDecimal("30.00"), derniere.getMontant()); // BigDecimal : montant de la transaction
+ assertEquals(new BigDecimal("70.00"), derniere.getSoldeApresOperation()); // BigDecimal : solde après = 100 - 30 = 70
 }
 ```
 
@@ -714,24 +757,27 @@ Même validation pour les retraits : type `RETRAIT`, solde après opération 70.
 #### Test 4.4 — `plusieursOperationsHistorique`
 
 ```java
+// Phase RED : vérifie l'ordre chronologique et les soldes progressifs
 @Test
-@DisplayName("Plusieurs opérations créent des transactions ordonnées")
+@DisplayName("Plusieurs opérations créent des transactions ordonnées") // @DisplayName : ordre et contenu
 void plusieursOperationsHistorique() {
- CompteBancaire compte = new CompteBancaire(1L, "Alice", new BigDecimal("0.00"));
- compte.deposer(new BigDecimal("1000.00"), "Salaire");
- compte.retirer(new BigDecimal("200.00"), "Loyer");
- compte.deposer(new BigDecimal("50.00"), "Remboursement");
+ CompteBancaire compte = new CompteBancaire(1L, "Alice", new BigDecimal("0.00")); // Solde initial 0
+ compte.deposer(new BigDecimal("1000.00"), "Salaire"); // 0 + 1000 = 1000
+ compte.retirer(new BigDecimal("200.00"), "Loyer"); // 1000 - 200 = 800
+ compte.deposer(new BigDecimal("50.00"), "Remboursement"); // 800 + 50 = 850
 
- List<Transaction> historique = compte.getHistorique();
- assertEquals(3, historique.size());
+ List<Transaction> historique = compte.getHistorique(); // getHistorique() : retourne la liste ordonnée
+ assertEquals(3, historique.size()); // 3 transactions au total
 
- assertEquals(Transaction.Type.DEPOT, historique.get(0).getType());
- assertEquals(Transaction.Type.RETRAIT, historique.get(1).getType());
- assertEquals(Transaction.Type.DEPOT, historique.get(2).getType());
+ // Vérification de l'ordre : index 0 = première opération, index 2 = dernière
+ assertEquals(Transaction.Type.DEPOT, historique.get(0).getType()); // Première transaction : DEPOT
+ assertEquals(Transaction.Type.RETRAIT, historique.get(1).getType()); // Deuxième : RETRAIT
+ assertEquals(Transaction.Type.DEPOT, historique.get(2).getType()); // Troisième : DEPOT
 
- assertEquals(new BigDecimal("1000.00"), historique.get(0).getSoldeApresOperation());
- assertEquals(new BigDecimal("800.00"), historique.get(1).getSoldeApresOperation());
- assertEquals(new BigDecimal("850.00"), historique.get(2).getSoldeApresOperation());
+ // Vérification du solde après chaque opération (progression du solde)
+ assertEquals(new BigDecimal("1000.00"), historique.get(0).getSoldeApresOperation()); // BigDecimal : après salaire
+ assertEquals(new BigDecimal("800.00"), historique.get(1).getSoldeApresOperation()); // BigDecimal : après loyer
+ assertEquals(new BigDecimal("850.00"), historique.get(2).getSoldeApresOperation()); // BigDecimal : après remboursement
 }
 ```
 
@@ -743,16 +789,18 @@ Ce test vérifie :
 #### Test 4.5 — `historiqueImmuable`
 
 ```java
+// Phase RED : test d'encapsulation — l'historique est protégé contre les modifications externes
 @Test
-@DisplayName("L'historique est immuable (ne peut pas être modifié de l'extérieur)")
+@DisplayName("L'historique est immuable (ne peut pas être modifié de l'extérieur)") // @DisplayName : encapsulation
 void historiqueImmuable() {
  CompteBancaire compte = new CompteBancaire(1L, "Alice", new BigDecimal("100.00"));
  compte.deposer(new BigDecimal("50.00"), "Test");
 
- List<Transaction> historique = compte.getHistorique();
+ List<Transaction> historique = compte.getHistorique(); // getHistorique() retourne Collections.unmodifiableList()
+ // Toute tentative de modification externe doit lever UnsupportedOperationException
  assertThrows(UnsupportedOperationException.class,
- () -> historique.add(null),
- "La liste retournée doit être non modifiable");
+  () -> historique.add(null), // Tentative d'ajout = modification interdite
+  "La liste retournée doit être non modifiable"); // Message d'assertion en cas d'échec
 }
 ```
 
@@ -761,11 +809,12 @@ void historiqueImmuable() {
 #### Test 4.6 — `derniereTransactionNullSiVide`
 
 ```java
+// Phase RED : cas limite — getDerniereTransaction() sur un historique vide retourne null
 @Test
-@DisplayName("getDerniereTransaction retourne null si historique vide")
+@DisplayName("getDerniereTransaction retourne null si historique vide") // @DisplayName : comportement du cas limite
 void derniereTransactionNullSiVide() {
  CompteBancaire compte = new CompteBancaire(1L, "Alice", new BigDecimal("100.00"));
- assertNull(compte.getDerniereTransaction());
+ assertNull(compte.getDerniereTransaction()); // getDerniereTransaction() : null si aucune transaction (pas d'exception)
 }
 ```
 
@@ -776,8 +825,9 @@ void derniereTransactionNullSiVide() {
 ### Groupe 5 : "Virements internes au compte" (5 tests)
 
 ```java
+// @Nested : groupe "Virements internes au compte" — tests de emettreVirement() et recevoirVirement()
 @Nested
-@DisplayName("Virements internes au compte")
+@DisplayName("Virements internes au compte") // @DisplayName : sous-groupe pour les méthodes de virement
 class OperationsVirement {
 ```
 
@@ -786,24 +836,26 @@ class OperationsVirement {
 #### Test 5.1 — `emissionVirementDebite`
 
 ```java
+// Phase RED : émission d'un virement débite le compte émetteur
 @Test
-@DisplayName("Émission d'un virement débite le compte")
+@DisplayName("Émission d'un virement débite le compte") // @DisplayName : comportement attendu
 void emissionVirementDebite() {
- CompteBancaire compte = new CompteBancaire(1L, "Alice", new BigDecimal("1000.00"));
- compte.emettreVirement(new BigDecimal("300.00"), "Paiement facture");
- assertEquals(new BigDecimal("700.00"), compte.getSolde());
+ CompteBancaire compte = new CompteBancaire(1L, "Alice", new BigDecimal("1000.00")); // Solde initial 1000
+ compte.emettreVirement(new BigDecimal("300.00"), "Paiement facture"); // emettreVirement() : débite le compte
+ assertEquals(new BigDecimal("700.00"), compte.getSolde()); // BigDecimal : 1000 - 300 = 700
 }
 ```
 
 #### Test 5.2 — `receptionVirementCredite`
 
 ```java
+// Phase RED : réception d'un virement crédite le compte bénéficiaire
 @Test
-@DisplayName("Réception d'un virement crédite le compte")
+@DisplayName("Réception d'un virement crédite le compte") // @DisplayName : comportement symétrique
 void receptionVirementCredite() {
- CompteBancaire compte = new CompteBancaire(1L, "Alice", new BigDecimal("500.00"));
- compte.recevoirVirement(new BigDecimal("200.00"), "Remboursement");
- assertEquals(new BigDecimal("700.00"), compte.getSolde());
+ CompteBancaire compte = new CompteBancaire(1L, "Alice", new BigDecimal("500.00")); // Solde initial 500
+ compte.recevoirVirement(new BigDecimal("200.00"), "Remboursement"); // recevoirVirement() : crédite le compte
+ assertEquals(new BigDecimal("700.00"), compte.getSolde()); // BigDecimal : 500 + 200 = 700
 }
 ```
 
@@ -812,13 +864,14 @@ void receptionVirementCredite() {
 #### Tests 5.3 et 5.4 — Types de transaction
 
 ```java
+// Phase RED : le virement émis crée une transaction de type VIREMENT_EMIS
 @Test
-@DisplayName("Le virement émis crée une transaction de type VIREMENT_EMIS")
+@DisplayName("Le virement émis crée une transaction de type VIREMENT_EMIS") // @DisplayName : vérification du type
 void transactionVirementEmis() {
  CompteBancaire compte = new CompteBancaire(1L, "Alice", new BigDecimal("500.00"));
- compte.emettreVirement(new BigDecimal("100.00"), "Test virement");
- assertEquals(Transaction.Type.VIREMENT_EMIS,
- compte.getDerniereTransaction().getType());
+ compte.emettreVirement(new BigDecimal("100.00"), "Test virement"); // emettreVirement() : crée transaction VIREMENT_EMIS
+ assertEquals(Transaction.Type.VIREMENT_EMIS, // VIREMENT_EMIS : distingue les flux sortants
+  compte.getDerniereTransaction().getType()); // getDerniereTransaction().getType() : type de la dernière opération
 }
 ```
 
@@ -827,12 +880,13 @@ Chaque type de virement crée une transaction avec le bon type (`VIREMENT_EMIS` 
 #### Test 5.5 — `virementEmisSuperieurSolde`
 
 ```java
+// Phase RED : cas d'erreur — virement supérieur au solde interdit
 @Test
-@DisplayName("Virement émis supérieur au solde interdit")
+@DisplayName("Virement émis supérieur au solde interdit") // @DisplayName : règle métier
 void virementEmisSuperieurSolde() {
- CompteBancaire compte = new CompteBancaire(1L, "Alice", new BigDecimal("100.00"));
- assertThrows(IllegalArgumentException.class,
- () -> compte.emettreVirement(new BigDecimal("200.00"), "Trop"));
+ CompteBancaire compte = new CompteBancaire(1L, "Alice", new BigDecimal("100.00")); // Solde 100
+ assertThrows(IllegalArgumentException.class, // L'exception est levée par emettreVirement()
+  () -> compte.emettreVirement(new BigDecimal("200.00"), "Trop")); // Tentative de virement de 200 avec 100 de solde
 }
 ```
 
@@ -843,8 +897,9 @@ void virementEmisSuperieurSolde() {
 ### Groupe 6 : "Concurrence et thread-safety" (2 tests)
 
 ```java
+// @Nested : groupe "Concurrence et thread-safety" — tests de synchronisation multi-thread
 @Nested
-@DisplayName("Concurrence et thread-safety")
+@DisplayName("Concurrence et thread-safety") // @DisplayName : sous-groupe dédié à la concurrence
 class Concurrence {
 ```
 
@@ -863,38 +918,44 @@ Avant d'analyser les tests, voici les trois classes Java utilisées :
 #### Test 6.1 — `depotsConcurrents`
 
 ```java
+// Phase RED : teste la thread-safety — dépôts concurrents sur un même compte
 @Test
-@DisplayName("Dépôts concurrents : le solde final est correct")
-@Timeout(value = 5, unit = TimeUnit.SECONDS)
-void depotsConcurrents() throws InterruptedException {
- CompteBancaire compte = new CompteBancaire(1L, "Alice", BigDecimal.ZERO);
- int nbThreads = 10;
- int nbOperations = 100;
- BigDecimal montant = BigDecimal.ONE;
+@DisplayName("Dépôts concurrents : le solde final est correct") // @DisplayName : intention du test concurrent
+@Timeout(value = 5, unit = TimeUnit.SECONDS) // @Timeout : sécurité anti-blocage (deadlock ou boucle infinie)
+void depotsConcurrents() throws InterruptedException { // throws InterruptedException : requis pour await()
+ // Arrange : création d'un compte à 0€
+ CompteBancaire compte = new CompteBancaire(1L, "Alice", BigDecimal.ZERO); // BigDecimal.ZERO : solde initial 0
+ int nbThreads = 10; // Nombre de threads concurrents
+ int nbOperations = 100; // Nombre d'opérations par thread
+ BigDecimal montant = BigDecimal.ONE; // BigDecimal.ONE : constante pour la valeur 1
 
- ExecutorService executor = Executors.newFixedThreadPool(nbThreads);
- CountDownLatch latch = new CountDownLatch(nbThreads);
+ // ExecutorService : pool de threads pour exécuter des tâches parallèles
+ ExecutorService executor = Executors.newFixedThreadPool(nbThreads); // newFixedThreadPool(n) : pool de n threads
+ // CountDownLatch : synchroniseur — attend que tous les threads aient terminé
+ CountDownLatch latch = new CountDownLatch(nbThreads); // Initialisé au nombre de threads à attendre
 
  for (int i = 0; i < nbThreads; i++) {
- executor.submit(() -> {
- try {
- for (int j = 0; j < nbOperations; j++) {
- compte.deposer(montant, "Dépôt concurrent");
- }
- } finally {
- latch.countDown();
- }
- });
+  executor.submit(() -> { // submit() : soumet une tâche Runnable au pool
+   try {
+    for (int j = 0; j < nbOperations; j++) {
+     compte.deposer(montant, "Dépôt concurrent"); // deposer() est synchronized : un seul thread à la fois
+    }
+   } finally {
+    latch.countDown(); // countDown() : décrémente le compteur, toujours dans finally (même si exception)
+   }
+  });
  }
 
- latch.await();
- executor.shutdown();
- executor.awaitTermination(5, TimeUnit.SECONDS);
+ latch.await(); // await() : bloque le thread principal jusqu'à ce que le compteur atteigne 0
+ executor.shutdown(); // shutdown() : arrêt du pool après la fin des tâches
+ executor.awaitTermination(5, TimeUnit.SECONDS); // awaitTermination() : attend l'arrêt complet avec timeout
 
- BigDecimal attendu = new BigDecimal(nbThreads * nbOperations);
+ // Assert : solde attendu = 10 threads × 100 opérations × 1€ = 1000€
+ // Sans synchronized, le solde serait < 1000 à cause des race conditions
+ BigDecimal attendu = new BigDecimal(nbThreads * nbOperations); // BigDecimal : multiplication exacte (int × int)
  assertEquals(attendu, compte.getSolde(),
- "Avec " + nbThreads + " threads × " + nbOperations + " dépôts de 1€, le solde doit être " + attendu + "€");
- assertEquals(nbThreads * nbOperations, compte.getNombreTransactions());
+  "Avec " + nbThreads + " threads × " + nbOperations + " dépôts de 1€, le solde doit être " + attendu + "€");
+ assertEquals(nbThreads * nbOperations, compte.getNombreTransactions()); // Vérifie aussi le nombre de transactions
 }
 ```
 
@@ -912,52 +973,61 @@ Si les méthodes n'étaient pas `synchronized`, des race conditions se produirai
 #### Test 6.2 — `operationsMixtesConcurrentes`
 
 ```java
+// Phase RED : test de concurrence plus exigeant — dépôts ET retraits simultanés
 @Test
-@DisplayName("Dépôts et retraits concurrents : intégrité du solde")
-@Timeout(value = 5, unit = TimeUnit.SECONDS)
+@DisplayName("Dépôts et retraits concurrents : intégrité du solde") // @DisplayName : test mixte dépôts/retraits
+@Timeout(value = 5, unit = TimeUnit.SECONDS) // @Timeout : protège contre le blocage en cas de deadlock
 void operationsMixtesConcurrentes() throws InterruptedException {
+ // Arrange : solde initial 1000€
  CompteBancaire compte = new CompteBancaire(1L, "Alice", new BigDecimal("1000.00"));
- int nbThreads = 5;
- BigDecimal montant = new BigDecimal("1.00");
+ int nbThreads = 5; // 5 threads au total
+ BigDecimal montant = new BigDecimal("1.00"); // BigDecimal("1.00") : montant unitaire pour chaque opération
 
- ExecutorService executor = Executors.newFixedThreadPool(nbThreads);
- CountDownLatch latch = new CountDownLatch(nbThreads);
+ // ExecutorService : pool de threads
+ ExecutorService executor = Executors.newFixedThreadPool(nbThreads); // newFixedThreadPool(5) : jusqu'à 5 threads
+ CountDownLatch latch = new CountDownLatch(nbThreads); // Compteur initialisé à 5
 
+ // Première boucle : nbThreads/2 + 1 = 3 threads de dépôt
+ // Chaque thread effectue 50 dépôts de 1€ → 150 dépôts au total
  for (int i = 0; i < nbThreads / 2 + 1; i++) {
- executor.submit(() -> {
- try {
- for (int j = 0; j < 50; j++) {
- compte.deposer(montant, "Dépôt");
+  executor.submit(() -> {
+   try {
+    for (int j = 0; j < 50; j++) {
+     compte.deposer(montant, "Dépôt"); // deposer() synchronized : exclusion mutuelle
+    }
+   } finally {
+    latch.countDown(); // finally : garantit countDown() même en cas d'exception
+   }
+  });
  }
- } finally {
- latch.countDown();
- }
- });
- }
+ // Deuxième boucle : les 2 threads restants font des retraits
+ // Chaque thread effectue 50 retraits de 1€ → 100 retraits au total
  for (int i = nbThreads / 2 + 1; i < nbThreads; i++) {
- executor.submit(() -> {
- try {
- for (int j = 0; j < 50; j++) {
- compte.retirer(montant, "Retrait");
- }
- } finally {
- latch.countDown();
- }
- });
+  executor.submit(() -> {
+   try {
+    for (int j = 0; j < 50; j++) {
+     compte.retirer(montant, "Retrait"); // retirer() synchronized : exclusion mutuelle
+    }
+   } finally {
+    latch.countDown(); // finally : décrémente même si une exception survient
+   }
+  });
  }
 
- latch.await();
- executor.shutdown();
- executor.awaitTermination(5, TimeUnit.SECONDS);
+ latch.await(); // await() : attend que les 5 threads aient terminé
+ executor.shutdown(); // shutdown() : arrêt gracieux du pool
+ executor.awaitTermination(5, TimeUnit.SECONDS); // awaitTermination() : attente avec timeout
 
- int nbDepots = 3 * 50; // 3 threads de dépôt × 50 opérations = 150
- int nbRetraits = 2 * 50; // 2 threads de retrait × 50 opérations = 100
+ int nbDepots = 3 * 50; // 3 threads de dépôt × 50 opérations = 150 dépôts
+ int nbRetraits = 2 * 50; // 2 threads de retrait × 50 opérations = 100 retraits
 
+ // BigDecimal : calcul du solde attendu avec add() et subtract()
+ // 1000 (initial) + 150 (dépôts) - 100 (retraits) = 1050
  BigDecimal attendu = new BigDecimal("1000.00")
- .add(new BigDecimal(nbDepots))
- .subtract(new BigDecimal(nbRetraits));
+  .add(new BigDecimal(nbDepots)) // add() : addition BigDecimal, ne pas utiliser +
+  .subtract(new BigDecimal(nbRetraits)); // subtract() : soustraction BigDecimal
 
- assertEquals(attendu, compte.getSolde());
+ assertEquals(attendu, compte.getSolde()); // Sans synchronized, le solde serait incorrect
 }
 ```
 
@@ -976,15 +1046,20 @@ Ce test est plus exigeant car il mélange lectures et écritures concurrentes de
 ### Groupe 7 : `@RepeatedTest` — Stabilité
 
 ```java
+// @RepeatedTest : exécute le test 10 fois pour vérifier l'absence d'état résiduel (flaky test)
+// value = 10 : 10 exécutions indépendantes (nouvelle instance de classe à chaque répétition)
+// name : modèle d'affichage dans le rapport — {currentRepetition}/{totalRepetitions} donne "3/10"
 @RepeatedTest(value = 10, name = "{displayName} — répétition {currentRepetition}/{totalRepetitions}")
-@DisplayName("Stabilité : le solde après 3 opérations est toujours correct")
+@DisplayName("Stabilité : le solde après 3 opérations est toujours correct") // @DisplayName : décrit l'objectif de stabilité
 void stabiliteSoldeApresOperations() {
- CompteBancaire compte = new CompteBancaire(1L, "Test", new BigDecimal("100.00"));
- compte.deposer(new BigDecimal("50.00"), "Depot");
- compte.retirer(new BigDecimal("30.00"), "Retrait");
- compte.deposer(new BigDecimal("20.00"), "Depot 2");
+ // Chaque répétition crée un nouveau compte isolé
+ CompteBancaire compte = new CompteBancaire(1L, "Test", new BigDecimal("100.00")); // BigDecimal : solde initial 100
+ compte.deposer(new BigDecimal("50.00"), "Depot"); // 100 + 50 = 150
+ compte.retirer(new BigDecimal("30.00"), "Retrait"); // 150 - 30 = 120
+ compte.deposer(new BigDecimal("20.00"), "Depot 2"); // 120 + 20 = 140
+ // Assert : après 100+50-30+20, le solde doit TOUJOURS être 140.00 (quelle que soit la répétition)
  assertEquals(new BigDecimal("140.00"), compte.getSolde(),
- "Après 100+50-30+20 le solde doit toujours être 140.00");
+  "Après 100+50-30+20 le solde doit toujours être 140.00"); // Message visible dans le rapport
 }
 ```
 
@@ -997,18 +1072,19 @@ Le `name` personnalisé permet d'identifier chaque répétition dans le rapport 
 ## Fichier 2 : `ServiceVirementTest.java` — Tests du service
 
 ```java
-@DisplayName("TDD : Service de Virement")
+@DisplayName("TDD : Service de Virement") // @DisplayName sur la classe : nom racine dans l'arborescence de tests
 class ServiceVirementTest {
 
- private ServiceVirement service;
- private CompteBancaire compteAlice;
- private CompteBancaire compteBob;
+ private ServiceVirement service; // Service à tester (instance réelle, pas de mock)
+ private CompteBancaire compteAlice; // Compte source pour les virements
+ private CompteBancaire compteBob; // Compte destination pour les virements
 
+ // @BeforeEach : exécuté avant CHAQUE test — garantit un état propre et isolé
  @BeforeEach
  void setUp() {
- service = new ServiceVirement();
- compteAlice = new CompteBancaire(1L, "Alice", new BigDecimal("1000.00"));
- compteBob = new CompteBancaire(2L, "Bob", new BigDecimal("500.00"));
+  service = new ServiceVirement(); // Nouvelle instance du service à chaque test
+  compteAlice = new CompteBancaire(1L, "Alice", new BigDecimal("1000.00")); // Alice : solde 1000€
+  compteBob = new CompteBancaire(2L, "Bob", new BigDecimal("500.00")); // Bob : solde 500€
  }
 ```
 
@@ -1019,16 +1095,19 @@ class ServiceVirementTest {
 #### Test 1.1 — `virementDebiteSourceCrediteDestination`
 
 ```java
+// Phase RED : test du cas nominal — virement entre deux comptes
 @Test
-@DisplayName("Le virement débite la source et crédite la destination")
+@DisplayName("Le virement débite la source et crédite la destination") // @DisplayName : les deux effets attendus
 void virementDebiteSourceCrediteDestination() {
+ // Act : effectuerVirement(source, destination, montant, description)
  service.effectuerVirement(compteAlice, compteBob,
- new BigDecimal("200.00"), "Remboursement");
+  new BigDecimal("200.00"), "Remboursement"); // BigDecimal("200.00") : montant du virement
 
- assertEquals(new BigDecimal("800.00"), compteAlice.getSolde(),
- "Alice doit être débitée de 200€");
- assertEquals(new BigDecimal("700.00"), compteBob.getSolde(),
- "Bob doit être crédité de 200€");
+ // Assert : les deux comptes sont modifiés
+ assertEquals(new BigDecimal("800.00"), compteAlice.getSolde(), // BigDecimal : Alice 1000 - 200 = 800
+  "Alice doit être débitée de 200€"); // Message d'assertion : visible en cas d'échec
+ assertEquals(new BigDecimal("700.00"), compteBob.getSolde(), // BigDecimal : Bob 500 + 200 = 700
+  "Bob doit être crédité de 200€"); // Vérifier un seul compte ne suffit pas
 }
 ```
 
@@ -1037,20 +1116,22 @@ void virementDebiteSourceCrediteDestination() {
 #### Test 1.2 — `virementCreeTransactions`
 
 ```java
+// Phase RED : traçabilité — un virement crée une transaction chez l'émetteur ET le bénéficiaire
 @Test
-@DisplayName("Le virement crée une transaction chez l'émetteur et le bénéficiaire")
+@DisplayName("Le virement crée une transaction chez l'émetteur et le bénéficiaire") // @DisplayName : traçabilité
 void virementCreeTransactions() {
  service.effectuerVirement(compteAlice, compteBob,
- new BigDecimal("100.00"), "Cadeau");
+  new BigDecimal("100.00"), "Cadeau"); // Virement de 100€
 
- assertEquals(1, compteAlice.getNombreTransactions());
- assertEquals(1, compteBob.getNombreTransactions());
+ // Chaque compte doit avoir exactement 1 transaction (pas plus)
+ assertEquals(1, compteAlice.getNombreTransactions()); // Alice : 1 transaction
+ assertEquals(1, compteBob.getNombreTransactions()); // Bob : 1 transaction
  assertEquals(
- com.nexa.banque.model.Transaction.Type.VIREMENT_EMIS,
- compteAlice.getDerniereTransaction().getType());
+  com.nexa.banque.model.Transaction.Type.VIREMENT_EMIS, // Type VIREMENT_EMIS pour l'émetteur
+  compteAlice.getDerniereTransaction().getType()); // getDerniereTransaction().getType() : type de la transaction
  assertEquals(
- com.nexa.banque.model.Transaction.Type.VIREMENT_RECU,
- compteBob.getDerniereTransaction().getType());
+  com.nexa.banque.model.Transaction.Type.VIREMENT_RECU, // Type VIREMENT_RECU pour le bénéficiaire
+  compteBob.getDerniereTransaction().getType()); // Permet de distinguer flux entrants et sortants
 }
 ```
 
@@ -1059,17 +1140,20 @@ Ce test valide la **traçabilité** : chaque virement crée une transaction chez
 #### Test 1.3 — `sommeSoldesConservee`
 
 ```java
+// Phase RED : invariant fondamental — l'argent ne se crée ni ne se détruit
 @Test
-@DisplayName("Somme des soldes conservée après virement")
+@DisplayName("Somme des soldes conservée après virement") // @DisplayName : conservation de la masse monétaire
 void sommeSoldesConservee() {
- BigDecimal sommeAvant = compteAlice.getSolde().add(compteBob.getSolde());
+ // BigDecimal.add() : addition de deux BigDecimal (jamais +)
+ BigDecimal sommeAvant = compteAlice.getSolde().add(compteBob.getSolde()); // 1000 + 500 = 1500
 
  service.effectuerVirement(compteAlice, compteBob,
- new BigDecimal("150.00"), "Test conservation");
+  new BigDecimal("150.00"), "Test conservation"); // Virement de 150€
 
- BigDecimal sommeApres = compteAlice.getSolde().add(compteBob.getSolde());
+ BigDecimal sommeApres = compteAlice.getSolde().add(compteBob.getSolde()); // 850 + 650 = 1500
+ // La somme avant et après doit être identique : aucun centime perdu ou créé
  assertEquals(sommeAvant, sommeApres,
- "La somme totale des soldes doit être conservée");
+  "La somme totale des soldes doit être conservée"); // Invariant comptable fondamental
 }
 ```
 
@@ -1078,20 +1162,23 @@ void sommeSoldesConservee() {
 ### Groupe 2 : "Cas d'erreur" (4 tests)
 
 ```java
+// @Nested : groupe "Cas d'erreur" — tests des validations métier du service de virement
 @Nested
-@DisplayName("Cas d'erreur")
+@DisplayName("Cas d'erreur") // @DisplayName : sous-groupe pour les cas d'erreur
 class CasErreur {
 ```
 
 #### Test 2.1 — `virementMemeCompteInterdit`
 
 ```java
+// Phase RED : cas d'erreur — virement vers soi-même interdit
 @Test
-@DisplayName("Virement vers le même compte interdit")
+@DisplayName("Virement vers le même compte interdit") // @DisplayName : règle métier
 void virementMemeCompteInterdit() {
+ // assertThrows : la source et la destination sont le même compte → exception
  assertThrows(IllegalArgumentException.class,
- () -> service.effectuerVirement(compteAlice, compteAlice,
- new BigDecimal("100.00"), "Moi-même"));
+  () -> service.effectuerVirement(compteAlice, compteAlice, // Même compte pour source et destination
+   new BigDecimal("100.00"), "Moi-même")); // BigDecimal : montant du virement (ignoré car exception)
 }
 ```
 
@@ -1100,24 +1187,26 @@ Le code source vérifie `source.equals(destination)` avant toute opération.
 #### Test 2.2 — `montantNulInterdit`
 
 ```java
+// Phase RED : cas d'erreur — montant nul interdit
 @Test
-@DisplayName("Montant nul interdit")
+@DisplayName("Montant nul interdit") // @DisplayName : règle métier
 void montantNulInterdit() {
  assertThrows(IllegalArgumentException.class,
- () -> service.effectuerVirement(compteAlice, compteBob,
- BigDecimal.ZERO, "Zéro"));
+  () -> service.effectuerVirement(compteAlice, compteBob,
+   BigDecimal.ZERO, "Zéro")); // BigDecimal.ZERO : montant nul rejeté
 }
 ```
 
 #### Test 2.3 — `montantNegatifInterdit`
 
 ```java
+// Phase RED : cas d'erreur — montant négatif interdit
 @Test
-@DisplayName("Montant négatif interdit")
+@DisplayName("Montant négatif interdit") // @DisplayName : règle métier
 void montantNegatifInterdit() {
  assertThrows(IllegalArgumentException.class,
- () -> service.effectuerVirement(compteAlice, compteBob,
- new BigDecimal("-50.00"), "Négatif"));
+  () -> service.effectuerVirement(compteAlice, compteBob,
+   new BigDecimal("-50.00"), "Négatif")); // BigDecimal("-50.00") : montant négatif rejeté
 }
 ```
 
@@ -1169,25 +1258,15 @@ Dans `CompteBancaireTest.java`, ajouter un `@Nested` "Découvert autorisé" avec
 
 **Phase RED** — Test suivant :
 
-4. **`retraitDansDecouvert`** : solde 100€, découvert 500€, retrait de 400€ → solde devient -300€ (dans la limite)
-5. **`retraitDepasseDecouvert`** : solde 100€, découvert 500€, retrait de 700€ → exception (100 - 700 = -600 < -500)
-
-**Phase GREEN** — Modifier `retirer()` :
-
 ```java
-public synchronized void retirer(BigDecimal montant, String description) {
- if (montant.compareTo(BigDecimal.ZERO) <= 0) {
- throw new IllegalArgumentException("Le montant du retrait doit être strictement positif");
- }
- BigDecimal nouveauSolde = this.solde.subtract(montant);
- if (nouveauSolde.compareTo(this.decouvertAutorise.negate()) < 0) {
- throw new IllegalArgumentException(
- String.format("Dépassement du découvert autorisé : solde deviendrait %s€, découvert max %s€",
- nouveauSolde, this.decouvertAutorise.negate()));
- }
- this.solde = nouveauSolde;
- historique.add(new Transaction(transactionIdGenerator.getAndIncrement(),
- Transaction.Type.RETRAIT, montant, this.solde, description));
+// Phase RED : nouveau test qui force une validation qui n'existe pas encore
+@Test
+@DisplayName("Le solde initial ne peut pas être négatif") // @DisplayName : décrit l'intention du test
+void soldeInitialNegatifInterdit() {
+ // assertThrows : vérifie qu'une exception est bien levée
+ // Le lambda () -> new CompteBancaire(...) décrit l'action qui doit échouer
+ assertThrows(IllegalArgumentException.class,
+  () -> new CompteBancaire(3L, "Charlie", new BigDecimal("-100.00"))); // BigDecimal négatif : test du cas d'erreur
 }
 ```
 

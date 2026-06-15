@@ -57,7 +57,7 @@ Impossible de forcer la base de données à retourner une erreur réseau, ou le 
 Tester les cas d'erreur est indispensable (utilisateur introuvable, email déjà existant, solde insuffisant). Sans mock, provoquer ces situations réelles est fastidieux, voire impossible. Un mock permet de les simuler en une ligne :
 
 ```java
-when(userRepository.findById(99L)).thenReturn(null);
+when(userRepository.findById(99L)).thenReturn(null); // when().thenReturn(null) : simule un utilisateur inexistant
 ```
 
 Cette ligne force le repository à retourner `null` pour l'ID 99, ce qui déclenchera le chemin d'erreur dans `UserService.trouverParId()`.
@@ -108,7 +108,7 @@ Pour utiliser Mockito avec JUnit 5, on ajoute la dépendance Maven suivante dans
 Cette dépendance (`pom.xml` du lab03, ligne 37-42) fournit l'extension JUnit 5 qui s'active avec l'annotation sur la classe de test :
 
 ```java
-@ExtendWith(MockitoExtension.class)
+@ExtendWith(MockitoExtension.class) // Active l'intégration Mockito + JUnit 5 (initialise @Mock, @InjectMocks, @Captor, @Spy)
 class UserServiceTest {
  // ...
 }
@@ -145,10 +145,10 @@ L'annotation `@Mock` crée un **simulacre** (proxy) qui implémente l'interface 
 Exemple tiré du code du lab :
 
 ```java
-@Mock
+@Mock          // @Mock crée un simulacre (proxy sans comportement réel) de l'interface
 private UserRepository userRepository;
 
-@Mock
+@Mock          // Toutes les méthodes de ce mock retournent des valeurs par défaut (null, false, 0)
 private EmailService emailService;
 ```
 
@@ -158,8 +158,8 @@ Ici, `userRepository` est un mock de l'interface `UserRepository`. Sans stubbing
 
 ```java
 // Sans @Mock, on écrirait dans un @BeforeEach :
-UserRepository userRepository = Mockito.mock(UserRepository.class);
-EmailService emailService = Mockito.mock(EmailService.class);
+UserRepository userRepository = Mockito.mock(UserRepository.class); // Mockito.mock() : crée un mock manuellement (sans annotation)
+EmailService emailService = Mockito.mock(EmailService.class);       // @Mock évite ce code répétitif
 ```
 
 L'annotation `@Mock` supprime ce code répétitif : Mockito le fait pour nous.
@@ -175,7 +175,7 @@ L'annotation `@Mock` supprime ce code répétitif : Mockito le fait pour nous.
 L'annotation `@InjectMocks` crée une **instance réelle** de la classe et y injecte automatiquement tous les `@Mock` présents dans le test.
 
 ```java
-@InjectMocks
+@InjectMocks  // @InjectMocks crée une instance réelle de UserService
 private UserService userService;
 ```
 
@@ -183,8 +183,8 @@ Ici, `userService` est un **vrai** objet `UserService` (pas un mock). Son constr
 
 ```java
 public UserService(UserRepository userRepository, EmailService emailService) {
- this.userRepository = userRepository;
- this.emailService = emailService;
+ this.userRepository = userRepository; // Injection des dépendances par constructeur
+ this.emailService = emailService;     // Les @Mock déclarés sont injectés automatiquement
 }
 ```
 
@@ -211,7 +211,8 @@ Le **stubbing** consiste à définir ce que le mock doit retourner quand une mé
 ### Syntaxe de base : `when().thenReturn()`
 
 ```java
-when(userRepository.findById(1L)).thenReturn(userAttendu);
+when(userRepository.findById(1L)).thenReturn(userAttendu); // when().thenReturn() : stubbing de base
+                                                            // quand findById(1L) est appelé, retourne userAttendu
 ```
 
 Cette ligne signifie : *quand la méthode `findById` sera appelée avec l'argument `1L`, alors retourne l'objet `userAttendu`*.
@@ -228,6 +229,7 @@ Si la méthode est appelée avec un argument différent (ex: `findById(2L)`), le
 ```java
 User userAttendu = new User(1L, "Alice", "alice@example.com", true);
 when(userRepository.findById(1L)).thenReturn(userAttendu);
+                                                  // when().thenReturn() : quand findById(1L) est appelé, retourne Alice
 ```
 
 → Quand `findById` est appelé avec `1L`, le mock retourne l'utilisateur Alice. Cela permet de tester la méthode `trouverParId` sans base de données.
@@ -235,7 +237,7 @@ when(userRepository.findById(1L)).thenReturn(userAttendu);
 **Retourner `null` (test `trouverParId_inexistant`, ligne 42) :**
 
 ```java
-when(userRepository.findById(99L)).thenReturn(null);
+when(userRepository.findById(99L)).thenReturn(null); // thenReturn(null) : simule un utilisateur inexistant
 ```
 
 → Simule un utilisateur inexistant. La méthode `trouverParId` vérifie si le résultat est `null` et lève `UserNotFoundException`, ce que le test vérifie avec `assertThrows`.
@@ -243,7 +245,7 @@ when(userRepository.findById(99L)).thenReturn(null);
 **Retourner un booléen (test `creerUtilisateur_succes`, ligne 51) :**
 
 ```java
-when(userRepository.existsByEmail("bob@test.com")).thenReturn(false);
+when(userRepository.existsByEmail("bob@test.com")).thenReturn(false); // when().thenReturn(false) : l'email n'existe pas encore
 ```
 
 → L'email n'existe pas encore, la création peut continuer.
@@ -253,8 +255,8 @@ when(userRepository.existsByEmail("bob@test.com")).thenReturn(false);
 On peut forcer un mock à lever une exception :
 
 ```java
-when(userRepository.save(any(User.class)))
- .thenThrow(new RuntimeException("Base de données indisponible"));
+when(userRepository.save(any(User.class)))                    // any(User.class) : accepte n'importe quel objet User
+ .thenThrow(new RuntimeException("Base de données indisponible")); // thenThrow() : force le mock à lever une exception
 ```
 
 Ce n'est pas utilisé dans le lab03 mais c'est une technique courante pour tester les blocs `try-catch` et la résilience.
@@ -264,8 +266,8 @@ Ce n'est pas utilisé dans le lab03 mais c'est une technique courante pour teste
 `thenReturn` retourne toujours la même valeur. `thenAnswer` permet un comportement **dynamique**, calculé au moment de l'appel :
 
 ```java
-when(userRepository.save(any(User.class)))
- .thenAnswer(invocation -> invocation.getArgument(0));
+when(userRepository.save(any(User.class)))          // any(User.class) : accepte n'importe quel User
+ .thenAnswer(invocation -> invocation.getArgument(0)); // thenAnswer() : retourne dynamiquement le 1er argument reçu
 ```
 
 Détaillons cette ligne utilisée dans le test `creerUtilisateur_succes` (ligne 52-53) :
@@ -277,10 +279,10 @@ Détaillons cette ligne utilisée dans le test `creerUtilisateur_succes` (ligne 
 **Variante plus sophistiquée (test `saveRetourneUtilisateurAvecId`, ligne 171-175) :**
 
 ```java
-when(userRepository.save(any(User.class))).thenAnswer(invocation -> {
- User user = invocation.getArgument(0);
+when(userRepository.save(any(User.class))).thenAnswer(invocation -> { // thenAnswer() : comportement dynamique défini par une lambda
+ User user = invocation.getArgument(0);                               // Récupère l'argument passé à save()
  user.setId(42L); // Simule l'attribution d'un ID par la base
- return user;
+ return user;     // Retourne l'utilisateur modifié avec son nouvel ID
 });
 ```
 
@@ -291,7 +293,7 @@ when(userRepository.save(any(User.class))).thenAnswer(invocation -> {
 Pour les objets annotés `@Spy` (voir section 1.10), la syntaxe est inversée :
 
 ```java
-doReturn(100).when(compteurSpy).incrementer();
+doReturn(100).when(compteurSpy).incrementer(); // doReturn().when() : stubbing pour spy (n'appelle pas la vraie méthode)
 ```
 
 On utilise `doReturn().when()` au lieu de `when().thenReturn()` car `when(spy.methode())` appellerait la **vraie** méthode du spy avant même d'enregistrer le stub, ce qui peut causer des effets de bord. `doReturn().when()` contourne ce problème en n'appelant jamais la vraie méthode.
@@ -302,6 +304,7 @@ Les méthodes `void` ne peuvent pas être stubbées avec `when()` car `when()` e
 
 ```java
 doThrow(new RuntimeException("Erreur")).when(emailService).envoyerEmail(anyString(), anyString(), anyString());
+// doThrow().when() : force une méthode void à lever une exception (when() ne fonctionne pas avec void)
 ```
 
 ---
@@ -315,7 +318,7 @@ Le principe : un mock doit avoir été appelé d'une certaine manière, un certa
 ### `verify(mock).methode()` — Appelée exactement 1 fois
 
 ```java
-verify(userRepository).save(any(User.class));
+verify(userRepository).save(any(User.class)); // verify() : vérifie que save() a été appelé exactement 1 fois
 ```
 
 Cette ligne (test `creerUtilisateur_succes`, ligne 63) vérifie que `userRepository.save()` a été appelée **exactement une fois** avec n'importe quel `User`. Si la méthode n'a jamais été appelée, ou a été appelée 2 fois, le test échoue.
@@ -323,7 +326,7 @@ Cette ligne (test `creerUtilisateur_succes`, ligne 63) vérifie que `userReposit
 ### `verify(mock, times(n))` — Appelée n fois
 
 ```java
-verify(userRepository, times(2)).save(any(User.class));
+verify(userRepository, times(2)).save(any(User.class)); // verify() + times(2) : vérifie que save() a été appelé exactement 2 fois
 ```
 
 Vérifie que `save` a été appelée exactement 2 fois. `times(1)` est équivalent à `verify(mock)` tout court.
@@ -331,8 +334,8 @@ Vérifie que `save` a été appelée exactement 2 fois. `times(1)` est équivale
 ### `verify(mock, never())` — Jamais appelée
 
 ```java
-verify(userRepository, never()).save(any(User.class));
-verify(emailService, never()).envoyerEmail(anyString(), anyString(), anyString());
+verify(userRepository, never()).save(any(User.class));                                    // verify() + never() : vérifie que save() n'a jamais été appelé
+verify(emailService, never()).envoyerEmail(anyString(), anyString(), anyString());         // never() garantit qu'aucun email n'a été envoyé
 ```
 
 Ces deux lignes (test `creerUtilisateur_emailExistant`, lignes 75-76) vérifient que la sauvegarde ET l'envoi d'email **n'ont jamais eu lieu**. Le test valide que quand l'email existe déjà, la méthode `creerUtilisateur` lève une exception **avant** d'appeler `save` ou `envoyerEmail`.
@@ -340,9 +343,9 @@ Ces deux lignes (test `creerUtilisateur_emailExistant`, lignes 75-76) vérifient
 ### `verify(mock, atLeast(n))` / `atMost(n)` / `atLeastOnce()`
 
 ```java
-verify(userRepository, atLeast(1)).save(any(User.class));
-verify(emailService, atMost(3)).envoyerEmail(anyString(), anyString(), anyString());
-verify(userRepository, atLeastOnce()).findById(anyLong());
+verify(userRepository, atLeast(1)).save(any(User.class));                              // verify() + atLeast(1) : au moins 1 appel
+verify(emailService, atMost(3)).envoyerEmail(anyString(), anyString(), anyString());    // atMost(3) : au plus 3 appels
+verify(userRepository, atLeastOnce()).findById(anyLong());                             // atLeastOnce() : équivalent à atLeast(1)
 ```
 
 - `atLeast(n)` : au moins n appels
@@ -352,8 +355,8 @@ verify(userRepository, atLeastOnce()).findById(anyLong());
 ### `verifyNoMoreInteractions(mock)` — Pas d'appels supplémentaires
 
 ```java
-verify(userRepository).findById(1L);
-verifyNoMoreInteractions(userRepository);
+verify(userRepository).findById(1L);                // verify() : vérifie que findById(1L) a été appelé
+verifyNoMoreInteractions(userRepository);            // verifyNoMoreInteractions() : garantit qu'aucune autre méthode de ce mock n'a été appelée
 ```
 
 Utilisé dans le test `pasDAutresInteractions` (ligne 161). Après avoir vérifié que `findById` a été appelé, `verifyNoMoreInteractions` vérifie qu'**aucune autre méthode** du mock `userRepository` n'a été appelée. Cela garantit que `trouverParId` n'appelle que `findById` et rien d'autre.
@@ -361,7 +364,7 @@ Utilisé dans le test `pasDAutresInteractions` (ligne 161). Après avoir vérifi
 ### `verifyNoInteractions(mock)` — Aucun appel du tout
 
 ```java
-verifyNoInteractions(emailService);
+verifyNoInteractions(emailService); // verifyNoInteractions() : vérifie que ce mock n'a subi aucun appel, d'aucune méthode
 ```
 
 Utilisé dans le test `pasDAutresInteractions` (ligne 162). Vérifie que le mock `emailService` n'a subi **aucun appel**, d'aucune méthode. Ici, cela confirme que `trouverParId` ne touche pas du tout au service d'email, ce qui est correct car la recherche par ID n'envoie pas d'email.
@@ -369,9 +372,9 @@ Utilisé dans le test `pasDAutresInteractions` (ligne 162). Vérifie que le mock
 ### `InOrder` — Vérification de l'ordre des appels
 
 ```java
-InOrder ordre = inOrder(userRepository, emailService);
-ordre.verify(userRepository).save(any(User.class));
-ordre.verify(emailService).envoyerEmail(anyString(), anyString(), anyString());
+InOrder ordre = inOrder(userRepository, emailService);          // InOrder : crée un vérificateur d'ordre lié aux deux mocks
+ordre.verify(userRepository).save(any(User.class));             // Le save() doit avoir eu lieu en PREMIER
+ordre.verify(emailService).envoyerEmail(anyString(), anyString(), anyString()); // L'envoi d'email doit avoir eu lieu en SECOND
 ```
 
 Utilisé dans le test `ordreDesAppels` (lignes 194-196). `InOrder` vérifie que les méthodes ont été appelées **dans un ordre précis** sur un ou plusieurs mocks :
@@ -404,10 +407,10 @@ Les **matchers d'arguments** permettent de stùbber ou vérifier des méthodes s
 ### Exemple du lab : `any()` et `anyString()`
 
 ```java
-when(userRepository.save(any(User.class)))
- .thenAnswer(invocation -> invocation.getArgument(0));
-when(emailService.envoyerEmail(anyString(), anyString(), anyString()))
- .thenReturn(true);
+when(userRepository.save(any(User.class)))          // any(User.class) : matcher qui accepte n'importe quel objet User
+ .thenAnswer(invocation -> invocation.getArgument(0)); // thenAnswer() : retourne l'argument reçu (simule la persistance)
+when(emailService.envoyerEmail(anyString(), anyString(), anyString())) // anyString() : accepte n'importe quelle chaîne
+ .thenReturn(true);                                                    // thenReturn(true) : l'envoi d'email réussit
 ```
 
 - `any(User.class)` : accepte n'importe quel objet `User`
@@ -419,12 +422,15 @@ Si **un seul** argument utilise un matcher (`any()`, `anyString()`, etc.), alors
 
  **Interdit :**
 ```java
+// Interdit :
 when(repo.save("exact", any(User.class))).thenReturn(...); // ERREUR !
+// On ne peut pas mélanger valeur exacte ("exact") et matcher (any(User.class))
 ```
 
  **Correct avec `eq()` :**
 ```java
 verify(emailService).envoyerEmail(eq("bob@test.com"), anyString(), anyString());
+// eq() permet de mélanger une valeur exacte avec des matchers (anyString())
 ```
 
 Cette ligne (test `creerUtilisateur_succes`, ligne 64) vérifie que l'email a été envoyé avec le destinataire exact `"bob@test.com"`, tout en acceptant n'importe quel sujet et contenu. Grâce à `eq()`, on mélange une valeur exacte avec des matchers, ce qui est autorisé.
@@ -433,14 +439,14 @@ Cette ligne (test `creerUtilisateur_succes`, ligne 64) vérifie que l'email a é
 
 ```java
 // Stubbing avec anyLong() — test argumentMatchersDemo, ligne 82
-when(userRepository.findById(anyLong())).thenReturn(
+when(userRepository.findById(anyLong())).thenReturn(          // anyLong() : accepte n'importe quel Long pour le stubbing
  new User(1L, "Test", "test@test.com", true));
 
 // Appel réel
 User u = userService.trouverParId(42L);
 
 // Vérification avec eq() — ligne 88
-verify(userRepository).findById(eq(42L));
+verify(userRepository).findById(eq(42L));                    // eq(42L) : vérifie que l'appel était bien avec 42L précisément
 ```
 
 Le stubbing utilise `anyLong()` pour accepter n'importe quel ID. La vérification utilise `eq(42L)` pour s'assurer que l'appel a bien été fait avec `42L` (et pas `43L` ou autre).
@@ -454,35 +460,56 @@ Parfois, on ne veut pas seulement vérifier qu'une méthode a été appelée, ma
 ### Déclaration
 
 ```java
-@Captor
-private ArgumentCaptor<User> userCaptor;
+@Captor                                                // @Captor crée un ArgumentCaptor pour intercepter les arguments passés à un mock
+private ArgumentCaptor<User> userCaptor;               // ArgumentCaptor<User> : spécialisé pour capturer des objets de type User
 ```
 
 L'annotation `@Captor` (ligne 91-92 du test) crée un capteur spécialisé pour le type `User`. L'extension Mockito l'initialise automatiquement (comme `@Mock`).
 
 ### Utilisation en trois étapes
 
-**Étape 1 — Stubbing :** on configure les mocks comme d'habitude.
-
 ```java
-when(userRepository.existsByEmail(anyString())).thenReturn(false);
-when(userRepository.save(any(User.class)))
- .thenAnswer(inv -> inv.getArgument(0));
-when(emailService.envoyerEmail(anyString(), anyString(), anyString()))
- .thenReturn(true);
+// --- Arrange : configuration des mocks ---
+when(userRepository.existsByEmail(anyString())).thenReturn(false);        // L'email n'existe pas
+when(userRepository.save(any(User.class)))                                // any(User.class) : accepte n'importe quel User
+ .thenAnswer(inv -> inv.getArgument(0));                                  // thenAnswer() : retourne l'argument reçu
+when(emailService.envoyerEmail(anyString(), anyString(), anyString()))    // anyString() : accepte n'importe quelle chaîne
+ .thenReturn(true);                                                       // L'envoi d'email réussit
 ```
 
 **Étape 2 — Act :** on appelle la méthode testée.
 
 ```java
-userService.creerUtilisateur("Charlie", "charlie@test.com");
+userService.creerUtilisateur("Charlie", "charlie@test.com"); // Act : appel de la méthode à tester
 ```
 
 **Étape 3 — Assert avec capture :** on utilise `captor.capture()` à la place d'un matcher dans `verify()`.
 
 ```java
-verify(userRepository).save(userCaptor.capture());
-User capture = userCaptor.getValue();
+verify(userRepository).save(userCaptor.capture()); // userCaptor.capture() intercepte l'argument passé à save()
+User capture = userCaptor.getValue();               // getValue() : récupère l'objet User capturé
+```
+
+On peut ensuite faire des assertions sur l'objet capturé :
+
+```java
+assertEquals("Charlie", capture.getNom());           // Vérifie le nom de l'utilisateur capturé
+assertEquals("charlie@test.com", capture.getEmail()); // Vérifie l'email
+assertTrue(capture.isActif());                        // Vérifie que le compte est actif
+assertNull(capture.getId(), "L'ID doit être null avant la persistance"); // L'ID est null (non encore généré par la base)
+```
+
+**Étape 2 — Act :** on appelle la méthode testée.
+
+```java
+userService.creerUtilisateur("Charlie", "charlie@test.com"); // Act : appel de la méthode testée
+```
+
+**Étape 3 — Assert avec capture :** on utilise `captor.capture()` à la place d'un matcher dans `verify()`.
+
+```java
+verify(userRepository).save(userCaptor.capture()); // userCaptor.capture() : intercepte le User passé à save()
+User capture = userCaptor.getValue();               // getValue() : récupère l'objet User capturé
 ```
 
 1. `userCaptor.capture()` intercepte l'argument passé à `save()` et le stocke
@@ -491,10 +518,10 @@ User capture = userCaptor.getValue();
 On peut ensuite faire des assertions sur l'objet capturé :
 
 ```java
-assertEquals("Charlie", capture.getNom());
-assertEquals("charlie@test.com", capture.getEmail());
-assertTrue(capture.isActif());
-assertNull(capture.getId(), "L'ID doit être null avant la persistance");
+assertEquals("Charlie", capture.getNom());           // Vérifie le nom de l'utilisateur capturé
+assertEquals("charlie@test.com", capture.getEmail()); // Vérifie l'email
+assertTrue(capture.isActif());                        // Vérifie que le compte est actif
+assertNull(capture.getId(), "L'ID doit être null avant la persistance"); // L'ID est null (généré par la base)
 ```
 
 L'intérêt pédagogique de cette dernière assertion : avant d'être sauvegardé, l'utilisateur a un ID `null`. C'est la base de données (ou le mock via `thenAnswer`) qui attribue l'ID. Le test vérifie que `UserService` ne définit **pas** l'ID lui-même.
@@ -502,9 +529,9 @@ L'intérêt pédagogique de cette dernière assertion : avant d'être sauvegard�
 ### Sans `@Captor` (équivalent manuel)
 
 ```java
-ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
-verify(userRepository).save(captor.capture());
-User capture = captor.getValue();
+ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class); // Création manuelle d'un ArgumentCaptor (sans @Captor)
+verify(userRepository).save(captor.capture());                     // captor.capture() : intercepte l'argument passé à save()
+User capture = captor.getValue();                                   // getValue() : récupère la valeur capturée
 ```
 
 L'annotation `@Captor` supprime l'appel à `ArgumentCaptor.forClass()`.
@@ -530,30 +557,30 @@ Le test `spyDemo` (lignes 140-150) définit une classe interne simple et un spy 
 
 ```java
 static class CompteurService {
- public int incrementer() { return 1; }
- public int decrementer() { return -1; }
+ public int incrementer() { return 1; }   // Méthode réelle : retourne 1
+ public int decrementer() { return -1; }  // Méthode réelle : retourne -1
 }
 
-@Spy
-private CompteurService compteurSpy;
+@Spy                                         // @Spy crée un espion : objet réel, méthodes partiellement remplaçables
+private CompteurService compteurSpy;         // Par défaut, toutes les méthodes appellent le vrai code
 ```
 
 `compteurSpy` est un **vrai** `CompteurService`. Par défaut, toutes ses méthodes exécutent le vrai code.
 
 ```java
 // Sans stubbing, le spy appelle la vraie méthode
-assertEquals(1, compteurSpy.incrementer(),
+assertEquals(1, compteurSpy.incrementer(),           // Appel réel : retourne 1 (vraie méthode)
  "Par défaut, le spy appelle la vraie méthode");
 
 // On stubbe une méthode avec doReturn().when()
-doReturn(100).when(compteurSpy).incrementer();
+doReturn(100).when(compteurSpy).incrementer();       // doReturn().when() : stubbing pour spy sans appeler la vraie méthode
 
 // La méthode stubbée retourne 100
-assertEquals(100, compteurSpy.incrementer(),
+assertEquals(100, compteurSpy.incrementer(),          // Stubbing actif : retourne 100 au lieu de 1
  "La méthode stubbée retourne 100");
 
 // La méthode non stubbée continue d'appeler la vraie implémentation
-assertEquals(-1, compteurSpy.decrementer(),
+assertEquals(-1, compteurSpy.decrementer(),           // Non stubbée : appelle la vraie méthode, retourne -1
  "La méthode non stubbée appelle la vraie implémentation");
 ```
 
@@ -578,18 +605,18 @@ Nous allons décortiquer chaque test du fichier `UserServiceTest.java`, en suiva
 ### Prérequis : les annotations de la classe de test
 
 ```java
-@ExtendWith(MockitoExtension.class)
-@DisplayName("Tests du UserService avec Mockito")
+@ExtendWith(MockitoExtension.class)                            // Active l'extension Mockito pour JUnit 5 (initialise @Mock, @InjectMocks, @Captor)
+@DisplayName("Tests du UserService avec Mockito")              // Nom personnalisé affiché dans le rapport de test
 class UserServiceTest {
 
- @Mock
- private UserRepository userRepository;
+ @Mock                                                        // @Mock crée un simulacre (proxy) de l'interface
+ private UserRepository userRepository;                       // Toutes les méthodes retournent des valeurs par défaut
 
- @Mock
- private EmailService emailService;
+ @Mock                                                        // @Mock crée un simulacre de EmailService
+ private EmailService emailService;                           // Les méthodes retournent null/false par défaut
 
- @InjectMocks
- private UserService userService;
+ @InjectMocks                                                 // @InjectMocks crée une VRAIE instance de UserService
+ private UserService userService;                             // Les @Mock sont injectés via le constructeur
 ```
 
 - `@ExtendWith(MockitoExtension.class)` : active l'extension Mockito pour JUnit 5 (initialisation des mocks et injection)
@@ -601,18 +628,21 @@ class UserServiceTest {
 ## Test 1 : `trouverParId_existant` — Stubbing simple
 
 ```java
-@Test
+@Test                                                       // @Test marque cette méthode comme un test JUnit
 @DisplayName("trouverParId — retourne l'utilisateur quand il existe")
 void trouverParId_existant() {
 
- User userAttendu = new User(1L, "Alice", "alice@example.com", true);
- when(userRepository.findById(1L)).thenReturn(userAttendu);
+ // --- Arrange : préparer les données et configurer les mocks ---
+ User userAttendu = new User(1L, "Alice", "alice@example.com", true); // Crée l'utilisateur attendu (Alice, active)
+ when(userRepository.findById(1L)).thenReturn(userAttendu);           // when().thenReturn() : quand findById(1L) est appelé, retourne Alice
 
- User resultat = userService.trouverParId(1L);
+ // --- Act : exécuter la méthode testée ---
+ User resultat = userService.trouverParId(1L);                        // Appel de la méthode à tester avec l'ID 1
 
- assertNotNull(resultat);
- assertEquals("Alice", resultat.getNom());
- assertEquals("alice@example.com", resultat.getEmail());
+ // --- Assert : vérifier les résultats ---
+ assertNotNull(resultat);                                             // L'utilisateur retourné n'est pas null
+ assertEquals("Alice", resultat.getNom());                            // Le nom correspond à Alice
+ assertEquals("alice@example.com", resultat.getEmail());              // L'email est correct
 }
 ```
 
@@ -638,10 +668,12 @@ void trouverParId_existant() {
 @Test
 @DisplayName("trouverParId — lève UserNotFoundException si l'utilisateur n'existe pas")
 void trouverParId_inexistant() {
- when(userRepository.findById(99L)).thenReturn(null);
+ // --- Arrange : le mock retourne null pour simuler un utilisateur inexistant ---
+ when(userRepository.findById(99L)).thenReturn(null); // when().thenReturn(null) : simule un utilisateur inexistant
 
- assertThrows(UserNotFoundException.class,
- () -> userService.trouverParId(99L));
+ // --- Act + Assert : vérifier que l'exception est levée ---
+ assertThrows(UserNotFoundException.class,            // assertThrows : vérifie qu'une exception de ce type est levée
+ () -> userService.trouverParId(99L));                // L'appel avec l'ID 99 doit lever UserNotFoundException
 }
 ```
 
@@ -655,11 +687,11 @@ void trouverParId_inexistant() {
 
 ```java
 public User trouverParId(Long id) {
- User user = userRepository.findById(id);
- if (user == null) {
- throw new UserNotFoundException("Utilisateur introuvable : id=" + id);
+ User user = userRepository.findById(id);            // Appel au repository (mocké en test)
+ if (user == null) {                                  // Si le repository retourne null (utilisateur inexistant)
+  throw new UserNotFoundException("Utilisateur introuvable : id=" + id); // Lever une exception personnalisée
  }
- return user;
+ return user;                                        // Sinon, retourner l'utilisateur trouvé
 }
 ```
 
@@ -671,20 +703,24 @@ public User trouverParId(Long id) {
 @Test
 @DisplayName("creerUtilisateur — sauvegarde l'utilisateur et envoie un email")
 void creerUtilisateur_succes() {
- when(userRepository.existsByEmail("bob@test.com")).thenReturn(false);
- when(userRepository.save(any(User.class)))
- .thenAnswer(invocation -> invocation.getArgument(0));
- when(emailService.envoyerEmail(anyString(), anyString(), anyString()))
- .thenReturn(true);
+ // --- Arrange : configurer les comportements des mocks ---
+ when(userRepository.existsByEmail("bob@test.com")).thenReturn(false);       // L'email n'existe pas, création autorisée
+ when(userRepository.save(any(User.class)))                                   // any(User.class) : accepte n'importe quel User
+ .thenAnswer(invocation -> invocation.getArgument(0));                        // thenAnswer() : retourne le User reçu en argument
+ when(emailService.envoyerEmail(anyString(), anyString(), anyString()))       // anyString() x3 : accepte n'importe quel destinataire, sujet, contenu
+ .thenReturn(true);                                                           // L'envoi d'email réussit
 
- User resultat = userService.creerUtilisateur("Bob", "bob@test.com");
+ // --- Act : exécuter la méthode testée ---
+ User resultat = userService.creerUtilisateur("Bob", "bob@test.com");         // Création d'un nouvel utilisateur Bob
 
- assertNotNull(resultat);
- assertEquals("Bob", resultat.getNom());
- assertTrue(resultat.isActif());
+ // --- Assert : vérifier la valeur de retour ---
+ assertNotNull(resultat);                                                     // L'utilisateur créé n'est pas null
+ assertEquals("Bob", resultat.getNom());                                      // Le nom est bien Bob
+ assertTrue(resultat.isActif());                                              // Le compte est actif par défaut
 
- verify(userRepository).save(any(User.class));
- verify(emailService).envoyerEmail(eq("bob@test.com"), anyString(), anyString());
+ // --- Assert : vérifier les interactions avec les mocks ---
+ verify(userRepository).save(any(User.class));                                // verify() : save() a été appelé exactement 1 fois
+ verify(emailService).envoyerEmail(eq("bob@test.com"), anyString(), anyString()); // eq() : vérifie le destinataire exact, anyString() pour sujet/contenu
 }
 ```
 
@@ -715,13 +751,16 @@ void creerUtilisateur_succes() {
 @Test
 @DisplayName("creerUtilisateur — échoue si l'email existe déjà")
 void creerUtilisateur_emailExistant() {
- when(userRepository.existsByEmail("existant@test.com")).thenReturn(true);
+ // --- Arrange : configurer le mock pour que l'email existe déjà ---
+ when(userRepository.existsByEmail("existant@test.com")).thenReturn(true); // L'email est déjà utilisé
 
- assertThrows(IllegalArgumentException.class,
- () -> userService.creerUtilisateur("Eve", "existant@test.com"));
+ // --- Act + Assert : vérifier que l'exception est levée ---
+ assertThrows(IllegalArgumentException.class,                               // assertThrows : l'exception attendue est IllegalArgumentException
+ () -> userService.creerUtilisateur("Eve", "existant@test.com"));           // La création avec un email existant doit échouer
 
- verify(userRepository, never()).save(any(User.class));
- verify(emailService, never()).envoyerEmail(anyString(), anyString(), anyString());
+ // --- Assert : vérifier que rien n'a été sauvegardé ni envoyé ---
+ verify(userRepository, never()).save(any(User.class));                     // verify() + never() : save() n'a JAMAIS été appelé
+ verify(emailService, never()).envoyerEmail(anyString(), anyString(), anyString()); // never() : aucun email n'a été envoyé
 }
 ```
 
@@ -738,9 +777,10 @@ void creerUtilisateur_emailExistant() {
 **Ce que ce test valide :** la méthode protège contre les doublons d'email et **n'effectue aucune opération** (pas de sauvegarde, pas d'email) avant de lever l'exception. Rappel du code source :
 
 ```java
-if (userRepository.existsByEmail(email)) {
- throw new IllegalArgumentException("Cet email est déjà utilisé : " + email);
+if (userRepository.existsByEmail(email)) {                  // Vérifie si l'email existe déjà
+ throw new IllegalArgumentException("Cet email est déjà utilisé : " + email); // Lève une exception AVANT toute sauvegarde
 }
+```
 ```
 
 Le `throw` est exécuté **avant** le `save` et l'`envoyerEmail`.
@@ -753,13 +793,16 @@ Le `throw` est exécuté **avant** le `save` et l'`envoyerEmail`.
 @Test
 @DisplayName("ArgumentMatchers : any() et eq()")
 void argumentMatchersDemo() {
- when(userRepository.findById(anyLong())).thenReturn(
- new User(1L, "Test", "test@test.com", true));
+ // --- Arrange : stubbing avec anyLong() pour accepter n'importe quel ID ---
+ when(userRepository.findById(anyLong())).thenReturn(                       // anyLong() : accepte n'importe quelle valeur de type Long
+ new User(1L, "Test", "test@test.com", true));                              // Retourne toujours le même utilisateur de test
 
- User u = userService.trouverParId(42L);
- assertNotNull(u);
+ // --- Act : appeler la méthode avec un ID arbitraire ---
+ User u = userService.trouverParId(42L);                                    // Appel avec l'ID 42
+ assertNotNull(u);                                                          // Vérifie que le résultat n'est pas null
 
- verify(userRepository).findById(eq(42L));
+ // --- Assert : vérifier que l'appel au mock était avec le bon ID ---
+ verify(userRepository).findById(eq(42L));                                  // eq(42L) : vérifie que l'ID passé était bien 42L
 }
 ```
 
@@ -779,27 +822,30 @@ void argumentMatchersDemo() {
 ## Test 6 : `capturerUtilisateurSauvegarde` — `@Captor` + `captor.capture()` + `getValue()`
 
 ```java
-@Captor
-private ArgumentCaptor<User> userCaptor;
+@Captor                                                    // @Captor crée un ArgumentCaptor pour intercepter les arguments
+private ArgumentCaptor<User> userCaptor;                   // Spécialisé pour le type User
 
 @Test
 @DisplayName("ArgumentCaptor : inspecter l'utilisateur sauvegardé")
 void capturerUtilisateurSauvegarde() {
- when(userRepository.existsByEmail(anyString())).thenReturn(false);
- when(userRepository.save(any(User.class)))
- .thenAnswer(inv -> inv.getArgument(0));
- when(emailService.envoyerEmail(anyString(), anyString(), anyString()))
- .thenReturn(true);
+ // --- Arrange : configurer les mocks ---
+ when(userRepository.existsByEmail(anyString())).thenReturn(false);     // Email disponible
+ when(userRepository.save(any(User.class)))                              // any(User.class) : accepte n'importe quel User
+ .thenAnswer(inv -> inv.getArgument(0));                                 // thenAnswer() : retourne l'utilisateur reçu
+ when(emailService.envoyerEmail(anyString(), anyString(), anyString()))  // anyString() : accepte n'importe quelle chaîne
+ .thenReturn(true);                                                      // Envoi d'email réussi
 
- userService.creerUtilisateur("Charlie", "charlie@test.com");
+ // --- Act : créer un utilisateur ---
+ userService.creerUtilisateur("Charlie", "charlie@test.com");            // Appel de la méthode testée
 
- verify(userRepository).save(userCaptor.capture());
- User capture = userCaptor.getValue();
+ // --- Assert : capturer et inspecter l'argument passé à save() ---
+ verify(userRepository).save(userCaptor.capture());                      // userCaptor.capture() : intercepte le User passé à save()
+ User capture = userCaptor.getValue();                                   // getValue() : récupère l'objet User capturé
 
- assertEquals("Charlie", capture.getNom());
- assertEquals("charlie@test.com", capture.getEmail());
- assertTrue(capture.isActif());
- assertNull(capture.getId(), "L'ID doit être null avant la persistance");
+ assertEquals("Charlie", capture.getNom());                              // Vérifie le nom de l'utilisateur capturé
+ assertEquals("charlie@test.com", capture.getEmail());                   // Vérifie l'email
+ assertTrue(capture.isActif());                                           // Vérifie que le compte est actif
+ assertNull(capture.getId(), "L'ID doit être null avant la persistance"); // L'ID est null (généré par la base, pas par le service)
 }
 ```
 
@@ -824,17 +870,20 @@ void capturerUtilisateurSauvegarde() {
 @Test
 @DisplayName("desactiverUtilisateur — gère l'échec d'envoi d'email")
 void desactiverUtilisateur_succes() {
- User user = new User(1L, "Dave", "dave@test.com", true);
- when(userRepository.findById(1L)).thenReturn(user);
- when(userRepository.save(any(User.class))).thenReturn(user);
- when(emailService.envoyerEmail(anyString(), anyString(), anyString()))
- .thenReturn(true);
+ // --- Arrange : préparer l'utilisateur et configurer les mocks ---
+ User user = new User(1L, "Dave", "dave@test.com", true);                // Dave, actif, ID=1
+ when(userRepository.findById(1L)).thenReturn(user);                     // when().thenReturn() : retourne Dave quand on cherche l'ID 1
+ when(userRepository.save(any(User.class))).thenReturn(user);            // save() retourne l'utilisateur sauvegardé
+ when(emailService.envoyerEmail(anyString(), anyString(), anyString()))  // anyString() x3 : peu importe les détails de l'email
+ .thenReturn(true);                                                      // L'envoi d'email réussit
 
- userService.desactiverUtilisateur(1L);
+ // --- Act : désactiver l'utilisateur ---
+ userService.desactiverUtilisateur(1L);                                   // Appel de la méthode à tester
 
- assertFalse(user.isActif());
- verify(userRepository).save(user);
- verify(emailService).envoyerEmail(eq("dave@test.com"), anyString(), anyString());
+ // --- Assert : vérifier l'état et les interactions ---
+ assertFalse(user.isActif());                                             // L'utilisateur est bien désactivé (actif = false)
+ verify(userRepository).save(user);                                       // verify() : save() a été appelé avec l'utilisateur modifié
+ verify(emailService).envoyerEmail(eq("dave@test.com"), anyString(), anyString()); // eq() : email envoyé au bon destinataire
 }
 ```
 
@@ -860,24 +909,27 @@ void desactiverUtilisateur_succes() {
 
 ```java
 static class CompteurService {
- public int incrementer() { return 1; }
- public int decrementer() { return -1; }
+ public int incrementer() { return 1; }   // Méthode réelle : retourne 1
+ public int decrementer() { return -1; }  // Méthode réelle : retourne -1
 }
 
-@Spy
-private CompteurService compteurSpy;
+@Spy                                            // @Spy crée un espion : instance réelle, méthodes partiellement remplaçables
+private CompteurService compteurSpy;            // Par défaut, toutes les méthodes appellent le VRAI code
 
 @Test
 @DisplayName("@Spy : l'objet réel est utilisé, sauf méthodes stubbées")
 void spyDemo() {
- assertEquals(1, compteurSpy.incrementer(),
+ // --- Phase 1 : sans stubbing, le spy appelle la vraie méthode ---
+ assertEquals(1, compteurSpy.incrementer(),     // Appel réel : la vraie méthode retourne 1
  "Par défaut, le spy appelle la vraie méthode");
 
- doReturn(100).when(compteurSpy).incrementer();
+ // --- Phase 2 : stubbing avec doReturn().when() pour un spy ---
+ doReturn(100).when(compteurSpy).incrementer();  // doReturn().when() : remplace le comportement de incrementer() SANS appeler la vraie méthode
 
- assertEquals(100, compteurSpy.incrementer(),
+ // --- Phase 3 : vérifier le comportement après stubbing ---
+ assertEquals(100, compteurSpy.incrementer(),    // Méthode stubbée : retourne 100 au lieu de 1
  "La méthode stubbée retourne 100");
- assertEquals(-1, compteurSpy.decrementer(),
+ assertEquals(-1, compteurSpy.decrementer(),     // Méthode non stubbée : appelle toujours la vraie implémentation
  "La méthode non stubbée appelle la vraie implémentation");
 }
 ```
@@ -900,14 +952,17 @@ void spyDemo() {
 @Test
 @DisplayName("verifyNoMoreInteractions : pas d'appels surprise")
 void pasDAutresInteractions() {
- User user = new User(1L, "Eve", "eve@test.com", true);
- when(userRepository.findById(1L)).thenReturn(user);
+ // --- Arrange : préparer les données et configurer le mock ---
+ User user = new User(1L, "Eve", "eve@test.com", true);    // Eve, active, ID=1
+ when(userRepository.findById(1L)).thenReturn(user);       // when().thenReturn() : retourne Eve pour l'ID 1
 
- userService.trouverParId(1L);
+ // --- Act : exécuter la méthode testée ---
+ userService.trouverParId(1L);                              // Chercher l'utilisateur par ID
 
- verify(userRepository).findById(1L);
- verifyNoMoreInteractions(userRepository);
- verifyNoInteractions(emailService);
+ // --- Assert : vérifier les interactions précises ---
+ verify(userRepository).findById(1L);                       // verify() : findById(1L) a bien été appelé
+ verifyNoMoreInteractions(userRepository);                  // verifyNoMoreInteractions() : AUCUNE autre méthode de userRepository n'a été appelée
+ verifyNoInteractions(emailService);                        // verifyNoInteractions() : emailService n'a subi AUCUN appel du tout
 }
 ```
 
@@ -929,18 +984,21 @@ void pasDAutresInteractions() {
 @Test
 @DisplayName("thenAnswer : l'utilisateur sauvegardé reçoit un ID")
 void saveRetourneUtilisateurAvecId() {
- when(userRepository.existsByEmail(anyString())).thenReturn(false);
- when(emailService.envoyerEmail(anyString(), anyString(), anyString())).thenReturn(true);
+ // --- Arrange : configurer les mocks ---
+ when(userRepository.existsByEmail(anyString())).thenReturn(false);  // Email disponible
+ when(emailService.envoyerEmail(anyString(), anyString(), anyString())).thenReturn(true); // Email envoyé avec succès
 
- when(userRepository.save(any(User.class))).thenAnswer(invocation -> {
- User user = invocation.getArgument(0);
- user.setId(42L);
- return user;
+ when(userRepository.save(any(User.class))).thenAnswer(invocation -> { // thenAnswer() : comportement dynamique
+ User user = invocation.getArgument(0);                                // Récupère le User passé en argument
+ user.setId(42L); // Simule l'attribution d'un ID par la base de données (comme JPA/Hibernate)
+ return user;     // Retourne l'utilisateur avec son nouvel ID
  });
 
- User resultat = userService.creerUtilisateur("Frank", "frank@test.com");
+ // --- Act : créer un utilisateur ---
+ User resultat = userService.creerUtilisateur("Frank", "frank@test.com"); // Appel de la méthode testée
 
- assertEquals(42L, resultat.getId(),
+ // --- Assert : vérifier que l'ID a bien été attribué ---
+ assertEquals(42L, resultat.getId(),                                // L'ID 42 a été attribué par le mock (simulation base de données)
  "Le mock simule l'attribution d'un ID par la base de données");
 }
 ```
@@ -963,17 +1021,20 @@ void saveRetourneUtilisateurAvecId() {
 @Test
 @DisplayName("InOrder : l'email est envoyé APRÈS la sauvegarde")
 void ordreDesAppels() {
- when(userRepository.existsByEmail(anyString())).thenReturn(false);
- when(userRepository.save(any(User.class)))
- .thenAnswer(inv -> inv.getArgument(0));
- when(emailService.envoyerEmail(anyString(), anyString(), anyString()))
- .thenReturn(true);
+ // --- Arrange : configurer les mocks ---
+ when(userRepository.existsByEmail(anyString())).thenReturn(false);  // Email disponible
+ when(userRepository.save(any(User.class)))                           // any(User.class) : accepte n'importe quel User
+ .thenAnswer(inv -> inv.getArgument(0));                              // thenAnswer() : retourne l'utilisateur reçu
+ when(emailService.envoyerEmail(anyString(), anyString(), anyString())) // anyString() : accepte n'importe quelles chaînes
+ .thenReturn(true);                                                    // Envoi réussi
 
- userService.creerUtilisateur("Grace", "grace@test.com");
+ // --- Act : créer un utilisateur ---
+ userService.creerUtilisateur("Grace", "grace@test.com");             // Appel de la méthode testée
 
- InOrder ordre = inOrder(userRepository, emailService);
- ordre.verify(userRepository).save(any(User.class));
- ordre.verify(emailService).envoyerEmail(anyString(), anyString(), anyString());
+ // --- Assert : vérifier l'ordre des appels avec InOrder ---
+ InOrder ordre = inOrder(userRepository, emailService);               // InOrder : crée un vérificateur d'ordre pour ces deux mocks
+ ordre.verify(userRepository).save(any(User.class));                  // 1er appel : save() DOIT avoir eu lieu en premier
+ ordre.verify(emailService).envoyerEmail(anyString(), anyString(), anyString()); // 2ème appel : envoyerEmail() DOIT avoir eu lieu en second
 }
 ```
 
@@ -1010,7 +1071,7 @@ Créez le fichier `src/main/java/com/nexa/mocking/SmsService.java` :
 package com.nexa.mocking;
 
 public interface SmsService {
- boolean envoyerSms(String numero, String message);
+ boolean envoyerSms(String numero, String message); // Méthode à mocker dans les tests : envoie un SMS et retourne true/false
 }
 ```
 
@@ -1025,9 +1086,9 @@ package com.nexa.mocking;
 
 public class NotificationService {
 
- private final SmsService smsService;
+ private final SmsService smsService;              // Dépendance à mocker avec @Mock dans les tests
 
- public NotificationService(SmsService smsService) {
+ public NotificationService(SmsService smsService) { // Constructeur : Injection de dépendance (sera utilisé par @InjectMocks)
  this.smsService = smsService;
  }
 

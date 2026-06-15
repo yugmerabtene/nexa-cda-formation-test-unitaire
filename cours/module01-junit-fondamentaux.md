@@ -82,13 +82,13 @@ Voici un exemple concret du pattern AAA avec une classe Calculatrice qui additio
 Exemple :
 
 ```java
-// Arrange
+// Arrange — Préparer : on crée l'instance de la classe à tester
 Calculatrice calc = new Calculatrice();
 
-// Act
+// Act — Agir : on appelle la méthode à tester et on stocke le résultat
 int resultat = calc.addition(2, 3);
 
-// Assert
+// Assert — Vérifier : on compare le résultat obtenu à la valeur attendue
 assertEquals(5, resultat);
 ```
 
@@ -213,6 +213,7 @@ C'est pour cette raison que les méthodes `@BeforeAll` et `@AfterAll` doivent ê
 Les assertions sont le cœur de vos tests. Elles viennent toutes de la classe `org.junit.jupiter.api.Assertions` et sont importées statiquement :
 
 ```java
+// Import statique : permet d'utiliser les assertions sans préfixe Assertions.*
 import static org.junit.jupiter.api.Assertions.*;
 ```
 
@@ -228,13 +229,13 @@ Voici le tableau complet de chaque assertion que vous allez utiliser :
 | **Message** | Le 3ᵉ paramètre optionnel s'affiche UNIQUEMENT en cas d'échec. |
 
 ```java
-// Exemple avec type primitif
-assertEquals(5, resultat); // 5 == 5 ? OK
-assertEquals(5, resultat, "2+3 != 5"); // Avec message personnalisé
+// Exemple avec type primitif — vérifie que 2+3 donne bien 5
+assertEquals(5, resultat); // 5 == 5 ? OK (comparaison directe pour les primitifs)
+assertEquals(5, resultat, "2+3 != 5"); // Avec message personnalisé affiché uniquement en cas d'échec
 
-// Exemple avec Supplier (lambda paresseuse)
+// Exemple avec Supplier (lambda paresseuse) — le message n'est construit que si le test échoue
 assertEquals(5, resultat,
- () -> "Calculé : " + resultat + " au lieu de 5");
+    () -> "Calculé : " + resultat + " au lieu de 5");
 ```
 
 **Pourquoi utiliser un `Supplier<String>` plutôt qu'une String pour le message ?**
@@ -242,13 +243,13 @@ assertEquals(5, resultat,
 Les lambdas (introduites avec `() -> ...`) fournissent une valeur de manière **paresseuse** (lazy). Si le test réussit, la lambda n'est **jamais exécutée**. Cela évite de construire un message coûteux (concaténations, requêtes, etc.) pour un test qui passe. En revanche, si vous passez une `String` directement, elle est évaluée AVANT l'assertion, même si le test réussit.
 
 ```java
-// Mauvaise pratique : le message est construit même si le test passe
+// Mauvaise pratique : la String est concaténée AVANT l'assertion, même si le test réussit
 assertEquals(5, resultat,
- "Le résultat est " + resultat + " au lieu de 5");
+   "Le résultat est " + resultat + " au lieu de 5");
 
-// Bonne pratique : le message n'est construit que si le test échoue
+// Bonne pratique : la lambda () -> "..." n'est exécutée QUE si le test échoue
 assertEquals(5, resultat,
- () -> "Le résultat est " + resultat + " au lieu de 5");
+   () -> "Le résultat est " + resultat + " au lieu de 5");
 ```
 
 ### `assertTrue(condition, [message])` / `assertFalse(condition, [message])`
@@ -260,10 +261,11 @@ assertEquals(5, resultat,
 | **Usage typique** | Méthodes qui retournent un booléen : `estPair()`, `contient()`, `estValide()`. |
 
 ```java
-assertTrue(calc.estPair(2), "2 est pair"); // Passe
-assertFalse(calc.estPair(1), "1 est impair"); // Passe
-assertTrue(calc.estPair(0), "0 est pair"); // Passe
-assertTrue(calc.estPair(-4), "-4 est pair"); // Passe
+// assertTrue vérifie que la condition booléenne est vraie
+assertTrue(calc.estPair(2), "2 est pair"); // Passe car 2 est pair
+assertFalse(calc.estPair(1), "1 est impair"); // assertFalse passe car 1 n'est pas pair
+assertTrue(calc.estPair(0), "0 est pair"); // Passe car 0 est mathématiquement pair
+assertTrue(calc.estPair(-4), "-4 est pair"); // Passe car les négatifs aussi peuvent être pairs
 ```
 
 **Attention** : n'utilisez pas `assertTrue` pour comparer deux valeurs. Écrivez `assertEquals(expected, actual)` plutôt que `assertTrue(expected == actual)`. La raison ? `assertEquals` vous donne un message d'erreur bien plus précis : il affiche les deux valeurs. `assertTrue` ne peut que dire "attendu true, obtenu false".
@@ -277,11 +279,13 @@ assertTrue(calc.estPair(-4), "-4 est pair"); // Passe
 | **Usage typique** | S'assurer qu'un objet a bien été instancié, ou qu'une méthode retourne `null` dans un cas d'erreur. |
 
 ```java
-// Vérifier qu'un objet a bien été créé
+// assertNotNull vérifie que l'objet n'est pas null (qu'il a bien été instancié)
+// Création de l'objet à tester
 Calculatrice calc = new Calculatrice();
 assertNotNull(calc, "L'instance ne doit pas être null");
 
-// Vérifier qu'une variable est null
+// assertNull vérifie qu'une référence est bien null
+// Cas où la variable est intentionnellement null
 String chaine = null;
 assertNull(chaine);
 ```
@@ -297,16 +301,19 @@ assertNull(chaine);
 C'est l'une des assertions les plus importantes. Elle permet de vérifier qu'une méthode lève bien une exception dans un cas d'erreur.
 
 ```java
-// Syntaxe de base
+// Syntaxe de base — assertThrows vérifie que l'exception attendue est bien levée
+// Le premier paramètre est le type de l'exception attendue
+// Le deuxième paramètre est une lambda contenant le code qui doit lever l'exception
 assertThrows(ArithmeticException.class,
- () -> calc.division(10, 0));
+    () -> calc.division(10, 0));
 
-// Récupérer l'exception pour vérifier son message
+// Récupérer l'exception pour vérifier son message et ses propriétés
 ArithmeticException exception = assertThrows(
- ArithmeticException.class,
- () -> calc.division(10, 0),
- "La division par zéro doit lever une ArithmeticException"
+    ArithmeticException.class,                // Type d'exception attendu
+    () -> calc.division(10, 0),               // Action qui doit lever l'exception
+    "La division par zéro doit lever une ArithmeticException" // Message en cas d'échec
 );
+// Vérifie que le message de l'exception contient bien "Division par zéro"
 assertTrue(exception.getMessage().contains("Division par zéro"));
 ```
 
@@ -316,11 +323,12 @@ Le deuxième paramètre de `assertThrows` est une `Executable`, c'est-à-dire un
 
 ```java
 // Sans lambda (Java 7, verbeux) — NE FAITES PAS CECI
+// Ancienne syntaxe avec classe anonyme, beaucoup plus lourde
 assertThrows(ArithmeticException.class, new Executable() {
- @Override
- public void execute() throws Throwable {
- calc.division(10, 0);
- }
+    @Override
+    public void execute() throws Throwable {
+        calc.division(10, 0); // L'action à tester qui doit lever l'exception
+    }
 });
 ```
 
@@ -340,20 +348,20 @@ La lambda rend le code beaucoup plus lisible.
 | **Différence cruciale** | Sans `assertAll`, si la première assertion échoue, les suivantes ne sont jamais exécutées. |
 
 ```java
-// Sans assertAll : si l'addition échoue, la multiplication n'est jamais testée
+// Sans assertAll : si la première assertion échoue, les suivantes ne sont jamais testées
 assertEquals(5, calc.addition(2, 3));
 assertEquals(6, calc.multiplication(2, 3));
 assertEquals(-1, calc.soustraction(2, 3));
 
-// Avec assertAll : TOUTES les assertions sont exécutées,
-// et TOUS les échecs sont rapportés
+// Avec assertAll : TOUTES les assertions sont exécutées même si certaines échouent,
+// et TOUS les échecs sont rapportés en une seule fois à la fin
 assertAll("Vérifications groupées de la calculatrice",
- () -> assertEquals(5, calc.addition(2, 3), "addition"),
- () -> assertEquals(6, calc.multiplication(2, 3), "multiplication"),
- () -> assertEquals(-1, calc.soustraction(2, 3), "soustraction"),
- () -> assertEquals(0, calc.division(0, 5), "division de 0"),
- () -> assertTrue(calc.estPair(10), "parité de 10"),
- () -> assertEquals(5, calc.valeurAbsolue(-5), "valeur absolue")
+    () -> assertEquals(5, calc.addition(2, 3), "addition"),
+    () -> assertEquals(6, calc.multiplication(2, 3), "multiplication"),
+    () -> assertEquals(-1, calc.soustraction(2, 3), "soustraction"),
+    () -> assertEquals(0, calc.division(0, 5), "division de 0"),
+    () -> assertTrue(calc.estPair(10), "parité de 10"),
+    () -> assertEquals(5, calc.valeurAbsolue(-5), "valeur absolue")
 );
 ```
 
@@ -368,13 +376,16 @@ assertAll("Vérifications groupées de la calculatrice",
 | **Pourquoi pas `assertEquals` ?** | `assertEquals` compare les tableaux par référence (`==`), pas par contenu. Deux tableaux avec les mêmes éléments mais à des adresses mémoire différentes seraient considérés comme différents. |
 
 ```java
+// Tableau attendu : les valeurs qu'on s'attend à obtenir
 int[] attendu = {2, 4, 6, 8};
+// Tableau obtenu : les résultats des appels à la méthode testée
 int[] obtenu = {
- calc.multiplication(2, 1),
- calc.multiplication(2, 2),
- calc.multiplication(2, 3),
- calc.multiplication(2, 4)
+    calc.multiplication(2, 1), // 2*1 = 2
+    calc.multiplication(2, 2), // 2*2 = 4
+    calc.multiplication(2, 3), // 2*3 = 6
+    calc.multiplication(2, 4)  // 2*4 = 8
 };
+// assertArrayEquals compare les tableaux élément par élément (pas par référence)
 assertArrayEquals(attendu, obtenu, "Table multipliée par 2");
 ```
 
@@ -488,19 +499,20 @@ Un **test fragile** (flaky test) est un test qui réussit parfois et échoue par
 
 ```java
 class MauvaisTest {
- List<String> historique = new ArrayList<>(); // Partagé entre les tests !
+    List<String> historique = new ArrayList<>(); // Partagé entre les tests ! (instances différentes mais même classe)
 
- @Test
- void testAjout() {
- historique.add("Action");
- assertEquals(1, historique.size()); // OK
- }
+    @Test
+    void testAjout() {
+        historique.add("Action");        // Ajoute un élément dans la liste
+        assertEquals(1, historique.size()); // Vérifie qu'il y a bien 1 élément → OK
+    }
 
- @Test
- void testComptage() {
- // Si testAjout() s'exécute AVANT, historique contient déjà "Action"
- assertEquals(0, historique.size()); // ÉCHEC !
- }
+    @Test
+    void testComptage() {
+        // Si testAjout() s'exécute AVANT, historique contient déjà "Action"
+        // Ce test s'attend à une liste vide, mais elle pourrait contenir un élément
+        assertEquals(0, historique.size()); // ÉCHEC si testAjout a pollué l'état !
+    }
 }
 ```
 
@@ -515,12 +527,15 @@ Le `testComptage()` s'attend à un historique vide, mais si `testAjout()` s'est 
 L'annotation `@DisplayName` permet de donner un nom lisible à vos classes et méthodes de test.
 
 ```java
+// @DisplayName donne un nom lisible à la classe de test pour les rapports
 @DisplayName("Tests de la classe Calculatrice")
 class CalculatriceTest {
 
- @Test
- @DisplayName("Addition de deux nombres positifs")
- void additionDeuxPositifs() { ... }
+    // @Test marque cette méthode comme un test unitaire exécuté par JUnit
+    @Test
+    // @DisplayName donne un nom lisible à ce test pour les rapports
+    @DisplayName("Addition de deux nombres positifs")
+    void additionDeuxPositifs() { ... } // Méthode de test : doit être void, sans paramètre
 }
 ```
 
@@ -726,41 +741,49 @@ Voici la classe Calculatrice que nous allons tester. Elle contient 7 méthodes :
 ```java
 package com.nexa.fondamentaux;
 
+// Classe Calculatrice : fournit des opérations mathématiques de base
 public class Calculatrice {
 
- public int addition(int a, int b) {
- return a + b;
- }
+    // Addition : prend deux entiers a et b, retourne leur somme
+    public int addition(int a, int b) {
+        return a + b;
+    }
 
- public int soustraction(int a, int b) {
- return a - b;
- }
+    // Soustraction : prend deux entiers a et b, retourne a - b
+    public int soustraction(int a, int b) {
+        return a - b;
+    }
 
- public int multiplication(int a, int b) {
- return a * b;
- }
+    // Multiplication : prend deux entiers a et b, retourne leur produit
+    public int multiplication(int a, int b) {
+        return a * b;
+    }
 
- public int division(int a, int b) {
- if (b == 0) {
- throw new ArithmeticException("Division par zéro interdite");
- }
- return a / b;
- }
+    // Division : prend deux entiers a et b, retourne le quotient entier a / b
+    public int division(int a, int b) {
+        if (b == 0) { // Cas d'erreur : la division par zéro est interdite
+            throw new ArithmeticException("Division par zéro interdite");
+        }
+        return a / b;
+    }
 
- public int modulo(int a, int b) {
- if (b == 0) {
- throw new ArithmeticException("Modulo par zéro interdit");
- }
- return a % b;
- }
+    // Modulo : prend deux entiers a et b, retourne le reste de la division a % b
+    public int modulo(int a, int b) {
+        if (b == 0) { // Cas d'erreur : le modulo par zéro est interdit
+            throw new ArithmeticException("Modulo par zéro interdit");
+        }
+        return a % b;
+    }
 
- public boolean estPair(int nombre) {
- return nombre % 2 == 0;
- }
+    // estPair : retourne true si le nombre est pair, false sinon
+    public boolean estPair(int nombre) {
+        return nombre % 2 == 0; // Un nombre est pair si son reste modulo 2 est 0
+    }
 
- public int valeurAbsolue(int nombre) {
- return Math.abs(nombre);
- }
+    // valeurAbsolue : retourne la valeur absolue du nombre
+    public int valeurAbsolue(int nombre) {
+        return Math.abs(nombre);
+    }
 }
 ```
 
@@ -769,8 +792,9 @@ public class Calculatrice {
 #### `addition(int a, int b)`
 
 ```java
+// Méthode addition : retourne la somme de deux entiers
 public int addition(int a, int b) {
- return a + b;
+    return a + b; // Addition simple, directement déléguée à l'opérateur +
 }
 ```
 
@@ -781,8 +805,9 @@ public int addition(int a, int b) {
 #### `soustraction(int a, int b)`
 
 ```java
+// Méthode soustraction : retourne la différence a - b
 public int soustraction(int a, int b) {
- return a - b;
+    return a - b; // L'ordre est important : a - b, pas b - a
 }
 ```
 
@@ -792,8 +817,9 @@ public int soustraction(int a, int b) {
 #### `multiplication(int a, int b)`
 
 ```java
+// Méthode multiplication : retourne le produit de deux entiers
 public int multiplication(int a, int b) {
- return a * b;
+    return a * b; // Multiplication simple, déléguée à l'opérateur *
 }
 ```
 
@@ -803,11 +829,12 @@ public int multiplication(int a, int b) {
 #### `division(int a, int b)`
 
 ```java
+// Méthode division : retourne le quotient entier a / b, ou lève une exception si b == 0
 public int division(int a, int b) {
- if (b == 0) {
- throw new ArithmeticException("Division par zéro interdite");
- }
- return a / b;
+    if (b == 0) { // Protection : on ne peut pas diviser par zéro
+        throw new ArithmeticException("Division par zéro interdite");
+    }
+    return a / b; // Division entière (le reste est tronqué)
 }
 ```
 
@@ -818,11 +845,12 @@ public int division(int a, int b) {
 #### `modulo(int a, int b)`
 
 ```java
+// Méthode modulo : retourne le reste de la division a % b, ou lève une exception si b == 0
 public int modulo(int a, int b) {
- if (b == 0) {
- throw new ArithmeticException("Modulo par zéro interdit");
- }
- return a % b;
+    if (b == 0) { // Protection : le modulo par zéro n'a pas de sens
+        throw new ArithmeticException("Modulo par zéro interdit");
+    }
+    return a % b; // Reste de la division entière de a par b
 }
 ```
 
@@ -832,8 +860,9 @@ public int modulo(int a, int b) {
 #### `estPair(int nombre)`
 
 ```java
+// Méthode estPair : retourne true si le nombre est divisible par 2
 public boolean estPair(int nombre) {
- return nombre % 2 == 0;
+    return nombre % 2 == 0; // Un nombre est pair si le reste de la division par 2 est 0
 }
 ```
 
@@ -844,8 +873,9 @@ public boolean estPair(int nombre) {
 #### `valeurAbsolue(int nombre)`
 
 ```java
+// Méthode valeurAbsolue : retourne la valeur absolue du nombre
 public int valeurAbsolue(int nombre) {
- return Math.abs(nombre);
+    return Math.abs(nombre); // Délégation à la méthode standard Math.abs()
 }
 ```
 
@@ -864,12 +894,17 @@ public int valeurAbsolue(int nombre) {
 Prenons le premier test de la classe et décortiquons-le ligne par ligne.
 
 ```java
+// @Test : signale à JUnit que cette méthode est un test unitaire à exécuter
 @Test
+// @DisplayName : nom lisible du test pour les rapports et l'IDE
 @DisplayName("Addition de deux nombres positifs")
 void additionDeuxPositifs() {
- Calculatrice calc = new Calculatrice();
- int resultat = calc.addition(2, 3);
- assertEquals(5, resultat, "2 + 3 devrait donner 5");
+    // Arrange : créer une instance fraîche de la classe à tester
+    Calculatrice calc = new Calculatrice();
+    // Act : appeler la méthode à tester avec les paramètres connus
+    int resultat = calc.addition(2, 3);
+    // Assert : vérifier que le résultat est conforme à la valeur attendue
+    assertEquals(5, resultat, "2 + 3 devrait donner 5");
 }
 ```
 
@@ -914,6 +949,8 @@ On instancie la classe à tester. Ici, c'est trivial : un simple `new`. Mais dan
 Notez que dans notre fichier complet, cette ligne n'apparaît qu'une fois, en tant que champ de la classe :
 
 ```java
+// Champ d'instance : initialisé une fois par instance de test
+// Comme JUnit crée une nouvelle instance pour chaque @Test, chaque test démarre avec une Calculatrice fraîche
 private final Calculatrice calc = new Calculatrice();
 ```
 
@@ -950,11 +987,15 @@ Parcourons maintenant CHAQUE test du fichier complet.
 ### `additionAvecNegatif`
 
 ```java
+// @Test : marque cette méthode comme test unitaire
 @Test
+// @DisplayName : nom lisible qui décrit le scénario testé
 @DisplayName("Addition avec un nombre négatif")
 void additionAvecNegatif() {
- assertEquals(1, calc.addition(3, -2));
- assertEquals(-5, calc.addition(-2, -3));
+    // Arrange + Act + Assert combinés : test avec un opérande négatif
+    assertEquals(1, calc.addition(3, -2));  // 3 + (-2) = 1 → cas un négatif
+    // Test avec deux opérandes négatifs
+    assertEquals(-5, calc.addition(-2, -3)); // (-2) + (-3) = -5 → cas deux négatifs
 }
 ```
 
@@ -966,13 +1007,17 @@ void additionAvecNegatif() {
 ### `additionAvecZero`
 
 ```java
+// @Test : marque cette méthode comme test unitaire
 @Test
+// @DisplayName : décrit la propriété mathématique testée (élément neutre)
 @DisplayName("Addition avec zéro (élément neutre)")
 void additionAvecZero() {
- assertEquals(7, calc.addition(7, 0),
- "a + 0 devrait toujours donner a");
- assertEquals(7, calc.addition(0, 7),
- "0 + a devrait toujours donner a");
+    // Arrange + Act + Assert : vérifie que 7 + 0 = 7 (zéro à droite)
+    assertEquals(7, calc.addition(7, 0),
+        "a + 0 devrait toujours donner a");
+    // Vérifie que 0 + 7 = 7 (zéro à gauche) — teste la commutativité
+    assertEquals(7, calc.addition(0, 7),
+        "0 + a devrait toujours donner a");
 }
 ```
 
@@ -983,10 +1028,13 @@ void additionAvecZero() {
 ### `soustractionSimple`
 
 ```java
+// @Test : marque cette méthode comme test unitaire
 @Test
+// @DisplayName : décrit le cas testé : soustraction simple à résultat positif
 @DisplayName("Soustraction simple")
 void soustractionSimple() {
- assertEquals(3, calc.soustraction(7, 4));
+    // Arrange + Act + Assert : 7 - 4 doit donner 3
+    assertEquals(3, calc.soustraction(7, 4));
 }
 ```
 
@@ -995,10 +1043,13 @@ void soustractionSimple() {
 ### `soustractionResultatNegatif`
 
 ```java
+// @Test : marque cette méthode comme test unitaire
 @Test
+// @DisplayName : cas où le résultat est négatif (a < b)
 @DisplayName("Soustraction donnant un résultat négatif")
 void soustractionResultatNegatif() {
- assertEquals(-3, calc.soustraction(2, 5));
+    // Arrange + Act + Assert : 2 - 5 = -3 (résultat négatif)
+    assertEquals(-3, calc.soustraction(2, 5));
 }
 ```
 
@@ -1008,21 +1059,28 @@ void soustractionResultatNegatif() {
 ### `multiplicationSimple`
 
 ```java
+// @Test : marque cette méthode comme test unitaire
 @Test
+// @DisplayName : cas nominal de la multiplication
 @DisplayName("Multiplication simple")
 void multiplicationSimple() {
- assertEquals(12, calc.multiplication(3, 4));
+    // Arrange + Act + Assert : 3 * 4 doit donner 12
+    assertEquals(12, calc.multiplication(3, 4));
 }
 ```
 
 ### `multiplicationParZero`
 
 ```java
+// @Test : marque cette méthode comme test unitaire
 @Test
+// @DisplayName : teste l'élément absorbant (zéro) de la multiplication
 @DisplayName("Multiplication par zéro (élément absorbant)")
 void multiplicationParZero() {
- assertEquals(0, calc.multiplication(5, 0));
- assertEquals(0, calc.multiplication(0, 5));
+    // Arrange + Act + Assert : tout nombre * 0 = 0 (zéro à droite)
+    assertEquals(0, calc.multiplication(5, 0));
+    // Vérifie la même propriété avec zéro à gauche (commutativité)
+    assertEquals(0, calc.multiplication(0, 5));
 }
 ```
 
@@ -1032,10 +1090,13 @@ void multiplicationParZero() {
 ### `multiplicationParUn`
 
 ```java
+// @Test : marque cette méthode comme test unitaire
 @Test
+// @DisplayName : teste l'élément neutre (un) de la multiplication
 @DisplayName("Multiplication par un (élément neutre)")
 void multiplicationParUn() {
- assertEquals(7, calc.multiplication(7, 1));
+    // Arrange + Act + Assert : multiplier par 1 ne change pas la valeur
+    assertEquals(7, calc.multiplication(7, 1));
 }
 ```
 
@@ -1044,10 +1105,13 @@ void multiplicationParUn() {
 ### `divisionSimple`
 
 ```java
+// @Test : marque cette méthode comme test unitaire
 @Test
+// @DisplayName : division exacte sans reste
 @DisplayName("Division simple")
 void divisionSimple() {
- assertEquals(3, calc.division(9, 3));
+    // Arrange + Act + Assert : 9 / 3 = 3 (division exacte)
+    assertEquals(3, calc.division(9, 3));
 }
 ```
 
@@ -1056,11 +1120,14 @@ void divisionSimple() {
 ### `divisionAvecReste`
 
 ```java
+// @Test : marque cette méthode comme test unitaire
 @Test
+// @DisplayName : division entière avec reste — le reste est tronqué
 @DisplayName("Division avec reste (troncature entière)")
 void divisionAvecReste() {
- assertEquals(3, calc.division(10, 3),
- "10 / 3 = 3 (division entière, le reste est ignoré)");
+    // Arrange + Act + Assert : 10 / 3 = 3 car c'est une division entière (reste 1 ignoré)
+    assertEquals(3, calc.division(10, 3),
+        "10 / 3 = 3 (division entière, le reste est ignoré)");
 }
 ```
 
@@ -1070,15 +1137,20 @@ void divisionAvecReste() {
 ### `divisionParZero` — ATTENTION PARTICULIÈRE
 
 ```java
+// @Test : marque cette méthode comme test unitaire
 @Test
+// @DisplayName : la division par zéro doit lever une exception
 @DisplayName("Division par zéro doit lever ArithmeticException")
 void divisionParZero() {
- ArithmeticException exception = assertThrows(
- ArithmeticException.class,
- () -> calc.division(10, 0),
- "La division par zéro doit lever une ArithmeticException"
- );
- assertTrue(exception.getMessage().contains("Division par zéro"));
+    // Arrange + Act + Assert via assertThrows :
+    // On vérifie que l'appel à calc.division(10, 0) lève bien une ArithmeticException
+    ArithmeticException exception = assertThrows(
+        ArithmeticException.class,                // Type d'exception attendu
+        () -> calc.division(10, 0),               // Lambda contenant le code à exécuter
+        "La division par zéro doit lever une ArithmeticException" // Message si échec
+    );
+    // Assert supplémentaire : on vérifie que le message de l'exception est pertinent
+    assertTrue(exception.getMessage().contains("Division par zéro"));
 }
 ```
 
@@ -1107,16 +1179,22 @@ Une fois l'exception capturée, on peut faire des assertions sur son contenu. Ic
 ### `moduloSimple` et `moduloSansReste`
 
 ```java
+// @Test : marque cette méthode comme test unitaire
 @Test
+// @DisplayName : modulo avec reste non nul
 @DisplayName("Modulo simple")
 void moduloSimple() {
- assertEquals(1, calc.modulo(10, 3));
+    // Arrange + Act + Assert : 10 % 3 = 1 (reste de la division)
+    assertEquals(1, calc.modulo(10, 3));
 }
 
+// @Test : marque cette méthode comme test unitaire
 @Test
+// @DisplayName : modulo d'une division exacte (reste zéro)
 @DisplayName("Modulo sans reste")
 void moduloSansReste() {
- assertEquals(0, calc.modulo(9, 3));
+    // Arrange + Act + Assert : 9 % 3 = 0 (pas de reste car 9 = 3 × 3)
+    assertEquals(0, calc.modulo(9, 3));
 }
 ```
 
@@ -1125,11 +1203,15 @@ Ces tests vérifient les deux cas de base du modulo : avec reste et sans reste.
 ### `moduloParZero`
 
 ```java
+// @Test : marque cette méthode comme test unitaire
 @Test
+// @DisplayName : le modulo par zéro doit lever une exception
 @DisplayName("Modulo par zéro doit lever exception")
 void moduloParZero() {
- assertThrows(ArithmeticException.class,
- () -> calc.modulo(5, 0));
+    // Arrange + Act + Assert via assertThrows :
+    // On vérifie que l'appel à calc.modulo(5, 0) lève ArithmeticException
+    assertThrows(ArithmeticException.class,
+        () -> calc.modulo(5, 0));
 }
 ```
 
@@ -1138,19 +1220,28 @@ Ici, on utilise `assertThrows` sans récupérer l'exception, car on n'a pas beso
 ### `nombrePair` et `nombreImpair`
 
 ```java
+// @Test : marque cette méthode comme test unitaire
 @Test
+// @DisplayName : teste des nombres pairs (positif, zéro, négatif)
 @DisplayName("Nombre pair")
 void nombrePair() {
- assertTrue(calc.estPair(2), "2 est pair");
- assertTrue(calc.estPair(0), "0 est pair");
- assertTrue(calc.estPair(-4), "-4 est pair");
+    // Arrange + Act + Assert : 2 est pair (cas nominal positif)
+    assertTrue(calc.estPair(2), "2 est pair");
+    // 0 est mathématiquement pair (0 % 2 = 0)
+    assertTrue(calc.estPair(0), "0 est pair");
+    // -4 est pair (les nombres pairs négatifs existent)
+    assertTrue(calc.estPair(-4), "-4 est pair");
 }
 
+// @Test : marque cette méthode comme test unitaire
 @Test
+// @DisplayName : teste des nombres impairs (positif, négatif)
 @DisplayName("Nombre impair")
 void nombreImpair() {
- assertFalse(calc.estPair(1), "1 est impair");
- assertFalse(calc.estPair(-3), "-3 est impair");
+    // Arrange + Act + Assert : 1 est impair (cas nominal positif)
+    assertFalse(calc.estPair(1), "1 est impair");
+    // -3 est impair (les nombres impairs négatifs existent)
+    assertFalse(calc.estPair(-3), "-3 est impair");
 }
 ```
 
@@ -1161,17 +1252,20 @@ void nombreImpair() {
 ### `testGroupeAvecAssertAll` — ATTENTION PARTICULIÈRE
 
 ```java
+// @Test : marque cette méthode comme test unitaire
 @Test
+// @DisplayName : démonstration d'assertAll pour grouper plusieurs assertions
 @DisplayName("Vérifications groupées avec assertAll")
 void testGroupeAvecAssertAll() {
- assertAll("Vérifications groupées de la calculatrice",
- () -> assertEquals(5, calc.addition(2, 3), "addition"),
- () -> assertEquals(6, calc.multiplication(2, 3), "multiplication"),
- () -> assertEquals(-1, calc.soustraction(2, 3), "soustraction"),
- () -> assertEquals(0, calc.division(0, 5), "division de 0"),
- () -> assertTrue(calc.estPair(10), "parité de 10"),
- () -> assertEquals(5, calc.valeurAbsolue(-5), "valeur absolue")
- );
+    // assertAll exécute TOUTES les assertions et rapporte TOUS les échecs à la fin
+    assertAll("Vérifications groupées de la calculatrice",
+        () -> assertEquals(5, calc.addition(2, 3), "addition"),       // Teste l'addition
+        () -> assertEquals(6, calc.multiplication(2, 3), "multiplication"), // Teste la multiplication
+        () -> assertEquals(-1, calc.soustraction(2, 3), "soustraction"),    // Teste la soustraction
+        () -> assertEquals(0, calc.division(0, 5), "division de 0"),  // Teste la division de zéro
+        () -> assertTrue(calc.estPair(10), "parité de 10"),           // Teste la parité
+        () -> assertEquals(5, calc.valeurAbsolue(-5), "valeur absolue")    // Teste la valeur absolue
+    );
 }
 ```
 
@@ -1186,19 +1280,23 @@ Ce test démontre `assertAll`, l'une des assertions les plus puissantes de JUnit
 
 Sans `assertAll` :
 ```java
-assertEquals(5, calc.addition(2, 3)); // Si ça échoue →
-assertEquals(6, calc.multiplication(2, 3)); // JAMAIS exécuté
-assertEquals(-1, calc.soustraction(2, 3)); // JAMAIS exécuté
+// Sans assertAll : chaque assertion s'exécute séquentiellement
+// Si la première échoue, les suivantes ne sont JAMAIS exécutées
+assertEquals(5, calc.addition(2, 3)); // Si ça échoue → arrête tout
+assertEquals(6, calc.multiplication(2, 3)); // JAMAIS exécuté si la ligne précédente échoue
+assertEquals(-1, calc.soustraction(2, 3)); // JAMAIS exécuté si la première assertion échoue
 ```
 
 Avec `assertAll` :
 ```java
+// Avec assertAll : toutes les assertions sont exécutées même si certaines échouent
 assertAll(
- () -> assertEquals(5, calc.addition(2, 3)), // Échec enregistré
- () -> assertEquals(6, calc.multiplication(2, 3)), // Exécuté quand mếme
- () -> assertEquals(-1, calc.soustraction(2, 3)) // Exécuté quand mếme
+    // Chaque lambda exécute une assertion et enregistre son résultat
+    () -> assertEquals(5, calc.addition(2, 3)),   // Si échec → enregistré, on continue
+    () -> assertEquals(6, calc.multiplication(2, 3)), // Exécuté même si la première a échoué
+    () -> assertEquals(-1, calc.soustraction(2, 3))   // Exécuté même si les précédentes ont échoué
 );
-// Rapport : 3 échecs affichés d'un coup
+// Rapport final : tous les échecs sont affichés en une seule exécution
 ```
 
 **Quand utiliser assertAll ?**
@@ -1209,22 +1307,31 @@ assertAll(
 ### `valeurAbsoluePositif`, `valeurAbsolueNegatif`, `valeurAbsolueZero`
 
 ```java
+// @Test : marque cette méthode comme test unitaire
 @Test
+// @DisplayName : la valeur absolue d'un positif ne change pas
 @DisplayName("Valeur absolue d'un nombre positif (ne change pas)")
 void valeurAbsoluePositif() {
- assertEquals(5, calc.valeurAbsolue(5));
+    // Arrange + Act + Assert : |5| = 5 (inchangé pour les positifs)
+    assertEquals(5, calc.valeurAbsolue(5));
 }
 
+// @Test : marque cette méthode comme test unitaire
 @Test
+// @DisplayName : la valeur absolue d'un négatif devient positif
 @DisplayName("Valeur absolue d'un nombre négatif (devient positif)")
 void valeurAbsolueNegatif() {
- assertEquals(5, calc.valeurAbsolue(-5));
+    // Arrange + Act + Assert : |-5| = 5 (le signe négatif est retiré)
+    assertEquals(5, calc.valeurAbsolue(-5));
 }
 
+// @Test : marque cette méthode comme test unitaire
 @Test
+// @DisplayName : la valeur absolue de zéro est zéro
 @DisplayName("Valeur absolue de zéro")
 void valeurAbsolueZero() {
- assertEquals(0, calc.valeurAbsolue(0));
+    // Arrange + Act + Assert : |0| = 0 (zéro est son propre inverse)
+    assertEquals(0, calc.valeurAbsolue(0));
 }
 ```
 
@@ -1233,14 +1340,18 @@ Trois tests pour couvrir les trois cas de la valeur absolue : positif (inchangé
 ### `testAvecMessagePersonnalise`
 
 ```java
+// @Test : marque cette méthode comme test unitaire
 @Test
+// @DisplayName : démonstration des messages d'erreur personnalisés
 @DisplayName("Démonstration : messages d'erreur personnalisés")
 void testAvecMessagePersonnalise() {
- assertEquals(4, calc.addition(2, 2),
- "Ce message s'affiche si 2+2 ≠ 4");
+    // Arrange + Act + Assert avec message d'échec sous forme de String directe
+    assertEquals(4, calc.addition(2, 2),
+        "Ce message s'affiche si 2+2 ≠ 4");
 
- assertTrue(calc.estPair(2),
- () -> "Message paresseux construit uniquement en cas d'échec pour 2");
+    // Assert avec message paresseux (Supplier) : la lambda n'est exécutée qu'en cas d'échec
+    assertTrue(calc.estPair(2),
+        () -> "Message paresseux construit uniquement en cas d'échec pour 2");
 }
 ```
 
@@ -1253,10 +1364,13 @@ Ce test existe pour démontrer deux formes de messages :
 ### `calculatriceNonNulle`
 
 ```java
+// @Test : marque cette méthode comme test unitaire
 @Test
+// @DisplayName : vérifie que l'instance n'est pas null
 @DisplayName("assertNotNull : l'objet calculatrice existe")
 void calculatriceNonNulle() {
- assertNotNull(calc, "L'instance de Calculatrice ne doit pas être null");
+    // Arrange + Act + Assert via assertNotNull : vérifie que calc est bien instancié
+    assertNotNull(calc, "L'instance de Calculatrice ne doit pas être null");
 }
 ```
 
@@ -1266,11 +1380,15 @@ void calculatriceNonNulle() {
 ### `testNull`
 
 ```java
+// @Test : marque cette méthode comme test unitaire
 @Test
+// @DisplayName : démonstration de l'assertion assertNull
 @DisplayName("assertNull : test de nullité")
 void testNull() {
- String chaine = null;
- assertNull(chaine);
+    // Arrange : on définit une variable intentionnellement null
+    String chaine = null;
+    // Assert via assertNull : vérifie que la variable est bien null
+    assertNull(chaine);
 }
 ```
 
@@ -1279,17 +1397,22 @@ void testNull() {
 ### `testTableaux`
 
 ```java
+// @Test : marque cette méthode comme test unitaire
 @Test
+// @DisplayName : démonstration de la comparaison de tableaux
 @DisplayName("assertArrayEquals : comparaison de tableaux")
 void testTableaux() {
- int[] attendu = {2, 4, 6, 8};
- int[] obtenu = {
- calc.multiplication(2, 1),
- calc.multiplication(2, 2),
- calc.multiplication(2, 3),
- calc.multiplication(2, 4)
- };
- assertArrayEquals(attendu, obtenu, "Table multipliée par 2");
+    // Arrange : on définit le tableau attendu avec les valeurs souhaitées
+    int[] attendu = {2, 4, 6, 8};
+    // Arrange + Act : on construit le tableau obtenu en appelant la méthode testée
+    int[] obtenu = {
+        calc.multiplication(2, 1), // 2*1 = 2
+        calc.multiplication(2, 2), // 2*2 = 4
+        calc.multiplication(2, 3), // 2*3 = 6
+        calc.multiplication(2, 4)  // 2*4 = 8
+    };
+    // Assert via assertArrayEquals : compare les tableaux élément par élément
+    assertArrayEquals(attendu, obtenu, "Table multipliée par 2");
 }
 ```
 
@@ -1308,41 +1431,51 @@ Cette classe de test ne teste aucune logique métier — elle sert UNIQUEMENT à
 ### Code complet et explication
 
 ```java
+// Définition du package : même que la classe testée pour accéder aux membres package-private
 package com.nexa.fondamentaux;
 
+// Import de toutes les annotations JUnit 5 (@Test, @BeforeEach, etc.)
 import org.junit.jupiter.api.*;
 
+// Import des classes Java standard utilisées dans le test
 import java.util.ArrayList;
 import java.util.List;
 
+// Import statique des assertions JUnit pour les utiliser sans préfixe
 import static org.junit.jupiter.api.Assertions.*;
 
+// @DisplayName : nom lisible de la classe de test dans les rapports
 @DisplayName("Démonstration du cycle de vie JUnit 5")
 class CycleDeVieTest {
 
- private List<String> historique;
+    // Champ d'instance : une nouvelle liste est créée pour chaque instance de test
+    private List<String> historique;
 
- @BeforeAll
- static void initialisationGlobale() {
- System.out.println("[@BeforeAll] — Appelé UNE FOIS avant tous les tests");
- }
+    // @BeforeAll : exécuté UNE SEULE FOIS avant tous les tests — doit être static
+    @BeforeAll
+    static void initialisationGlobale() {
+        System.out.println("[@BeforeAll] — Appelé UNE FOIS avant tous les tests");
+    }
 
- @BeforeEach
- void preparationAvantChaqueTest() {
- this.historique = new ArrayList<>();
- System.out.println(" [@BeforeEach] — Appelé avant chaque test");
- }
+    // @BeforeEach : exécuté avant CHAQUE test — réinitialise l'état
+    @BeforeEach
+    void preparationAvantChaqueTest() {
+        this.historique = new ArrayList<>(); // Nouvelle liste vide pour chaque test
+        System.out.println(" [@BeforeEach] — Appelé avant chaque test");
+    }
 
- @AfterEach
- void nettoyageApresChaqueTest() {
- this.historique.clear();
- System.out.println(" [@AfterEach] — Appelé après chaque test");
- }
+    // @AfterEach : exécuté après CHAQUE test — nettoie les ressources
+    @AfterEach
+    void nettoyageApresChaqueTest() {
+        this.historique.clear(); // Vide la liste pour ne pas polluer le test suivant
+        System.out.println(" [@AfterEach] — Appelé après chaque test");
+    }
 
- @AfterAll
- static void nettoyageFinal() {
- System.out.println("[@AfterAll] — Appelé UNE FOIS après tous les tests");
- }
+    // @AfterAll : exécuté UNE SEULE FOIS après tous les tests — doit être static
+    @AfterAll
+    static void nettoyageFinal() {
+        System.out.println("[@AfterAll] — Appelé UNE FOIS après tous les tests");
+    }
 ```
 
 ### Flux d'exécution étape par étape
@@ -1401,11 +1534,14 @@ Voici ce qui se passe quand Maven exécute cette classe :
 #### Test 1 : `testHistoriqueVide`
 
 ```java
+// @Test : marque cette méthode comme test unitaire
 @Test
+// @DisplayName : vérifie que l'historique est vide grâce à @BeforeEach
 @DisplayName("Test 1 : l'historique est vide au départ")
 void testHistoriqueVide() {
- assertTrue(historique.isEmpty(),
- "Grâce à @BeforeEach, l'historique est réinitialisé avant chaque test");
+    // Assert : l'historique doit être vide car @BeforeEach l'a réinitialisé
+    assertTrue(historique.isEmpty(),
+        "Grâce à @BeforeEach, l'historique est réinitialisé avant chaque test");
 }
 ```
 
@@ -1414,13 +1550,18 @@ Ce test est simple : il vérifie que l'historique est vide. Il réussit parce qu
 #### Test 2 : `testAjoutElement`
 
 ```java
+// @Test : marque cette méthode comme test unitaire
 @Test
+// @DisplayName : vérifie qu'on peut ajouter un élément dans l'historique
 @DisplayName("Test 2 : on peut ajouter un élément")
 void testAjoutElement() {
- historique.add("Action 1");
- assertEquals(1, historique.size(),
- "L'historique doit contenir l'élément ajouté");
- assertEquals("Action 1", historique.get(0));
+    // Arrange + Act : on ajoute un élément dans la liste
+    historique.add("Action 1");
+    // Assert : la liste doit contenir exactement 1 élément
+    assertEquals(1, historique.size(),
+        "L'historique doit contenir l'élément ajouté");
+    // Assert : l'élément à l'index 0 doit être celui qu'on a ajouté
+    assertEquals("Action 1", historique.get(0));
 }
 ```
 
@@ -1429,12 +1570,16 @@ Ce test ajoute un élément et vérifie qu'il est bien présent. Après ce test,
 #### Test 3 : `testPreuveIsolation` — LE PLUS IMPORTANT
 
 ```java
+// @Test : marque cette méthode comme test unitaire
 @Test
+// @DisplayName : ce test prouve que le test 2 n'a pas contaminé l'état
 @DisplayName("Test 3 : preuve d'isolation — l'historique est vide malgré le test 2")
 void testPreuveIsolation() {
- assertTrue(historique.isEmpty(),
- "Preuve : @BeforeEach a réinitialisé l'historique.\n" +
- "Si ce test échoue, c'est qu'il y a interdépendance entre les tests.");
+    // Assert : l'historique doit être vide, malgré l'ajout fait dans testAjoutElement
+    // Cela prouve que JUnit a créé une NOUVELLE instance et appelé @BeforeEach
+    assertTrue(historique.isEmpty(),
+        "Preuve : @BeforeEach a réinitialisé l'historique.\n" +
+        "Si ce test échoue, c'est qu'il y a interdépendance entre les tests.");
 }
 ```
 
@@ -1450,9 +1595,11 @@ Le fait qu'il réussisse démontre que :
 ### Pourquoi @BeforeAll et @AfterAll sont static
 
 ```java
+// @BeforeAll : exécuté UNE FOIS avant tous les tests, dans le contexte statique
 @BeforeAll
 static void initialisationGlobale() { ... }
 
+// @AfterAll : exécuté UNE FOIS après tous les tests, dans le contexte statique
 @AfterAll
 static void nettoyageFinal() { ... }
 ```
@@ -1588,30 +1735,32 @@ Beaucoup d'étudiants écrivent une boucle `for (int i = 1; i <= n; i++)` et ne 
 
 **Solution correcte** :
 ```java
+// Solution correcte pour la factorielle
 public int factorielle(int n) {
- if (n < 0) {
- throw new ArithmeticException("Factorielle d'un nombre négatif interdite");
- }
- int resultat = 1;
- for (int i = 1; i <= n; i++) {
- resultat *= i;
- }
- return resultat;
+    if (n < 0) { // Cas d'erreur : la factorielle d'un nombre négatif n'existe pas
+        throw new ArithmeticException("Factorielle d'un nombre négatif interdite");
+    }
+    int resultat = 1; // Initialisation à 1 (élément neutre de la multiplication)
+    for (int i = 1; i <= n; i++) { // Boucle de 1 à n inclus
+        resultat *= i; // Multiplie le résultat par i à chaque itération
+    }
+    return resultat; // Si n = 0, la boucle n'est pas exécutée → retourne 1 (correct)
 }
 ```
 
 #### 2. `puissance` avec exposant 0 = 1
 
 ```java
+// Solution correcte pour la puissance
 public int puissance(int base, int exposant) {
- if (exposant < 0) {
- throw new ArithmeticException("Exposant négatif non supporté");
- }
- int resultat = 1;
- for (int i = 0; i < exposant; i++) {
- resultat *= base;
- }
- return resultat;
+    if (exposant < 0) { // Cas d'erreur : exposant négatif non supporté
+        throw new ArithmeticException("Exposant négatif non supporté");
+    }
+    int resultat = 1; // Initialisation à 1 (x^0 = 1 pour tout x)
+    for (int i = 0; i < exposant; i++) { // Boucle qui s'exécute exposant fois
+        resultat *= base; // Multiplie par la base à chaque itération
+    }
+    return resultat; // Si exposant = 0, la boucle n'est pas exécutée → retourne 1
 }
 ```
 
@@ -1622,23 +1771,28 @@ Notez l'initialisation à 1 et la boucle qui commence à 0. Si `exposant == 0`, 
 Le cas piège : 1 n'est pas premier. Beaucoup d'étudiants font une boucle `for (int i = 2; i < n; i++)` et si `n = 1`, la boucle n'est pas exécutée, ils retournent `true` — erreur.
 
 ```java
+// Solution correcte pour estPremier
 public boolean estPremier(int n) {
- if (n <= 1) return false;
- for (int i = 2; i <= Math.sqrt(n); i++) {
- if (n % i == 0) return false;
- }
- return true;
+    if (n <= 1) return false; // 0 et 1 ne sont pas des nombres premiers
+    // Boucle de 2 à sqrt(n) : si n est divisible par i, il n'est pas premier
+    for (int i = 2; i <= Math.sqrt(n); i++) {
+        if (n % i == 0) return false; // n est divisible par i → pas premier
+    }
+    return true; // Aucun diviseur trouvé → n est premier
 }
 ```
 
 #### 4. Utiliser `assertThrows` pour les cas d'erreur
 
 ```java
+// @Test : marque cette méthode comme test unitaire
 @Test
+// @DisplayName : la factorielle d'un négatif doit lever une exception
 @DisplayName("Factorielle d'un nombre négatif doit lever ArithmeticException")
 void factorielleNegatif() {
- assertThrows(ArithmeticException.class,
- () -> calc.factorielle(-1));
+    // Assert via assertThrows : vérifie que factorielle(-1) lève ArithmeticException
+    assertThrows(ArithmeticException.class,
+        () -> calc.factorielle(-1));
 }
 ```
 
