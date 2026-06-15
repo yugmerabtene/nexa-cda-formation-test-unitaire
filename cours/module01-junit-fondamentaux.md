@@ -138,13 +138,13 @@ Un projet Maven standard pour les tests unitaires respecte l'arborescence suivan
 
 ```
 lab01-fondamentaux/
-├── pom.xml
-└── src/
-    ├── main/java/com/nexa/fondamentaux/
-    │   └── Calculatrice.java
-    └── test/java/com/nexa/fondamentaux/
-        ├── CalculatriceTest.java
-        └── CycleDeVieTest.java
+  pom.xml
+  src/
+    main/java/com/nexa/fondamentaux/
+      Calculatrice.java
+    test/java/com/nexa/fondamentaux/
+      CalculatriceTest.java
+      CycleDeVieTest.java
 ```
 
 **Deux répertoires racines** :

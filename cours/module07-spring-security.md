@@ -370,34 +370,34 @@ echo "eyJzdWIiOiJhZG1pbiIsInJvbGUiOiJBRE1JTiJ9" | base64 -d
 
 ```
 lab07-spring-security/
-├── pom.xml
-└── src/
-    ├── main/
-    │   ├── java/com/nexa/secu/
-    │   │   ├── SpringSecurityApplication.java
-    │   │   ├── config/
-    │   │   │   ├── SecurityConfig.java
-    │   │   │   └── AppConfig.java
-    │   │   ├── entity/
-    │   │   │   └── Utilisateur.java
-    │   │   ├── repository/
-    │   │   │   └── UtilisateurRepository.java
-    │   │   ├── service/
-    │   │   │   └── UtilisateurService.java
-    │   │   ├── controller/
-    │   │   │   ├── AuthController.java
-    │   │   │   └── ProduitController.java
-    │   │   └── security/
-    │   │       ├── JwtUtil.java
-    │   │       └── JwtAuthenticationFilter.java
-    │   └── resources/
-    │       └── application.properties
-    └── test/
-        └── java/com/nexa/secu/
-            ├── security/
-            │   └── JwtUtilTest.java
-            └── controller/
-                └── SecurityIntegrationTest.java
+  pom.xml
+  src/
+    main/
+      java/com/nexa/secu/
+        SpringSecurityApplication.java
+        config/
+          SecurityConfig.java
+          AppConfig.java
+        entity/
+          Utilisateur.java
+        repository/
+          UtilisateurRepository.java
+        service/
+          UtilisateurService.java
+        controller/
+          AuthController.java
+          ProduitController.java
+        security/
+          JwtUtil.java
+          JwtAuthenticationFilter.java
+      resources/
+        application.properties
+    test/
+      java/com/nexa/secu/
+        security/
+          JwtUtilTest.java
+        controller/
+          SecurityIntegrationTest.java
 ```
 
 ---

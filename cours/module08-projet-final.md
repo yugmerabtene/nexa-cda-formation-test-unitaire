@@ -408,55 +408,55 @@ public class BusinessException extends RuntimeException {
 
 ```
 lab08-user-manager/
-├── pom.xml
-└── src/
-    ├── main/
-    │   ├── java/com/nexa/usermanager/
-    │   │   ├── UserManagerApplication.java
-    │   │   ├── config/
-    │   │   │   ├── SecurityConfig.java
-    │   │   │   └── AppConfig.java
-    │   │   ├── entity/
-    │   │   │   └── User.java
-    │   │   ├── dto/
-    │   │   │   ├── UserRequest.java
-    │   │   │   ├── UserResponse.java
-    │   │   │   └── ErrorResponse.java
-    │   │   ├── repository/
-    │   │   │   └── UserRepository.java
-    │   │   ├── service/
-    │   │   │   └── UserService.java
-    │   │   ├── controller/
-    │   │   │   └── UserController.java
-    │   │   ├── security/
-    │   │   │   ├── JwtUtil.java
-    │   │   │   └── JwtFilter.java
-    │   │   └── exception/
-    │   │       ├── ResourceNotFoundException.java
-    │   │       ├── BusinessException.java
-    │   │       └── GlobalExceptionHandler.java
-    │   └── resources/
-    │       └── application.properties
-    └── test/
-        └── java/com/nexa/usermanager/
-            ├── unit/
-            │   ├── UserEntityTest.java
-            │   ├── UserRequestTest.java
-            │   ├── UserResponseTest.java
-            │   ├── UserServiceTest.java
-            │   ├── ErrorResponseTest.java
-            │   ├── ExceptionsTest.java
-            │   └── GlobalExceptionHandlerTest.java
-            ├── controller/
-            │   └── UserControllerTest.java
-            ├── repository/
-            │   └── UserRepositoryTest.java
-            ├── security/
-            │   ├── JwtUtilTest.java
-            │   └── SecurityTests.java
-            └── resources/
-                ├── application.properties
-                └── application-test.properties
+  pom.xml
+  src/
+    main/
+      java/com/nexa/usermanager/
+        UserManagerApplication.java
+        config/
+          SecurityConfig.java
+          AppConfig.java
+        entity/
+          User.java
+        dto/
+          UserRequest.java
+          UserResponse.java
+          ErrorResponse.java
+        repository/
+          UserRepository.java
+        service/
+          UserService.java
+        controller/
+          UserController.java
+        security/
+          JwtUtil.java
+          JwtFilter.java
+        exception/
+          ResourceNotFoundException.java
+          BusinessException.java
+          GlobalExceptionHandler.java
+      resources/
+        application.properties
+    test/
+      java/com/nexa/usermanager/
+        unit/
+          UserEntityTest.java
+          UserRequestTest.java
+          UserResponseTest.java
+          UserServiceTest.java
+          ErrorResponseTest.java
+          ExceptionsTest.java
+          GlobalExceptionHandlerTest.java
+        controller/
+          UserControllerTest.java
+        repository/
+          UserRepositoryTest.java
+        security/
+          JwtUtilTest.java
+          SecurityTests.java
+        resources/
+          application.properties
+          application-test.properties
 ```
 
 ---
