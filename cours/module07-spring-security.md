@@ -53,22 +53,18 @@ Spring Security est un framework qui s'intercale dans le traitement des requête
 
 ### Les composants clés
 
-```
-REQUÊTE HTTP
-
- SECURITY FILTER CHAIN
-
- JwtAuth- Username- Exception-
- entication Password Translation ...
- Filter (*) AuthFilter Filter
-
- Authentica-
- tionManager
-
- UserDetails-
- Service
-
-CONTRÔLEUR (@RestController)
+```mermaid
+graph TD
+    REQ["REQUETE HTTP"] --> FILTER["SecurityFilterChain"]
+    subgraph FILTER["SecurityFilterChain"]
+        JWT["JwtAuthenticationFilter"]
+        UP["UsernamePasswordAuthFilter"]
+        ET["ExceptionTranslationFilter"]
+        JWT --> UP --> ET
+    end
+    FILTER --> AUTH["AuthenticationManager"]
+    AUTH --> UDS["UserDetailsService"]
+    FILTER --> CTRL["CONTROLEUR (RestController)"]
 ```
 
 #### SecurityFilterChain
@@ -374,34 +370,34 @@ echo "eyJzdWIiOiJhZG1pbiIsInJvbGUiOiJBRE1JTiJ9" | base64 -d
 
 ```
 lab07-spring-security/
- pom.xml
- src/
- main/
- java/com/nexa/secu/
- SpringSecurityApplication.java
- config/
- SecurityConfig.java
- AppConfig.java
- entity/
- Utilisateur.java
- repository/
- UtilisateurRepository.java
- service/
- UtilisateurService.java
- controller/
- AuthController.java
- ProduitController.java
- security/
- JwtUtil.java
- JwtAuthenticationFilter.java
- resources/
- application.properties
- test/
- java/com/nexa/secu/
- security/
- JwtUtilTest.java
- controller/
- SecurityIntegrationTest.java
+├── pom.xml
+└── src/
+    ├── main/
+    │   ├── java/com/nexa/secu/
+    │   │   ├── SpringSecurityApplication.java
+    │   │   ├── config/
+    │   │   │   ├── SecurityConfig.java
+    │   │   │   └── AppConfig.java
+    │   │   ├── entity/
+    │   │   │   └── Utilisateur.java
+    │   │   ├── repository/
+    │   │   │   └── UtilisateurRepository.java
+    │   │   ├── service/
+    │   │   │   └── UtilisateurService.java
+    │   │   ├── controller/
+    │   │   │   ├── AuthController.java
+    │   │   │   └── ProduitController.java
+    │   │   └── security/
+    │   │       ├── JwtUtil.java
+    │   │       └── JwtAuthenticationFilter.java
+    │   └── resources/
+    │       └── application.properties
+    └── test/
+        └── java/com/nexa/secu/
+            ├── security/
+            │   └── JwtUtilTest.java
+            └── controller/
+                └── SecurityIntegrationTest.java
 ```
 
 ---

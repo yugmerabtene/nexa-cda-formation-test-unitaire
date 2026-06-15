@@ -42,6 +42,32 @@
 
 ### Diagramme des couches
 
+```mermaid
+graph TD
+    HTTP["HTTP REQUEST<br/>Authorization: Bearer JWT"] --> SECU["COUCHE SECURITE"]
+    subgraph SECU[" "]
+        JF["JwtFilter: extrait le JWT"]
+        SFC["SecurityFilterChain: regles"]
+        PA["@PreAuthorize: annotations"]
+        JF --> SFC --> PA
+    end
+    SECU --> CTRL["COUCHE CONTROLEUR (@RestController)"]
+    subgraph CTRL[" "]
+        UC["UserController<br/>Deserialise JSON → UserRequest<br/>Valide avec @Valid<br/>Serialise User → UserResponse"]
+    end
+    CTRL --> SVC["COUCHE SERVICE (@Service, @Transactional)"]
+    subgraph SVC[" "]
+        US["UserService<br/>Logique metier<br/>Hachage mot de passe<br/>Validation email unique"]
+    end
+    SVC --> REPO["COUCHE REPOSITORY (@Repository, JpaRepository)"]
+    subgraph REPO[" "]
+        UR["UserRepository<br/>Requetes derivees findByEmail, findByRole...<br/>Pagination Pageable"]
+    end
+    REPO --> ENTITY["COUCHE ENTITE (@Entity, @Table)"]
+    subgraph ENTITY[" "]
+        UE["User<br/>Mapping JPA<br/>Contraintes @NotBlank, @Email...<br/>Role {USER, ADMIN}"]
+    end
+    ENTITY --> DB["BASE DE DONNEES (PostgreSQL / H2 en test)<br/>Table: users"]
 ```
 
  HTTP REQUEST
@@ -94,51 +120,35 @@
 
 Prenons l'exemple d'une requête `GET /api/users/42` avec un token ADMIN :
 
-```
-1. CLIENT → GET /api/users/42
- Header: Authorization: Bearer eyJhbGciOiJI...
+```mermaid
+sequenceDiagram
+    participant Client
+    participant JwtFilter
+    participant SecurityFilterChain
+    participant UserController
+    participant UserService
+    participant UserRepository
+    participant DB as Base de donnees
 
-2. JwtFilter.doFilterInternal()
- - Extrait "Bearer eyJhbGciOiJI..."
- - substring(7) → token
- - jwtUtil.estValide(token) → true
- - Extrait email: "admin@nexa.fr", role: "ADMIN"
- - Crée UsernamePasswordAuthenticationToken(email, null, [ROLE_ADMIN])
- - SecurityContextHolder.getContext().setAuthentication(...)
+    Client->>+JwtFilter: GET /api/users/42<br/>Authorization: Bearer eyJ...
+    JwtFilter->>JwtFilter: doFilterInternal()<br/>Extrait le token, verifie JWT<br/>Extrait email: admin@nexa.fr, role: ADMIN
+    JwtFilter->>JwtFilter: Cree UsernamePasswordAuthenticationToken<br/>SecurityContextHolder.setAuthentication(...)
 
-3. SecurityFilterChain.authorizeHttpRequests()
- - URL: /api/users/42
- - Méthode: GET
- - Règle: GET /api/users/** → hasAnyRole("ADMIN", "USER")
- - Rôle trouvé: ROLE_ADMIN → OK
+    JwtFilter->>+SecurityFilterChain: authorizeHttpRequests()
+    SecurityFilterChain->>SecurityFilterChain: URL: /api/users/42, GET<br/>Regle: hasAnyRole(ADMIN, USER)<br/>Role: ROLE_ADMIN → OK
 
-4. UserController.trouver(42)
- - @PreAuthorize("hasAnyRole('ADMIN', 'USER')") → ROLE_ADMIN → OK
- - Appelle service.trouverParId(42)
+    SecurityFilterChain->>+UserController: @PreAuthorize("hasAnyRole('ADMIN','USER')")
+    UserController->>UserController: ROLE_ADMIN → OK
+    UserController->>+UserService: trouverParId(42)
 
-5. UserService.trouverParId(42)
- - repo.findById(42)
- - Si présent: retourne User
- - Si absent: throw ResourceNotFoundException
+    UserService->>+UserRepository: findById(42)
+    UserRepository->>+DB: SELECT * FROM users WHERE id = 42
+    DB-->>-UserRepository: Optional<User>
+    UserRepository-->>-UserService: Optional<User>
+    UserService-->>-UserController: User
 
-6. UserRepository.findById(42)
- - JPA génère: SELECT * FROM users WHERE id = 42
- - Retourne Optional<User>
-
-7. Contrôleur convertit User → UserResponse
- - UserResponse.from(user) → masque le mot de passe
-
-8. RÉPONSE → 200 OK
- {
- "id": 42,
- "nom": "Dupont",
- "prenom": "Jean",
- "email": "jean@test.com",
- "role": "USER",
- "actif": true,
- "dateCreation": "2024-01-01T10:00:00",
- "dateModification": null
- }
+    UserController->>UserController: UserResponse.from(user)<br/>Masque le mot de passe
+    UserController-->>-Client: 200 OK<br/>{"id":42, "nom":"Dupont", ...}
 ```
 
 > **Remarque :** Le mot de passe n'est **jamais** dans la réponse.
@@ -398,55 +408,55 @@ public class BusinessException extends RuntimeException {
 
 ```
 lab08-user-manager/
- pom.xml
- src/
- main/
- java/com/nexa/usermanager/
- UserManagerApplication.java ← Point d'entrée
- config/
- SecurityConfig.java ← Sécurité
- AppConfig.java ← Beans
- entity/
- User.java ← Entité JPA
- dto/
- UserRequest.java ← DTO entrée
- UserResponse.java ← DTO sortie
- ErrorResponse.java ← DTO erreur
- repository/
- UserRepository.java ← Accès données
- service/
- UserService.java ← Métier
- controller/
- UserController.java ← Endpoints REST
- security/
- JwtUtil.java ← Gestion JWT
- JwtFilter.java ← Filtre JWT
- exception/
- ResourceNotFoundException.java
- BusinessException.java
- GlobalExceptionHandler.java
- resources/
- application.properties
- test/
- java/com/nexa/usermanager/
- unit/
- UserEntityTest.java
- UserRequestTest.java
- UserResponseTest.java
- UserServiceTest.java
- ErrorResponseTest.java
- ExceptionsTest.java
- GlobalExceptionHandlerTest.java
- controller/
- UserControllerTest.java
- repository/
- UserRepositoryTest.java
- security/
- JwtUtilTest.java
- SecurityTests.java
- resources/
- application.properties
- application-test.properties
+├── pom.xml
+└── src/
+    ├── main/
+    │   ├── java/com/nexa/usermanager/
+    │   │   ├── UserManagerApplication.java
+    │   │   ├── config/
+    │   │   │   ├── SecurityConfig.java
+    │   │   │   └── AppConfig.java
+    │   │   ├── entity/
+    │   │   │   └── User.java
+    │   │   ├── dto/
+    │   │   │   ├── UserRequest.java
+    │   │   │   ├── UserResponse.java
+    │   │   │   └── ErrorResponse.java
+    │   │   ├── repository/
+    │   │   │   └── UserRepository.java
+    │   │   ├── service/
+    │   │   │   └── UserService.java
+    │   │   ├── controller/
+    │   │   │   └── UserController.java
+    │   │   ├── security/
+    │   │   │   ├── JwtUtil.java
+    │   │   │   └── JwtFilter.java
+    │   │   └── exception/
+    │   │       ├── ResourceNotFoundException.java
+    │   │       ├── BusinessException.java
+    │   │       └── GlobalExceptionHandler.java
+    │   └── resources/
+    │       └── application.properties
+    └── test/
+        └── java/com/nexa/usermanager/
+            ├── unit/
+            │   ├── UserEntityTest.java
+            │   ├── UserRequestTest.java
+            │   ├── UserResponseTest.java
+            │   ├── UserServiceTest.java
+            │   ├── ErrorResponseTest.java
+            │   ├── ExceptionsTest.java
+            │   └── GlobalExceptionHandlerTest.java
+            ├── controller/
+            │   └── UserControllerTest.java
+            ├── repository/
+            │   └── UserRepositoryTest.java
+            ├── security/
+            │   ├── JwtUtilTest.java
+            │   └── SecurityTests.java
+            └── resources/
+                ├── application.properties
+                └── application-test.properties
 ```
 
 ---

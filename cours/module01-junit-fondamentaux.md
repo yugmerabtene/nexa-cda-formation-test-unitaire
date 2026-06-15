@@ -138,13 +138,13 @@ Un projet Maven standard pour les tests unitaires respecte l'arborescence suivan
 
 ```
 lab01-fondamentaux/
- pom.xml ← Configuration Maven
- src/
- main/java/com/nexa/fondamentaux/
- Calculatrice.java ← Code de production
- test/java/com/nexa/fondamentaux/
- CalculatriceTest.java ← Tests de la Calculatrice
- CycleDeVieTest.java ← Tests du cycle de vie
+├── pom.xml
+└── src/
+    ├── main/java/com/nexa/fondamentaux/
+    │   └── Calculatrice.java
+    └── test/java/com/nexa/fondamentaux/
+        ├── CalculatriceTest.java
+        └── CycleDeVieTest.java
 ```
 
 **Deux répertoires racines** :
@@ -406,11 +406,44 @@ JUnit 5 fournit quatre annotations pour contrôler le cycle de vie de vos tests.
 | `@AfterEach` | Test | Après CHAQUE méthode `@Test` | Non |
 | `@AfterAll` | Classe | Une seule fois, après TOUS les tests | **Oui** (obligatoire) |
 
-### Schéma textuel du cycle de vie
+### Schema textuel du cycle de vie
 
-Voici l'ordre d'exécution pour une classe contenant 3 tests :
+Voici l'ordre d'execution pour une classe contenant 3 tests :
 
+```mermaid
+sequenceDiagram
+    participant JUnit
+    participant Instance1 as Instance n°1
+    participant Instance2 as Instance n°2
+    participant Instance3 as Instance n°3
+
+    JUnit->>JUnit: @BeforeAll (static, UNE SEULE FOIS)
+
+    activate Instance1
+    JUnit->>Instance1: Creation instance
+    JUnit->>Instance1: @BeforeEach
+    JUnit->>Instance1: @Test — test 1
+    JUnit->>Instance1: @AfterEach
+    deactivate Instance1
+
+    activate Instance2
+    JUnit->>Instance2: Creation instance
+    JUnit->>Instance2: @BeforeEach
+    JUnit->>Instance2: @Test — test 2
+    JUnit->>Instance2: @AfterEach
+    deactivate Instance2
+
+    activate Instance3
+    JUnit->>Instance3: Creation instance
+    JUnit->>Instance3: @BeforeEach
+    JUnit->>Instance3: @Test — test 3
+    JUnit->>Instance3: @AfterEach
+    deactivate Instance3
+
+    JUnit->>JUnit: @AfterAll (static, UNE SEULE FOIS)
 ```
+
+Chaque test s'execute sur une **nouvelle instance** de la classe. JUnit cree une instance fraiche avant chaque `@Test` et la detruit apres. Cela garantit l'**isolation** : aucun test ne peut affecter l'etat d'un autre test via des champs d'instance.
 Début de la classe de test
 
  @BeforeAll (static) — exécuté UNE SEULE FOIS
