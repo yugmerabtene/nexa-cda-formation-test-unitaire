@@ -13,15 +13,42 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * Tests d'integration pour le repository {@link UserRepository}.
+ *
+ * <p>Cette classe utilise {@code @DataJpaTest} pour tester les interactions
+ * avec la base de donnees H2 en memoire. Elle verifie :</p>
+ * <ul>
+ *   <li>Les methodes de requete derivees (findByEmail, existsByEmail, etc.).</li>
+ *   <li>La persistance, la mise a jour et la suppression des entites.</li>
+ *   <li>La contrainte d'unicite sur l'email.</li>
+ *   <li>La pagination des resultats.</li>
+ *   <li>Le comptage par role.</li>
+ * </ul>
+ */
 @DataJpaTest
 @DisplayName("Tests repository : UserRepository")
 class UserRepositoryTest {
 
+    /** Repository sous test. */
     @Autowired private UserRepository repo;
+
+    /** EntityManager de test pour forcer les flush. */
     @Autowired private TestEntityManager em;
 
-    private User admin, user1, user2;
+    /** Utilisateur admin de test. */
+    private User admin;
 
+    /** Premier utilisateur standard de test. */
+    private User user1;
+
+    /** Deuxieme utilisateur standard de test. */
+    private User user2;
+
+    /**
+     * Initialise 3 utilisateurs en base avant chaque test :
+     * un admin et deux utilisateurs standards.
+     */
     @BeforeEach
     void setUp() {
         admin = repo.save(new User("Admin", "Super", "admin@nexa.fr", "admin123", User.Role.ADMIN));
@@ -29,6 +56,9 @@ class UserRepositoryTest {
         user2 = repo.save(new User("Dupont", "Marie", "marie@nexa.fr", "user123", User.Role.USER));
     }
 
+    /**
+     * Verifie que findByEmail retourne l'utilisateur correspondant a l'email.
+     */
     @Test
     @DisplayName("findByEmail : trouve par email")
     void findByEmail() {
@@ -37,27 +67,39 @@ class UserRepositoryTest {
         assertEquals("Admin", found.get().getNom());
     }
 
+    /**
+     * Verifie que findByEmail retourne un Optional vide pour un email inexistant.
+     */
     @Test
     @DisplayName("findByEmail : retourne empty si inexistant")
     void findByEmailInexistant() {
         assertTrue(repo.findByEmail("inconnu@nexa.fr").isEmpty());
     }
 
+    /**
+     * Verifie que existsByEmail detecte correctement la presence ou l'absence d'un email.
+     */
     @Test
-    @DisplayName("existsByEmail : détecte l'existence")
+    @DisplayName("existsByEmail : detecte l'existence")
     void existsByEmail() {
         assertTrue(repo.existsByEmail("paul@nexa.fr"));
         assertFalse(repo.existsByEmail("inconnu@nexa.fr"));
     }
 
+    /**
+     * Verifie que la recherche par nom est insensible a la casse.
+     */
     @Test
-    @DisplayName("findByNomContainingIgnoreCase : insensible à la casse")
+    @DisplayName("findByNomContainingIgnoreCase : insensible a la casse")
     void rechercheParNom() {
         assertEquals(1, repo.findByNomContainingIgnoreCase("adm").size());
         assertEquals(1, repo.findByNomContainingIgnoreCase("ADM").size());
         assertEquals(0, repo.findByNomContainingIgnoreCase("inconnu").size());
     }
 
+    /**
+     * Verifie le filtrage des utilisateurs par statut actif/inactif.
+     */
     @Test
     @DisplayName("findByActif : filtre par statut")
     void findByActif() {
@@ -69,6 +111,9 @@ class UserRepositoryTest {
         assertTrue(actifs.stream().allMatch(User::isActif));
     }
 
+    /**
+     * Verifie la recherche paginee par role.
+     */
     @Test
     @DisplayName("findByRole avec pagination")
     void findByRolePagination() {
@@ -77,20 +122,29 @@ class UserRepositoryTest {
         assertEquals("USER", page.getContent().get(0).getRole().name());
     }
 
+    /**
+     * Verifie le comptage des utilisateurs par role.
+     */
     @Test
-    @DisplayName("countByRole : compte les utilisateurs par rôle")
+    @DisplayName("countByRole : compte les utilisateurs par role")
     void countByRole() {
         assertEquals(1, repo.countByRole(User.Role.ADMIN));
         assertEquals(2, repo.countByRole(User.Role.USER));
     }
 
+    /**
+     * Verifie que le save persiste correctement et genere un ID.
+     */
     @Test
-    @DisplayName("save : persiste avec ID auto-généré")
+    @DisplayName("save : persiste avec ID auto-genere")
     void saveAvecId() {
         User newUser = repo.save(new User("Nouveau", "User", "new@nexa.fr", "pass", User.Role.USER));
         assertNotNull(newUser.getId());
     }
 
+    /**
+     * Verifie la suppression d'un utilisateur par ID.
+     */
     @Test
     @DisplayName("deleteById : supprime l'utilisateur")
     void deleteById() {
@@ -100,12 +154,18 @@ class UserRepositoryTest {
         assertEquals(2, repo.count());
     }
 
+    /**
+     * Verifie que findAll retourne tous les utilisateurs en base.
+     */
     @Test
     @DisplayName("findAll : retourne tous les utilisateurs")
     void findAll() {
         assertEquals(3, repo.findAll().size());
     }
 
+    /**
+     * Verifie que findById retourne l'utilisateur correspondant.
+     */
     @Test
     @DisplayName("findById : retourne l'utilisateur")
     void findById() {
@@ -113,8 +173,12 @@ class UserRepositoryTest {
         assertEquals("admin@nexa.fr", repo.findById(admin.getId()).get().getEmail());
     }
 
+    /**
+     * Verifie que la contrainte d'unicite sur l'email est bien appliquee.
+     * Une tentative d'insertion d'un email deja existant doit lever une exception.
+     */
     @Test
-    @DisplayName("La contrainte d'unicité sur l'email est respectée")
+    @DisplayName("La contrainte d'unicite sur l'email est respectee")
     void uniciteEmail() {
         assertThrows(Exception.class, () -> {
             repo.save(new User("Dupont2", "Jean", "admin@nexa.fr", "pass", User.Role.USER));

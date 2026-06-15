@@ -18,26 +18,54 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
+/**
+ * Tests unitaires pour le service metier {@link UserService}.
+ *
+ * <p>Cette classe utilise Mockito pour mocker le repository et l'encodeur
+ * de mot de passe, et teste toutes les methodes du service :</p>
+ * <ul>
+ *   <li><b>Creation</b> : succes, echec si email existant, hachage du mot de passe.</li>
+ *   <li><b>Lecture</b> : par ID, par email, liste complete, pagination, recherche, filtrage.</li>
+ *   <li><b>Mise a jour</b> : modification des champs, gestion du mot de passe vide.</li>
+ *   <li><b>Suppression</b> : suppression reussie, exception si ID inexistant, desactivation.</li>
+ * </ul>
+ */
 @ExtendWith(MockitoExtension.class)
 @DisplayName("Tests unitaires : UserService")
 class UserServiceTest {
 
+    /** Mock du repository utilisateur. */
     @Mock private UserRepository repo;
+
+    /** Mock de l'encodeur de mot de passe BCrypt. */
     @Mock private PasswordEncoder encoder;
+
+    /** Service sous test avec les mocks injectes. */
     @InjectMocks private UserService service;
 
+    /** Utilisateur de test reinitialise avant chaque test. */
     private User user;
 
+    /**
+     * Initialise un utilisateur de test avec des valeurs par defaut.
+     */
     @BeforeEach
     void setUp() {
         user = new User("Dupont", "Jean", "jean@test.com", "rawpass", User.Role.USER);
         user.setId(1L);
     }
 
+    /**
+     * Tests regroupes pour les operations de creation d'utilisateur.
+     */
     @Nested
-    @DisplayName("CRUD - Création")
+    @DisplayName("CRUD - Creation")
     class Creation {
 
+        /**
+         * Verifie qu'un utilisateur est cree avec le mot de passe hache
+         * et que le repository.save est bien appele.
+         */
         @Test
         @DisplayName("creer : encode le mot de passe et sauvegarde")
         void creerSucces() {
@@ -56,8 +84,12 @@ class UserServiceTest {
             verify(repo).save(any(User.class));
         }
 
+        /**
+         * Verifie que la creation echoue avec une RuntimeException
+         * si l'email est deja utilise, et que save n'est jamais appele.
+         */
         @Test
-        @DisplayName("creer : échoue si l'email existe déjà")
+        @DisplayName("creer : echoue si l'email existe deja")
         void creerEmailExistant() {
             when(repo.existsByEmail("jean@test.com")).thenReturn(true);
             assertThrows(RuntimeException.class, () -> service.creer(user));
@@ -65,10 +97,16 @@ class UserServiceTest {
         }
     }
 
+    /**
+     * Tests regroupes pour les operations de lecture.
+     */
     @Nested
     @DisplayName("CRUD - Lecture")
     class Lecture {
 
+        /**
+         * Verifie la recherche par ID avec succes.
+         */
         @Test
         @DisplayName("trouverParId : retourne l'utilisateur")
         void trouverParId() {
@@ -76,13 +114,19 @@ class UserServiceTest {
             assertEquals("Dupont", service.trouverParId(1L).getNom());
         }
 
+        /**
+         * Verifie que la recherche par ID inexistant leve ResourceNotFoundException.
+         */
         @Test
-        @DisplayName("trouverParId : lève ResourceNotFoundException")
+        @DisplayName("trouverParId : leve ResourceNotFoundException")
         void trouverParIdInexistant() {
             when(repo.findById(99L)).thenReturn(Optional.empty());
             assertThrows(ResourceNotFoundException.class, () -> service.trouverParId(99L));
         }
 
+        /**
+         * Verifie que listerTous retourne tous les utilisateurs.
+         */
         @Test
         @DisplayName("listerTous : retourne la liste")
         void listerTous() {
@@ -90,6 +134,9 @@ class UserServiceTest {
             assertEquals(1, service.listerTous().size());
         }
 
+        /**
+         * Verifie que listerPagine retourne une page d'utilisateurs.
+         */
         @Test
         @DisplayName("listerPagine : retourne une page")
         void listerPagine() {
@@ -100,6 +147,9 @@ class UserServiceTest {
             assertEquals(1, result.getTotalElements());
         }
 
+        /**
+         * Verifie la recherche par email avec succes.
+         */
         @Test
         @DisplayName("trouverParEmail : retourne l'utilisateur")
         void trouverParEmail() {
@@ -107,13 +157,19 @@ class UserServiceTest {
             assertTrue(service.trouverParEmail("jean@test.com").isPresent());
         }
 
+        /**
+         * Verifie la recherche par nom partiel.
+         */
         @Test
-        @DisplayName("rechercherParNom : retourne les résultats")
+        @DisplayName("rechercherParNom : retourne les resultats")
         void rechercherParNom() {
             when(repo.findByNomContainingIgnoreCase("dup")).thenReturn(List.of(user));
             assertEquals(1, service.rechercherParNom("dup").size());
         }
 
+        /**
+         * Verifie le filtrage des utilisateurs actifs.
+         */
         @Test
         @DisplayName("listerActifs : retourne les utilisateurs actifs")
         void listerActifs() {
@@ -121,6 +177,9 @@ class UserServiceTest {
             assertEquals(1, service.listerActifs().size());
         }
 
+        /**
+         * Verifie le comptage par role.
+         */
         @Test
         @DisplayName("compterParRole : retourne le compte")
         void compterParRole() {
@@ -129,10 +188,16 @@ class UserServiceTest {
         }
     }
 
+    /**
+     * Tests regroupes pour les operations de mise a jour.
+     */
     @Nested
-    @DisplayName("CRUD - Mise à jour")
+    @DisplayName("CRUD - Mise a jour")
     class MiseAJour {
 
+        /**
+         * Verifie que la mise a jour modifie correctement tous les champs.
+         */
         @Test
         @DisplayName("mettreAJour : modifie les champs")
         void mettreAJour() {
@@ -148,6 +213,10 @@ class UserServiceTest {
             verify(repo).save(any(User.class));
         }
 
+        /**
+         * Verifie que le mot de passe n'est pas modifie si la nouvelle
+         * valeur est vide ou nulle (mise a jour partielle).
+         */
         @Test
         @DisplayName("mettreAJour : ne change pas le mot de passe si null/vide")
         void mettreAJourSansMotDePasse() {
@@ -158,14 +227,20 @@ class UserServiceTest {
             service.mettreAJour(1L, update);
 
             assertEquals("rawpass", user.getPassword(),
-                "Le mot de passe ne doit pas être modifié si la nouvelle valeur est vide");
+                "Le mot de passe ne doit pas etre modifie si la nouvelle valeur est vide");
         }
     }
 
+    /**
+     * Tests regroupes pour les operations de suppression et desactivation.
+     */
     @Nested
-    @DisplayName("CRUD - Suppression et désactivation")
+    @DisplayName("CRUD - Suppression et desactivation")
     class Suppression {
 
+        /**
+         * Verifie la suppression d'un utilisateur existant.
+         */
         @Test
         @DisplayName("supprimer : supprime si l'utilisateur existe")
         void supprimer() {
@@ -174,15 +249,22 @@ class UserServiceTest {
             verify(repo).deleteById(1L);
         }
 
+        /**
+         * Verifie que la suppression leve ResourceNotFoundException si l'ID est inexistant.
+         */
         @Test
-        @DisplayName("supprimer : lève exception si inexistant")
+        @DisplayName("supprimer : leve exception si inexistant")
         void supprimerInexistant() {
             when(repo.existsById(99L)).thenReturn(false);
             assertThrows(ResourceNotFoundException.class, () -> service.supprimer(99L));
         }
 
+        /**
+         * Verifie que la desactivation passe le statut actif a false
+         * et sauvegarde l'utilisateur.
+         */
         @Test
-        @DisplayName("desactiver : désactive l'utilisateur")
+        @DisplayName("desactiver : desactive l'utilisateur")
         void desactiver() {
             when(repo.findById(1L)).thenReturn(Optional.of(user));
             service.desactiver(1L);

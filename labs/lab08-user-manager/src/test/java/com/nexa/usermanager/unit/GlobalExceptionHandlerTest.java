@@ -13,32 +13,53 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * Tests unitaires pour le {@link GlobalExceptionHandler}.
+ *
+ * <p>Verifie que chaque type d'exception est correctement converti
+ * en reponse HTTP avec le bon code de statut et le bon message :</p>
+ * <ul>
+ *   <li>{@link ResourceNotFoundException} -> HTTP 404</li>
+ *   <li>{@link BusinessException}         -> HTTP 409</li>
+ *   <li>{@link IllegalArgumentException}  -> HTTP 400</li>
+ * </ul>
+ */
 @DisplayName("Tests unitaires : GlobalExceptionHandler")
 class GlobalExceptionHandlerTest {
 
+    /** Instance du gestionnaire d'exceptions sous test. */
     private final GlobalExceptionHandler handler = new GlobalExceptionHandler();
 
+    /**
+     * Verifie qu'une ResourceNotFoundException produit une reponse 404.
+     */
     @Test
-    @DisplayName("ResourceNotFoundException → 404")
+    @DisplayName("ResourceNotFoundException -> 404")
     void handleNotFound() {
-        var ex = new ResourceNotFoundException("Utilisateur 42 non trouvé");
+        var ex = new ResourceNotFoundException("Utilisateur 42 non trouve");
         ResponseEntity<ErrorResponse> response = handler.handleNotFound(ex);
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
         assertEquals(404, response.getBody().getStatus());
-        assertEquals("Utilisateur 42 non trouvé", response.getBody().getDetail());
+        assertEquals("Utilisateur 42 non trouve", response.getBody().getDetail());
     }
 
+    /**
+     * Verifie qu'une BusinessException produit une reponse 409 Conflict.
+     */
     @Test
-    @DisplayName("BusinessException → 409")
+    @DisplayName("BusinessException -> 409")
     void handleBusiness() {
-        var ex = new BusinessException("Email déjà utilisé");
+        var ex = new BusinessException("Email deja utilise");
         ResponseEntity<ErrorResponse> response = handler.handleBusiness(ex);
         assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
-        assertEquals("Email déjà utilisé", response.getBody().getDetail());
+        assertEquals("Email deja utilise", response.getBody().getDetail());
     }
 
+    /**
+     * Verifie qu'une IllegalArgumentException produit une reponse 400 Bad Request.
+     */
     @Test
-    @DisplayName("IllegalArgumentException → 400")
+    @DisplayName("IllegalArgumentException -> 400")
     void handleIllegalArgument() {
         var ex = new IllegalArgumentException("Argument invalide");
         ResponseEntity<ErrorResponse> response = handler.handleIllegalArgument(ex);

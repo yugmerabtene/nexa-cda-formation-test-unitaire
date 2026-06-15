@@ -9,15 +9,32 @@ import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@DisplayName("Tests unitaires : Entité User")
+/**
+ * Tests unitaires pour l'entite JPA {@link User}.
+ *
+ * <p>Cette classe verifie le bon fonctionnement de l'entite User :</p>
+ * <ul>
+ *   <li>Les constructeurs (par defaut et parametre).</li>
+ *   <li>Les valeurs par defaut (role USER, compte actif, date de creation).</li>
+ *   <li>Tous les setters et getters.</li>
+ *   <li>L'enum {@code Role} et ses valeurs.</li>
+ * </ul>
+ */
+@DisplayName("Tests unitaires : Entite User")
 class UserEntityTest {
 
+    /**
+     * Tests regroupes pour les constructeurs de l'entite User.
+     */
     @Nested
     @DisplayName("Construction")
     class Construction {
 
+        /**
+         * Verifie que le constructeur parametre initialise correctement tous les champs.
+         */
         @Test
-        @DisplayName("Constructeur paramétré initialise correctement")
+        @DisplayName("Constructeur parametre initialise correctement")
         void constructeurParametre() {
             User user = new User("Martin", "Paul", "paul@test.com", "password", User.Role.ADMIN);
             assertEquals("Martin", user.getNom());
@@ -29,8 +46,12 @@ class UserEntityTest {
             assertNotNull(user.getDateCreation());
         }
 
+        /**
+         * Verifie que le constructeur par defaut cree un utilisateur avec
+         * le role USER et le compte actif.
+         */
         @Test
-        @DisplayName("Le constructeur par défaut crée un objet avec rôle USER")
+        @DisplayName("Le constructeur par defaut cree un objet avec role USER")
         void constructeurDefaut() {
             User user = new User();
             assertEquals(User.Role.USER, user.getRole());
@@ -38,10 +59,17 @@ class UserEntityTest {
         }
     }
 
+    /**
+     * Tests regroupes pour les accesseurs (setters et getters).
+     */
     @Nested
     @DisplayName("Setters / Getters")
     class Accesseurs {
 
+        /**
+         * Verifie que tous les setters modifient bien les valeurs
+         * et que les getters correspondants les retournent correctement.
+         */
         @Test
         @DisplayName("Tous les setters fonctionnent")
         void tousLesSetters() {
@@ -69,10 +97,16 @@ class UserEntityTest {
         }
     }
 
+    /**
+     * Tests regroupes pour l'enum Role.
+     */
     @Nested
     @DisplayName("Enum Role")
     class RoleEnum {
 
+        /**
+         * Verifie les noms des valeurs de l'enum Role.
+         */
         @Test
         @DisplayName("Role.USER et Role.ADMIN existent")
         void rolesDisponibles() {
@@ -80,6 +114,9 @@ class UserEntityTest {
             assertEquals("ADMIN", User.Role.ADMIN.name());
         }
 
+        /**
+         * Verifie que valueOf fonctionne pour les deux roles.
+         */
         @Test
         @DisplayName("ValueOf fonctionne")
         void valueOf() {

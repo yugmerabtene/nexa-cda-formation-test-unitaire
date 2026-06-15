@@ -9,9 +9,32 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+/**
+ * Configuration applicative : services Spring Security et initialisation des donnees.
+ *
+ * <p>Cette classe definit deux beans principaux :</p>
+ * <ul>
+ *   <li>{@link UserDetailsService} : service de chargement des utilisateurs pour
+ *       l'authentification Spring Security. Il recherche les utilisateurs par email
+ *       dans le repository et les convertit en objets {@code UserDetails}.</li>
+ *   <li>{@link CommandLineRunner} : initialise la base de donnees avec deux
+ *       utilisateurs par defaut (admin et user) si elle est vide au demarrage.</li>
+ * </ul>
+ */
 @Configuration
 public class AppConfig {
 
+    /**
+     * Definit le service de chargement des utilisateurs pour Spring Security.
+     *
+     * <p>Ce bean est utilise par le {@code AuthenticationManager} pour charger
+     * les details d'un utilisateur lors de l'authentification. Il recherche
+     * l'utilisateur par email et construit un objet {@code UserDetails} avec
+     * son email, son mot de passe hache et son role.</p>
+     *
+     * @param repo le repository d'acces aux utilisateurs
+     * @return un {@link UserDetailsService} qui charge les utilisateurs par email
+     */
     @Bean
     public UserDetailsService userDetailsService(UserRepository repo) {
         return email -> {
@@ -25,6 +48,23 @@ public class AppConfig {
         };
     }
 
+    /**
+     * Initialise la base de donnees avec des utilisateurs par defaut au demarrage.
+     *
+     * <p>Ce runner s'execute au lancement de l'application. Il verifie si les
+     * utilisateurs par defaut existent deja (par email) et les cree uniquement
+     * s'ils sont absents. Cela evite les doublons lors des redemarrages.</p>
+     *
+     * <p>Utilisateurs crees :</p>
+     * <ul>
+     *   <li><b>admin@nexa.fr</b> / admin123 - Role ADMIN</li>
+     *   <li><b>user@nexa.fr</b>  / user123  - Role USER</li>
+     * </ul>
+     *
+     * @param repo    le repository d'acces aux utilisateurs
+     * @param encoder l'encodeur de mot de passe pour hacher les mots de passe
+     * @return un {@link CommandLineRunner} qui initialise les donnees
+     */
     @Bean
     public CommandLineRunner init(UserRepository repo, PasswordEncoder encoder) {
         return args -> {
