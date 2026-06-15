@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * Tests unitaires pour le {@link GlobalExceptionHandler}.
  *
  * <p>Verifie que chaque type d'exception est correctement converti
- * en reponse HTTP avec le bon code de statut et le bon message :</p>
+ * en réponse HTTP avec le bon code de statut et le bon message :</p>
  * <ul>
  *   <li>{@link ResourceNotFoundException} -> HTTP 404</li>
  *   <li>{@link BusinessException}         -> HTTP 409</li>
@@ -31,7 +31,7 @@ class GlobalExceptionHandlerTest {
     private final GlobalExceptionHandler handler = new GlobalExceptionHandler();
 
     /**
-     * Verifie qu'une ResourceNotFoundException produit une reponse 404.
+     * Verifie qu'une ResourceNotFoundException produit une réponse 404.
      */
     @Test
     @DisplayName("ResourceNotFoundException -> 404")
@@ -44,19 +44,19 @@ class GlobalExceptionHandlerTest {
     }
 
     /**
-     * Verifie qu'une BusinessException produit une reponse 409 Conflict.
+     * Verifie qu'une BusinessException produit une réponse 409 Conflict.
      */
     @Test
     @DisplayName("BusinessException -> 409")
     void handleBusiness() {
-        var ex = new BusinessException("Email deja utilise");
+        var ex = new BusinessException("Email déjà utilisé");
         ResponseEntity<ErrorResponse> response = handler.handleBusiness(ex);
         assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
-        assertEquals("Email deja utilise", response.getBody().getDetail());
+        assertEquals("Email déjà utilisé", response.getBody().getDetail());
     }
 
     /**
-     * Verifie qu'une IllegalArgumentException produit une reponse 400 Bad Request.
+     * Verifie qu'une IllegalArgumentException produit une réponse 400 Bad Request.
      */
     @Test
     @DisplayName("IllegalArgumentException -> 400")

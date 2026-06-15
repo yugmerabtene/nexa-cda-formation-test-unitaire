@@ -16,9 +16,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 /**
  * Configuration centrale de Spring Security pour l'application.
  * <p>
- * Cette classe definit la chaine de filtres de securite, les regles
- * de controle d'acces par URL et par methode HTTP, la politique de session
- * (sans etat pour une API REST), et active la securite au niveau des methodes
+ * Cette classe definit la chaine de filtres de sécurité, les regles
+ * de controle d'accès par URL et par méthode HTTP, la politique de session
+ * (sans état pour une API REST), et active la sécurité au niveau des méthodes
  * via les annotations {@code @PreAuthorize}.
  */
 @Configuration
@@ -27,7 +27,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     /**
-     * Filtre JWT injecte par Spring et place dans la chaine de securite
+     * Filtre JWT injecte par Spring et place dans la chaine de sécurité
      * avant le filtre d'authentification standard.
      */
     private final JwtAuthenticationFilter jwtFilter;
@@ -42,18 +42,18 @@ public class SecurityConfig {
     }
 
     /**
-     * Construit et configure la chaine de filtres de securite.
+     * Construit et configure la chaine de filtres de sécurité.
      * <ul>
-     *   <li>Desactive CSRF (non necessaire pour une API REST sans etat)</li>
+     *   <li>Desactive CSRF (non necessaire pour une API REST sans état)</li>
      *   <li>Definit une politique de session {@code STATELESS} : aucun cookie
-     *       de session HTTP n'est cree</li>
-     *   <li>Declare les regles d'autorisation par chemin et methode HTTP</li>
+     *       de session HTTP n'est créé</li>
+     *   <li>Declare les regles d'autorisation par chemin et méthode HTTP</li>
      *   <li>Insere le filtre JWT avant le {@link UsernamePasswordAuthenticationFilter}</li>
      * </ul>
      *
      * @param http l'objet de configuration HTTP de Spring Security
-     * @return la chaine de filtres de securite construite
-     * @throws Exception si la construction de la chaine echoue
+     * @return la chaine de filtres de sécurité construite
+     * @throws Exception si la construction de la chaine échoué
      */
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {

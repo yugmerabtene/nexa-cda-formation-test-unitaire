@@ -3,13 +3,13 @@ package com.nexa.usermanager.dto;
 import java.util.Map;
 
 /**
- * DTO representant une reponse d'erreur structuree conforme au standard
+ * DTO representant une réponse d'erreur structuree conforme au standard
  * RFC 7807 (Problem Details for HTTP APIs).
  *
- * <p>Cette classe est utilisee par le {@code GlobalExceptionHandler} pour
+ * <p>Cette classe est utilisé́e par le {@code GlobalExceptionHandler} pour
  * retourner des reponses d'erreur coherentes et informatives au client.</p>
  *
- * <p>Structure de la reponse :</p>
+ * <p>Structure de la réponse :</p>
  * <ul>
  *   <li>{@code status} : code HTTP de l'erreur</li>
  *   <li>{@code title} : titre court decrivant le type d'erreur</li>

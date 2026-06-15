@@ -9,19 +9,19 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * Tests unitaires pour la classe {@link JwtUtil}.
  * <p>
- * Cette classe verifie le comportement de l'utilitaire JWT :
+ * Cette classe vérifié le comportement de l'utilitaire JWT :
  * <ul>
  *   <li>Generation de tokens valides</li>
  *   <li>Extraction correcte du username et du role</li>
  *   <li>Detection des tokens invalides (null, vides, modifies, aleatoires)</li>
- *   <li>Unicite des tokens generes (timestamp d'emission different)</li>
+ *   <li>Unicite des tokens generes (timestamp d'emission différent)</li>
  * </ul>
  * Aucun contexte Spring n'est necessaire : le JwtUtil est instancie directement.
  */
 @DisplayName("Tests du JwtUtil")
 class JwtUtilTest {
 
-    /** Instance du JwtUtil testee, creee manuellement sans Spring. */
+    /** Instance du JwtUtil testee, créée manuellement sans Spring. */
     private final JwtUtil jwtUtil = new JwtUtil();
 
     /**
@@ -32,11 +32,11 @@ class JwtUtilTest {
     class GenerationValidation {
 
         /**
-         * Verifie qu'un token genere est non null, non vide et considere valide
-         * par la methode {@code estTokenValide()}.
+         * Verifie qu'un token genere est non null, non vide et considere validé
+         * par la méthode {@code estTokenValide()}.
          */
         @Test
-        @DisplayName("Un token généré est valide")
+        @DisplayName("Un token généré est validé")
         void tokenGenereEstValide() {
             String token = jwtUtil.genererToken("alice", "ADMIN");
             assertNotNull(token);
@@ -49,7 +49,7 @@ class JwtUtilTest {
          * a celui passe lors de la generation.
          */
         @Test
-        @DisplayName("Extraire le username d'un token valide")
+        @DisplayName("Extraire le username d'un token validé")
         void extraireUsername() {
             String token = jwtUtil.genererToken("bob", "USER");
             assertEquals("bob", jwtUtil.extraireUsername(token));
@@ -60,7 +60,7 @@ class JwtUtilTest {
          * a celui passe lors de la generation.
          */
         @Test
-        @DisplayName("Extraire le rôle d'un token valide")
+        @DisplayName("Extraire le rôle d'un token validé")
         void extraireRole() {
             String token = jwtUtil.genererToken("charlie", "ADMIN");
             assertEquals("ADMIN", jwtUtil.extraireRole(token));
@@ -109,8 +109,8 @@ class JwtUtilTest {
         }
 
         /**
-         * Verifie que deux appels consecutifs a {@code genererToken} pour le meme
-         * utilisateur produisent des tokens differents (a cause du timestamp iat).
+         * Verifie que deux appels consecutifs a {@code genererToken} pour le même
+         * utilisateur produisent des tokens différents (a cause du timestamp iat).
          */
         @Test
         @DisplayName("Tokens différents pour le même utilisateur")

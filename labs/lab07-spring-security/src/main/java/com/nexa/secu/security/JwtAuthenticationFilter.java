@@ -14,11 +14,11 @@ import java.io.IOException;
 import java.util.List;
 
 /**
- * Filtre de securite qui intercepte chaque requete HTTP pour extraire et
+ * Filtre de sécurité qui intercepte chaque requête HTTP pour extraire et
  * valider un token JWT depuis le header {@code Authorization}.
  * <p>
- * Ce filtre herite de {@link OncePerRequestFilter}, garantissant une execution
- * unique par requete. Il est insere dans la chaine de filtres Spring Security
+ * Ce filtre herite de {@link OncePerRequestFilter}, garantissant une exécution
+ * unique par requête. Il est insere dans la chaine de filtres Spring Security
  * avant le {@code UsernamePasswordAuthenticationFilter} (voir {@code SecurityConfig}).
  * <p>
  * Fonctionnement :
@@ -26,9 +26,9 @@ import java.util.List;
  *   <li>Extraire le header {@code Authorization}</li>
  *   <li>Verifier le prefixe {@code Bearer }</li>
  *   <li>Extraire et valider le token via {@link JwtUtil}</li>
- *   <li>Si le token est valide, creer un objet d'authentification et le placer
+ *   <li>Si le token est validé, creer un objet d'authentification et le placer
  *       dans le {@code SecurityContextHolder}</li>
- *   <li>Poursuivre la chaine de filtres quel que soit le resultat</li>
+ *   <li>Poursuivre la chaine de filtres quel que soit le résultat</li>
  * </ol>
  */
 @Component
@@ -47,14 +47,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     /**
-     * Methode principale du filtre, executee pour chaque requete HTTP.
+     * Methode principale du filtre, executee pour chaque requête HTTP.
      * <p>
-     * Si un token Bearer valide est present dans le header {@code Authorization},
-     * l'utilisateur est authentifie dans le contexte de securite avec le role
-     * extrait du token. Sinon, la requete poursuit sans authentification.
+     * Si un token Bearer validé est present dans le header {@code Authorization},
+     * l'utilisateur est authentifie dans le contexte de sécurité avec le role
+     * extrait du token. Sinon, la requête poursuit sans authentification.
      *
-     * @param request     la requete HTTP entrante
-     * @param response    la reponse HTTP
+     * @param request     la requête HTTP entrante
+     * @param response    la réponse HTTP
      * @param filterChain la chaine de filtres a poursuivre
      * @throws ServletException en cas d'erreur de filtrage
      * @throws IOException      en cas d'erreur d'entree/sortie
@@ -86,7 +86,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         List.of(new SimpleGrantedAuthority("ROLE_" + role))
                     );
 
-                // Placement de l'authentification dans le contexte de securite
+                // Placement de l'authentification dans le contexte de sécurité
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
         }

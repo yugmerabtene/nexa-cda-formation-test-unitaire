@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Tests d'integration du repository avec {@code @DataJpaTest}.
- * Utilise une base H2 en memoire et valide la couche de persistance JPA.
+ * Utilise une base H2 en memoire et validé la couche de persistance JPA.
  */
 @DataJpaTest
 @DisplayName("Tests du ProduitRepository")
@@ -50,7 +50,7 @@ class ProduitRepositoryTest {
     }
 
     /**
-     * Teste la methode {@code findAll} : doit retourner les 3 produits inseres.
+     * Teste la méthode {@code findAll} : doit retourner les 3 produits inseres.
      */
     @Test
     @DisplayName("findAll : retourne tous les produits")
@@ -60,19 +60,19 @@ class ProduitRepositoryTest {
     }
 
     /**
-     * Teste la methode {@code findById} : doit retrouver le produit par son identifiant.
+     * Teste la méthode {@code findById} : doit retrouver le produit par son identifiant.
      */
     @Test
     @DisplayName("findById : retourne le produit par ID")
     void findById() {
-        Optional<Produit> resultat = repository.findById(p1.getId());
-        assertTrue(resultat.isPresent());
-        assertEquals("Ordinateur", resultat.get().getNom());
+        Optional<Produit> résultat = repository.findById(p1.getId());
+        assertTrue(résultat.isPresent());
+        assertEquals("Ordinateur", résultat.get().getNom());
     }
 
     /**
      * Teste la recherche insensible a la casse : "ordi" et "ORDI" doivent
-     * retourner le meme produit "Ordinateur".
+     * retourner le même produit "Ordinateur".
      */
     @Test
     @DisplayName("findByNomContainingIgnoreCase : insensible a la casse")
@@ -108,7 +108,7 @@ class ProduitRepositoryTest {
     }
 
     /**
-     * Teste la methode {@code save} : un nouveau produit persiste doit recevoir
+     * Teste la méthode {@code save} : un nouveau produit persiste doit recevoir
      * un identifiant genere et le compte total doit augmenter.
      */
     @Test
@@ -120,7 +120,7 @@ class ProduitRepositoryTest {
     }
 
     /**
-     * Teste la methode {@code deleteById} : apres suppression, le produit ne doit
+     * Teste la méthode {@code deleteById} : après suppression, le produit ne doit
      * plus exister et le compte total doit diminuer.
      */
     @Test

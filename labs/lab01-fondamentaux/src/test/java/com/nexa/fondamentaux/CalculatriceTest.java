@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * - L'utilisation de messages d'erreur personnalises
  * - Les Suppliers pour les messages paresseux (constructeur lambda)
  *
- * Chaque test est independant et peut etre execute dans n'importe quel ordre.
+ * Chaque test est independant et peut etre exécuté dans n'importe quel ordre.
  */
 @DisplayName("Tests de la classe Calculatrice")
 class CalculatriceTest {
@@ -23,7 +23,7 @@ class CalculatriceTest {
      * Instance de la classe a tester.
      *
      * Creee comme champ final car l'objet est immutable et partage
-     * entre tous les tests. JUnit cree une nouvelle instance de la classe
+     * entre tous les tests. JUnit créé une nouvelle instance de la classe
      * de test AVANT chaque @Test, donc ce champ est reinitialise a chaque test.
      */
     private final Calculatrice calc = new Calculatrice();
@@ -38,10 +38,10 @@ class CalculatriceTest {
      * Pattern AAA :
      * - Arrange : calc est initialise comme champ de classe
      * - Act : calc.addition(2, 3) retourne 5
-     * - Assert : assertEquals verifie que le resultat vaut 5
+     * - Assert : assertEquals vérifié que le résultat vaut 5
      *
-     * Le troisieme parametre de assertEquals est le message affiche
-     * UNIQUEMENT en cas d'echec du test.
+     * Le troisieme paramètre de assertEquals est le message affiche
+     * UNIQUEMENT en cas d'échec du test.
      */
     @Test
     @DisplayName("Addition de deux nombres positifs")
@@ -57,8 +57,8 @@ class CalculatriceTest {
      * - L'addition d'un positif et d'un negatif
      * - L'addition de deux negatifs
      *
-     * Chaque assertEquals est independante : si la premiere echoue,
-     * la deuxieme est quand meme executee (contrairement a des if/else).
+     * Chaque assertEquals est independante : si la première échoué,
+     * la deuxieme est quand même executee (contrairement a des if/else).
      */
     @Test
     @DisplayName("Addition avec un nombre negatif")
@@ -68,14 +68,14 @@ class CalculatriceTest {
     }
 
     /**
-     * Test de l'element neutre de l'addition : zero.
+     * Test de l'élément neutre de l'addition : zero.
      *
      * a + 0 = a et 0 + a = a, quelle que soit la valeur de a.
      * Ces proprietes sont fondamentales en mathematiques et doivent
      * etre preservees par l'implementation.
      */
     @Test
-    @DisplayName("Addition avec zero (element neutre)")
+    @DisplayName("Addition avec zero (élément neutre)")
     void additionAvecZero() {
         assertEquals(7, calc.addition(7, 0),
             "a + 0 devrait toujours donner a");
@@ -98,13 +98,13 @@ class CalculatriceTest {
     }
 
     /**
-     * Test de la soustraction donnant un resultat negatif.
+     * Test de la soustraction donnant un résultat negatif.
      *
-     * 2 - 5 = -3. Ce test verifie que la soustraction gere correctement
-     * les cas ou le resultat passe en dessous de zero.
+     * 2 - 5 = -3. Ce test vérifié que la soustraction gère correctement
+     * les cas ou le résultat passe en dessous de zero.
      */
     @Test
-    @DisplayName("Soustraction donnant un resultat negatif")
+    @DisplayName("Soustraction donnant un résultat negatif")
     void soustractionResultatNegatif() {
         assertEquals(-3, calc.soustraction(2, 5));
     }
@@ -124,24 +124,24 @@ class CalculatriceTest {
     }
 
     /**
-     * Test de l'element absorbant de la multiplication : zero.
+     * Test de l'élément absorbant de la multiplication : zero.
      *
      * a x 0 = 0 et 0 x a = 0. Tout nombre multiplie par zero donne zero.
      */
     @Test
-    @DisplayName("Multiplication par zero (element absorbant)")
+    @DisplayName("Multiplication par zero (élément absorbant)")
     void multiplicationParZero() {
         assertEquals(0, calc.multiplication(5, 0));
         assertEquals(0, calc.multiplication(0, 5));
     }
 
     /**
-     * Test de l'element neutre de la multiplication : un.
+     * Test de l'élément neutre de la multiplication : un.
      *
      * a x 1 = a. Multiplier par 1 ne change pas la valeur.
      */
     @Test
-    @DisplayName("Multiplication par un (element neutre)")
+    @DisplayName("Multiplication par un (élément neutre)")
     void multiplicationParUn() {
         assertEquals(7, calc.multiplication(7, 1));
     }
@@ -177,12 +177,12 @@ class CalculatriceTest {
      * Test de la division par zero.
      *
      * Diviser par zero est indefini et DOIT lever une exception.
-     * On utilise assertThrows pour :
+     * On utilisé assertThrows pour :
      * 1. Verifier le TYPE de l'exception (ArithmeticException.class)
      * 2. Verifier le MESSAGE de l'exception
      *
      * La lambda () -> calc.division(10, 0) est le code qui doit lever l'exception.
-     * Si aucune exception n'est levee, le test echoue.
+     * Si aucune exception n'est levee, le test échoué.
      */
     @Test
     @DisplayName("Division par zero doit lever ArithmeticException")
@@ -227,7 +227,7 @@ class CalculatriceTest {
      * Test du modulo par zero.
      *
      * Tout comme la division, le modulo par zero doit lever une exception.
-     * On utilise assertThrows sans capturer l'exception car on ne verifie
+     * On utilisé assertThrows sans capturer l'exception car on ne vérifié
      * que le type ici.
      */
     @Test
@@ -260,7 +260,7 @@ class CalculatriceTest {
     /**
      * Test de nombres impairs.
      *
-     * assertFalse verifie que la condition est FALSE.
+     * assertFalse vérifié que la condition est FALSE.
      * 1 et -3 sont impairs, donc estPair doit retourner false.
      */
     @Test
@@ -277,7 +277,7 @@ class CalculatriceTest {
     /**
      * Test de valeur absolue d'un nombre positif.
      *
-     * La valeur absolue d'un nombre positif est le nombre lui-meme.
+     * La valeur absolue d'un nombre positif est le nombre lui-même.
      */
     @Test
     @DisplayName("Valeur absolue d'un nombre positif (ne change pas)")
@@ -315,13 +315,13 @@ class CalculatriceTest {
     /**
      * Demonstration de assertAll : groupement d'assertions.
      *
-     * assertAll execute TOUTES les assertions, meme si certaines echouent.
-     * C'est different de plusieurs assertEquals a la suite :
-     * - Avec assertEquals en sequence : le premier echec arrete le test
+     * assertAll exécuté TOUTES les assertions, même si certaines echouent.
+     * C'est différent de plusieurs assertEquals a la suite :
+     * - Avec assertEquals en sequence : le premier échec arrete le test
      * - Avec assertAll : toutes les assertions sont executees, et le rapport
      *   liste TOUS les echecs
      *
-     * Avantage : vous voyez tous les problemes en une seule execution,
+     * Avantage : vous voyez tous les problèmes en une seule exécution,
      * au lieu de corriger les erreurs une par une.
      */
     @Test
@@ -341,8 +341,8 @@ class CalculatriceTest {
      * Demonstration des messages d'assertion personnalises.
      *
      * Deux types de messages :
-     * 1. String directe : evaluee AVANT l'assertion, meme si le test reussit
-     * 2. Supplier<String> (lambda) : evalue UNIQUEMENT en cas d'echec
+     * 1. String directe : evaluee AVANT l'assertion, même si le test reussit
+     * 2. Supplier<String> (lambda) : evalue UNIQUEMENT en cas d'échec
      *
      * Le Supplier (introduit par () -> "...") est dit "paresseux" (lazy)
      * car la lambda n'est executee que si necessaire.
@@ -355,9 +355,9 @@ class CalculatriceTest {
         assertEquals(4, calc.addition(2, 2),
             "Ce message s'affiche si 2+2 != 4");
 
-        // Message Supplier : evalue UNIQUEMENT si le test echoue
+        // Message Supplier : evalue UNIQUEMENT si le test échoué
         assertTrue(calc.estPair(2),
-            () -> "Message paresseux construit uniquement en cas d'echec pour 2");
+            () -> "Message paresseux construit uniquement en cas d'échec pour 2");
     }
 
     /**
@@ -388,12 +388,12 @@ class CalculatriceTest {
     /**
      * Test de assertArrayEquals.
      *
-     * Compare deux tableaux element par element.
+     * Compare deux tableaux élément par élément.
      * Contrairement a assertEquals qui utiliserait equals() sur les tableaux
      * (ce qui comparerait les references, pas le contenu),
-     * assertArrayEquals parcourt chaque element et les compare un a un.
+     * assertArrayEquals parcourt chaque élément et les compare un a un.
      *
-     * Ici on verifie que les 4 premiers multiples de 2 sont [2, 4, 6, 8].
+     * Ici on vérifié que les 4 premiers multiples de 2 sont [2, 4, 6, 8].
      */
     @Test
     @DisplayName("assertArrayEquals : comparaison de tableaux")

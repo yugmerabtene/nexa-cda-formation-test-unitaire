@@ -1,18 +1,18 @@
-package com.nexa.parametres;
+package com.nexa.paramètrès;
 
 /**
  * Validateur de saisies utilisateur.
  *
- * Cette classe implemente 5 methodes de validation :
+ * Cette classe implemente 5 méthodes de validation :
  * - Email (format RFC basique)
  * - Telephone (formats francais : 10 chiffres, +33)
  * - Score de mot de passe (robustesse 0-100)
- * - Age valide (18-120 ans)
+ * - Age validé (18-120 ans)
  * - Categorie d'age (MINEUR a CENTENAIRE)
  *
- * Chaque methode est concue pour etre testee de maniere exhaustive
- * avec des tests parametres (@ParameterizedTest) qui couvrent
- * des dizaines de cas en une seule methode de test.
+ * Chaque méthode est concue pour etre testee de maniere exhaustive
+ * avec des tests paramètrès (@ParameterizedTest) qui couvrent
+ * des dizaines de cas en une seule méthode de test.
  */
 public class ValidateurUtilisateur {
 
@@ -23,11 +23,11 @@ public class ValidateurUtilisateur {
      * 1. Ne doit pas etre null ou vide
      * 2. Longueur maximale : 255 caracteres (limite RFC 5321)
      * 3. Doit contenir exactement un caractere '@'
-     * 4. Le '@' ne doit pas etre en premiere position
-     * 5. Le domaine (apres le '@') doit contenir un point
+     * 4. Le '@' ne doit pas etre en première position
+     * 5. Le domaine (après le '@') doit contenir un point
      *
      * @param email l'adresse email a valider (peut etre null)
-     * @return true si l'email est syntaxiquement valide
+     * @return true si l'email est syntaxiquement validé
      *
      * Exemples :
      * - "test@example.com" -> true
@@ -42,14 +42,14 @@ public class ValidateurUtilisateur {
 
         // Trouver la position du premier '@'
         int arobaseIndex = email.indexOf('@');
-        // Le '@' ne doit pas etre absent ni en premiere position
+        // Le '@' ne doit pas etre absent ni en première position
         if (arobaseIndex <= 0) return false;
 
         // Verifier qu'il n'y a qu'un seul '@'
-        // Si un second '@' est trouve apres le premier, c'est invalide
+        // Si un second '@' est trouve après le premier, c'est invalide
         if (email.indexOf('@', arobaseIndex + 1) != -1) return false;
 
-        // Extraire la partie domaine (tout apres le '@')
+        // Extraire la partie domaine (tout après le '@')
         String domaine = email.substring(arobaseIndex + 1);
         // Le domaine doit contenir un point et avoir au moins 2 caracteres
         return domaine.contains(".") && domaine.length() > 1;
@@ -67,7 +67,7 @@ public class ValidateurUtilisateur {
      * - +33 6 12 34 56 78 (format international avec espaces)
      *
      * @param telephone le numero a valider (peut etre null)
-     * @return true si le telephone est un numero francais valide
+     * @return true si le telephone est un numero francais validé
      *
      * Algorithme :
      * 1. Nettoyer les separateurs (espaces, points, tirets, +)
@@ -90,7 +90,7 @@ public class ValidateurUtilisateur {
             nettoye = "0" + nettoye.substring(3); // Enlever "+33", ajouter "0"
         }
 
-        // Apres nettoyage, un telephone francais fait exactement 10 chiffres
+        // Après nettoyage, un telephone francais fait exactement 10 chiffres
         if (nettoye.length() != 10) return false;
 
         // Le premier chiffre doit etre 0 (operateur de sortie France)
@@ -120,14 +120,14 @@ public class ValidateurUtilisateur {
      * | Au moins une majuscule [A-Z] | +20 |
      * | Au moins une minuscule [a-z] | +15 |
      * | Au moins un chiffre [0-9] | +15 |
-     * | Au moins un caractere special | +10 |
+     * | Au moins un caractere spécial | +10 |
      *
      * @param motDePasse le mot de passe a evaluer (peut etre null)
-     * @return score entre 0 (tres faible) et 100 (tres fort)
+     * @return score entre 0 (très faible) et 100 (très fort)
      *
      * Exemples :
      * - "abc" -> 0 (trop court, pas de criteres satisfaits)
-     * - "Abcd1234!" -> 70 (8+ chars, majuscule, minuscule, chiffre, special)
+     * - "Abcd1234!" -> 70 (8+ chars, majuscule, minuscule, chiffre, spécial)
      * - "MotDePasseTresLong123!" -> 100 (tous les criteres)
      */
     public int scoreMotDePasse(String motDePasse) {
@@ -150,7 +150,7 @@ public class ValidateurUtilisateur {
         // Critere de diversite : chiffre
         if (motDePasse.matches(".*[0-9].*")) score += 15;
 
-        // Critere de diversite : caractere special
+        // Critere de diversite : caractere spécial
         // La liste inclut : !@#$%^&*()_+-=[]{};':"\|,.<>/?
         if (motDePasse.matches(".*[!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>/?].*")) score += 10;
 
@@ -159,7 +159,7 @@ public class ValidateurUtilisateur {
     }
 
     /**
-     * Verifie si un age est dans la plage valide (18 a 120 ans).
+     * Verifie si un age est dans la plage validé (18 a 120 ans).
      *
      * @param age l'age a verifier
      * @return true si 18 <= age <= 120
@@ -179,17 +179,17 @@ public class ValidateurUtilisateur {
      * - CENTENAIRE : 120 ans et plus
      *
      * @param age l'age a categoriser
-     * @return la categorie sous forme de chaine
+     * @return la catégorie sous forme de chaine
      * @throws IllegalArgumentException si l'age est negatif
      *
      * Note : les conditions sont evaluees de haut en bas (if/else if).
-     * La premiere condition satisfaite determine la categorie.
+     * La première condition satisfaite determine la catégorie.
      */
     public String categorieAge(int age) {
         // Un age negatif n'a pas de sens physique
         if (age < 0) throw new IllegalArgumentException("L'age ne peut pas etre negatif");
 
-        // Evaluation en cascade : la premiere condition vraie est retenue
+        // Evaluation en cascade : la première condition vraie est retenue
         if (age < 18) return "MINEUR";       // 0-17 ans
         if (age < 25) return "JEUNE_ADULTE"; // 18-24 ans
         if (age < 60) return "ADULTE";       // 25-59 ans

@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class GestionnaireMotDePasseTest {
 
     /**
-     * Instance du gestionnaire de mots de passe utilisee dans tous les tests.
+     * Instance du gestionnaire de mots de passe utilisé́e dans tous les tests.
      */
     private final GestionnaireMotDePasse gestionnaire = new GestionnaireMotDePasse();
 
@@ -35,36 +35,36 @@ class GestionnaireMotDePasseTest {
 
         /**
          * Verifie que le hachage vulnerable est deterministe : deux appels
-         * avec le meme mot de passe produisent le meme hash. Cette propriete
+         * avec le même mot de passe produisent le même hash. Cette propriete
          * le rend vulnerable aux attaques par rainbow tables.
          */
         @Test
-        @DisplayName("Hachage vulnerable : deterministe, meme entree → meme sortie")
+        @DisplayName("Hachage vulnerable : deterministe, même entree → même sortie")
         void hachageVulnerableDeterministe() {
             String h1 = gestionnaire.hacherVulnerable("password123");
             String h2 = gestionnaire.hacherVulnerable("password123");
             assertEquals(h1, h2,
-                "Le hachage sans sel produit toujours le meme resultat → vulnerable aux rainbow tables");
+                "Le hachage sans sel produit toujours le même résultat → vulnerable aux rainbow tables");
         }
 
         /**
          * Verifie que le hachage securise est aleatoire : deux appels avec
-         * le meme mot de passe produisent des hashs differents grace au sel.
+         * le même mot de passe produisent des hashs différents grace au sel.
          */
         @Test
-        @DisplayName("Hachage securise : aleatoire, meme entree → sorties differentes")
+        @DisplayName("Hachage securise : aleatoire, même entree → sorties differentes")
         void hachageSecuriseAleatoire() {
             String h1 = gestionnaire.hacherAvecSel("password123");
             String h2 = gestionnaire.hacherAvecSel("password123");
             assertNotEquals(h1, h2,
-                "Avec un sel aleatoire, le meme mot de passe produit des hashs differents");
+                "Avec un sel aleatoire, le même mot de passe produit des hashs différents");
         }
 
         /**
-         * Verifie qu'un mot de passe correct est valide par rapport a son hash.
+         * Verifie qu'un mot de passe correct est validé par rapport a son hash.
          */
         @Test
-        @DisplayName("Verification : mot de passe correct valide")
+        @DisplayName("Verification : mot de passe correct validé")
         void verificationMotDePasseCorrect() {
             String hash = gestionnaire.hacherAvecSel("monSuperMotDePasse");
             assertTrue(gestionnaire.verifierMotDePasse("monSuperMotDePasse", hash));

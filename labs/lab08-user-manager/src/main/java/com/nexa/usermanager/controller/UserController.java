@@ -22,13 +22,13 @@ import java.util.Map;
 /**
  * Controleur REST principal exposant les endpoints de l'API de gestion d'utilisateurs.
  *
- * <p>Ce controleur gere l'authentification JWT et les operations CRUD sur les
- * utilisateurs. L'acces aux endpoints est protege par Spring Security avec
- * des annotations {@link PreAuthorize} qui restreignent l'acces selon les roles.</p>
+ * <p>Ce controleur gère l'authentification JWT et les operations CRUD sur les
+ * utilisateurs. L'accès aux endpoints est protege par Spring Security avec
+ * des annotations {@link PreAuthorize} qui restreignent l'accès selon les roles.</p>
  *
  * <p>Tous les endpoints sont prefixes par {@code /api}.</p>
  *
- * <p>Roles d'acces :</p>
+ * <p>Roles d'accès :</p>
  * <ul>
  *   <li><b>Public</b> : {@code POST /api/auth/login}, {@code GET /actuator/health}</li>
  *   <li><b>ADMIN et USER</b> : tous les {@code GET} en lecture</li>
@@ -49,7 +49,7 @@ public class UserController {
     private final AuthenticationManager authManager;
 
     /**
-     * Constructeur avec injection de dependances.
+     * Constructeur avec injection de dépendances.
      *
      * @param service     le service utilisateur
      * @param jwtUtil     l'utilitaire JWT
@@ -62,13 +62,13 @@ public class UserController {
     }
 
     /**
-     * Endpoint d'authentification : verifie les identifiants et retourne un token JWT.
+     * Endpoint d'authentification : vérifié les identifiants et retourne un token JWT.
      *
-     * <p>Le corps de la requete doit contenir un objet JSON avec les champs
+     * <p>Le corps de la requête doit contenir un objet JSON avec les champs
      * {@code email} et {@code password}.</p>
      *
-     * @param body le corps de la requete contenant email et password
-     * @return un token JWT en cas de succes, ou une erreur 401 en cas d'echec
+     * @param body le corps de la requête contenant email et password
+     * @return un token JWT en cas de succès, ou une erreur 401 en cas d'échec
      */
     @PostMapping("/auth/login")
     public ResponseEntity<?> login(@RequestBody Map<String, String> body) {
@@ -85,7 +85,7 @@ public class UserController {
     }
 
     /**
-     * Liste tous les utilisateurs du systeme.
+     * Liste tous les utilisateurs du système.
      *
      * <p>Accessible aux roles ADMIN et USER.</p>
      *
@@ -100,12 +100,12 @@ public class UserController {
     /**
      * Liste les utilisateurs avec pagination.
      *
-     * <p>Les parametres de pagination (page, size, sort) sont passes
-     * en parametres de requete ({@code ?page=0&size=10&sort=nom,asc}).</p>
+     * <p>Les paramètrès de pagination (page, size, sort) sont passes
+     * en paramètrès de requête ({@code ?page=0&size=10&sort=nom,asc}).</p>
      *
      * <p>Accessible aux roles ADMIN et USER.</p>
      *
-     * @param pageable les parametres de pagination
+     * @param pageable les paramètrès de pagination
      * @return une page de DTOs {@link UserResponse}
      */
     @GetMapping("/users/page")
@@ -132,13 +132,13 @@ public class UserController {
     /**
      * Cree un nouvel utilisateur.
      *
-     * <p>Reserve au role ADMIN. Retourne un statut HTTP 201 Created en cas de succes.</p>
+     * <p>Reserve au role ADMIN. Retourne un statut HTTP 201 Created en cas de succès.</p>
      *
-     * <p>Le role fourni dans la requete est converti en majuscules pour
+     * <p>Le role fourni dans la requête est converti en majuscules pour
      * correspondre aux valeurs de l'enum {@link User.Role}.</p>
      *
-     * @param req le DTO contenant les donnees du nouvel utilisateur (valide)
-     * @return le DTO {@link UserResponse} de l'utilisateur cree
+     * @param req le DTO contenant les donnees du nouvel utilisateur (validé)
+     * @return le DTO {@link UserResponse} de l'utilisateur créé
      */
     @PostMapping("/users")
     @PreAuthorize("hasRole('ADMIN')")
@@ -160,7 +160,7 @@ public class UserController {
      * mot de passe si fourni.</p>
      *
      * @param id  l'identifiant de l'utilisateur a modifier
-     * @param req le DTO contenant les nouvelles donnees (valide)
+     * @param req le DTO contenant les nouvelles donnees (validé)
      * @return le DTO {@link UserResponse} de l'utilisateur mis a jour
      */
     @PutMapping("/users/{id}")
@@ -178,7 +178,7 @@ public class UserController {
     /**
      * Supprime un utilisateur.
      *
-     * <p>Reserve au role ADMIN. Retourne un statut HTTP 204 No Content en cas de succes.</p>
+     * <p>Reserve au role ADMIN. Retourne un statut HTTP 204 No Content en cas de succès.</p>
      *
      * @param id l'identifiant de l'utilisateur a supprimer
      */
@@ -193,7 +193,7 @@ public class UserController {
      * Recherche des utilisateurs par nom partiel.
      *
      * <p>La recherche est insensible a la casse et retourne tous les utilisateurs
-     * dont le nom contient la chaine fournie en parametre.</p>
+     * dont le nom contient la chaine fournie en paramètre.</p>
      *
      * <p>Accessible aux roles ADMIN et USER.</p>
      *

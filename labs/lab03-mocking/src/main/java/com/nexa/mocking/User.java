@@ -7,8 +7,8 @@ package com.nexa.mocking;
  * - Des champs prives
  * - Des getters/setters publics
  * - Un constructeur par defaut (necessaire pour certaines librairies)
- * - Un constructeur parametre
- * - Une methode toString() pour le debugging
+ * - Un constructeur paramètre
+ * - Une méthode toString() pour le debugging
  *
  * Les setters permettent a Mockito et aux tests de manipuler l'objet.
  */
@@ -23,7 +23,7 @@ public class User {
     /** Adresse email (unique en base) */
     private String email;
 
-    /** Indique si le compte est actif ou desactive */
+    /** Indique si le compte est actif ou désactivé */
     private boolean actif;
 
     /**
@@ -39,7 +39,7 @@ public class User {
      * @param id l'identifiant (peut etre null pour une creation)
      * @param nom le nom de l'utilisateur
      * @param email l'adresse email
-     * @param actif l'etat du compte (true = actif)
+     * @param actif l'état du compte (true = actif)
      */
     public User(Long id, String nom, String email, boolean actif) {
         this.id = id;

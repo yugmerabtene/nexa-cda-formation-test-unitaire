@@ -5,7 +5,7 @@ import jakarta.validation.constraints.*;
 import java.time.LocalDateTime;
 
 /**
- * Entite JPA representant un utilisateur du systeme.
+ * Entite JPA representant un utilisateur du système.
  *
  * <p>Cette classe est mappee sur la table {@code users} en base de donnees.
  * Chaque utilisateur possede un identifiant unique auto-genere, un nom,
@@ -36,7 +36,7 @@ public class User {
     @Column(nullable = false, length = 50)
     private String prenom;
 
-    /** Adresse email unique de l'utilisateur (format email valide, obligatoire). */
+    /** Adresse email unique de l'utilisateur (format email validé, obligatoire). */
     @NotBlank
     @Email
     @Column(unique = true, nullable = false)
@@ -48,7 +48,7 @@ public class User {
     @Column(nullable = false)
     private String password;
 
-    /** Role de l'utilisateur dans le systeme (USER par defaut). */
+    /** Role de l'utilisateur dans le système (USER par defaut). */
     @NotNull
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
@@ -62,15 +62,15 @@ public class User {
     @Column(nullable = false)
     private LocalDateTime dateCreation = LocalDateTime.now();
 
-    /** Date et heure de la derniere modification du compte. */
+    /** Date et heure de la dernière modification du compte. */
     private LocalDateTime dateModification;
 
     /**
-     * Enumeration des roles disponibles dans le systeme.
+     * Enumeration des roles disponibles dans le système.
      *
      * <ul>
-     *   <li>{@code USER} : utilisateur standard avec acces en lecture seule.</li>
-     *   <li>{@code ADMIN} : administrateur avec acces complet (CRUD).</li>
+     *   <li>{@code USER} : utilisateur standard avec accès en lecture seule.</li>
+     *   <li>{@code ADMIN} : administrateur avec accès complèt (CRUD).</li>
      * </ul>
      */
     public enum Role { USER, ADMIN }
@@ -82,7 +82,7 @@ public class User {
     public User() {}
 
     /**
-     * Constructeur parametre pour creer un utilisateur avec ses informations principales.
+     * Constructeur paramètre pour creer un utilisateur avec ses informations principales.
      *
      * @param nom      le nom de famille de l'utilisateur
      * @param prenom   le prenom de l'utilisateur
@@ -130,7 +130,7 @@ public class User {
     public LocalDateTime getDateCreation() { return dateCreation; }
     /** @param dateCreation la date de creation a definir */
     public void setDateCreation(LocalDateTime dateCreation) { this.dateCreation = dateCreation; }
-    /** @return la date de derniere modification */
+    /** @return la date de dernière modification */
     public LocalDateTime getDateModification() { return dateModification; }
     /** @param dateModification la date de modification a definir */
     public void setDateModification(LocalDateTime dateModification) { this.dateModification = dateModification; }

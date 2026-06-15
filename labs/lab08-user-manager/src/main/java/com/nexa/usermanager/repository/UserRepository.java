@@ -10,13 +10,13 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Interface repository pour l'entite {@link User}.
+ * Interface repository pour l'entité {@link User}.
  *
- * <p>Ce repository etend {@link JpaRepository} et fournit des methodes
- * de requete derivees pour les operations courantes de recherche
+ * <p>Ce repository etend {@link JpaRepository} et fournit des méthodes
+ * de requête derivees pour les operations courantes de recherche
  * et de filtrage des utilisateurs.</p>
  *
- * <p>Les methodes sont automatiquement implementees par Spring Data JPA
+ * <p>Les méthodes sont automatiquement implementees par Spring Data JPA
  * en fonction de leur signature (convention de nommage).</p>
  */
 @Repository

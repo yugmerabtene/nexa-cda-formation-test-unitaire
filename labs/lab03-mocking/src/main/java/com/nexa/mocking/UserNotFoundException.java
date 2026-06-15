@@ -4,7 +4,7 @@ package com.nexa.mocking;
  * Exception levee lorsqu'un utilisateur est introuvable.
  *
  * Herite de RuntimeException pour eviter de devoir declarer
- * throws dans toutes les signatures de methodes (non-verifiee).
+ * throws dans toutes les signatures de méthodes (non-verifiee).
  *
  * Utilisee dans UserService.trouverParId() quand findById retourne null.
  *

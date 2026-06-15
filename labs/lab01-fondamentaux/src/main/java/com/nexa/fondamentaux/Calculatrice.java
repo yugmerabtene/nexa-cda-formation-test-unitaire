@@ -4,7 +4,7 @@ package com.nexa.fondamentaux;
  * Classe Calculatrice : implementation d'une calculatrice simple.
  *
  * Cette classe sert de support pour les premiers tests unitaires.
- * Chaque methode est concue pour etre testable de maniere isolee.
+ * Chaque méthode est concue pour etre testable de maniere isolee.
  *
  * Les tests correspondants sont dans CalculatriceTest.java.
  *
@@ -97,7 +97,7 @@ public class Calculatrice {
      *
      * Un nombre est pair si le reste de sa division par 2 vaut 0.
      * Zero est considere comme pair (0 % 2 == 0).
-     * Les nombres negatifs suivent la meme regle (-4 % 2 == 0).
+     * Les nombres negatifs suivent la même regle (-4 % 2 == 0).
      *
      * @param nombre le nombre a tester (int)
      * @return true si le nombre est pair, false s'il est impair
@@ -117,7 +117,7 @@ public class Calculatrice {
      * Retourne la valeur absolue du nombre fourni.
      *
      * La valeur absolue est la distance d'un nombre a zero, toujours positive.
-     * Math.abs() gere les cas positifs, negatifs, et zero.
+     * Math.abs() gère les cas positifs, negatifs, et zero.
      *
      * @param nombre le nombre dont on veut la valeur absolue (int)
      * @return la valeur absolue du nombre (toujours >= 0)
@@ -128,7 +128,7 @@ public class Calculatrice {
      * - valeurAbsolue(0) -> 0
      */
     public int valeurAbsolue(int nombre) {
-        // Delegation a la methode standard de Java
+        // Delegation a la méthode standard de Java
         return Math.abs(nombre);
     }
 }

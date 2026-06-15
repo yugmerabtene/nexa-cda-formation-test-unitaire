@@ -21,11 +21,11 @@ import static org.mockito.Mockito.*;
 /**
  * Tests unitaires pour le service metier {@link UserService}.
  *
- * <p>Cette classe utilise Mockito pour mocker le repository et l'encodeur
- * de mot de passe, et teste toutes les methodes du service :</p>
+ * <p>Cette classe utilisé Mockito pour mocker le repository et l'encodeur
+ * de mot de passe, et teste toutes les méthodes du service :</p>
  * <ul>
- *   <li><b>Creation</b> : succes, echec si email existant, hachage du mot de passe.</li>
- *   <li><b>Lecture</b> : par ID, par email, liste complete, pagination, recherche, filtrage.</li>
+ *   <li><b>Creation</b> : succès, échec si email existant, hachage du mot de passe.</li>
+ *   <li><b>Lecture</b> : par ID, par email, liste complète, pagination, recherche, filtrage.</li>
  *   <li><b>Mise a jour</b> : modification des champs, gestion du mot de passe vide.</li>
  *   <li><b>Suppression</b> : suppression reussie, exception si ID inexistant, desactivation.</li>
  * </ul>
@@ -63,8 +63,8 @@ class UserServiceTest {
     class Creation {
 
         /**
-         * Verifie qu'un utilisateur est cree avec le mot de passe hache
-         * et que le repository.save est bien appele.
+         * Verifie qu'un utilisateur est créé avec le mot de passe hache
+         * et que le repository.save est bien appelé.
          */
         @Test
         @DisplayName("creer : encode le mot de passe et sauvegarde")
@@ -77,19 +77,19 @@ class UserServiceTest {
                 return u;
             });
 
-            User resultat = service.creer(user);
-            assertNotNull(resultat);
-            assertEquals("hashed", resultat.getPassword());
-            assertEquals(1L, resultat.getId());
+            User résultat = service.creer(user);
+            assertNotNull(résultat);
+            assertEquals("hashed", résultat.getPassword());
+            assertEquals(1L, résultat.getId());
             verify(repo).save(any(User.class));
         }
 
         /**
-         * Verifie que la creation echoue avec une RuntimeException
-         * si l'email est deja utilise, et que save n'est jamais appele.
+         * Verifie que la creation échoué avec une RuntimeException
+         * si l'email est déjà utilisé, et que save n'est jamais appelé.
          */
         @Test
-        @DisplayName("creer : echoue si l'email existe deja")
+        @DisplayName("creer : échoué si l'email existe déjà")
         void creerEmailExistant() {
             when(repo.existsByEmail("jean@test.com")).thenReturn(true);
             assertThrows(RuntimeException.class, () -> service.creer(user));
@@ -105,7 +105,7 @@ class UserServiceTest {
     class Lecture {
 
         /**
-         * Verifie la recherche par ID avec succes.
+         * Verifie la recherche par ID avec succès.
          */
         @Test
         @DisplayName("trouverParId : retourne l'utilisateur")
@@ -115,10 +115,10 @@ class UserServiceTest {
         }
 
         /**
-         * Verifie que la recherche par ID inexistant leve ResourceNotFoundException.
+         * Verifie que la recherche par ID inexistant lève ResourceNotFoundException.
          */
         @Test
-        @DisplayName("trouverParId : leve ResourceNotFoundException")
+        @DisplayName("trouverParId : lève ResourceNotFoundException")
         void trouverParIdInexistant() {
             when(repo.findById(99L)).thenReturn(Optional.empty());
             assertThrows(ResourceNotFoundException.class, () -> service.trouverParId(99L));
@@ -148,7 +148,7 @@ class UserServiceTest {
         }
 
         /**
-         * Verifie la recherche par email avec succes.
+         * Verifie la recherche par email avec succès.
          */
         @Test
         @DisplayName("trouverParEmail : retourne l'utilisateur")
@@ -205,11 +205,11 @@ class UserServiceTest {
             when(repo.save(any(User.class))).thenReturn(user);
 
             User update = new User("Nouveau", "Nom", "new@test.com", "newpass", User.Role.ADMIN);
-            User resultat = service.mettreAJour(1L, update);
+            User résultat = service.mettreAJour(1L, update);
 
-            assertEquals("Nouveau", resultat.getNom());
-            assertEquals("Nom", resultat.getPrenom());
-            assertEquals(User.Role.ADMIN, resultat.getRole());
+            assertEquals("Nouveau", résultat.getNom());
+            assertEquals("Nom", résultat.getPrenom());
+            assertEquals(User.Role.ADMIN, résultat.getRole());
             verify(repo).save(any(User.class));
         }
 
@@ -250,10 +250,10 @@ class UserServiceTest {
         }
 
         /**
-         * Verifie que la suppression leve ResourceNotFoundException si l'ID est inexistant.
+         * Verifie que la suppression lève ResourceNotFoundException si l'ID est inexistant.
          */
         @Test
-        @DisplayName("supprimer : leve exception si inexistant")
+        @DisplayName("supprimer : lève exception si inexistant")
         void supprimerInexistant() {
             when(repo.existsById(99L)).thenReturn(false);
             assertThrows(ResourceNotFoundException.class, () -> service.supprimer(99L));
@@ -264,10 +264,10 @@ class UserServiceTest {
          * et sauvegarde l'utilisateur.
          */
         @Test
-        @DisplayName("desactiver : desactive l'utilisateur")
-        void desactiver() {
+        @DisplayName("désactiver : désactivé l'utilisateur")
+        void désactiver() {
             when(repo.findById(1L)).thenReturn(Optional.of(user));
-            service.desactiver(1L);
+            service.désactiver(1L);
             assertFalse(user.isActif());
             verify(repo).save(user);
         }

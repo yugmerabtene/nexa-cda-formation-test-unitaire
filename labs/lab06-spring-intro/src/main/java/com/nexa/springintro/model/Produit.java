@@ -54,7 +54,7 @@ public class Produit {
     public Produit() {}
 
     /**
-     * Constructeur parametre pratique pour les tests et les insertions.
+     * Constructeur paramètre pratique pour les tests et les insertions.
      *
      * @param nom         nom du produit
      * @param description description du produit

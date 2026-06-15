@@ -27,12 +27,12 @@ public class AppConfig {
     /**
      * Definit le service de chargement des utilisateurs pour Spring Security.
      *
-     * <p>Ce bean est utilise par le {@code AuthenticationManager} pour charger
+     * <p>Ce bean est utilisé par le {@code AuthenticationManager} pour charger
      * les details d'un utilisateur lors de l'authentification. Il recherche
      * l'utilisateur par email et construit un objet {@code UserDetails} avec
      * son email, son mot de passe hache et son role.</p>
      *
-     * @param repo le repository d'acces aux utilisateurs
+     * @param repo le repository d'accès aux utilisateurs
      * @return un {@link UserDetailsService} qui charge les utilisateurs par email
      */
     @Bean
@@ -51,8 +51,8 @@ public class AppConfig {
     /**
      * Initialise la base de donnees avec des utilisateurs par defaut au demarrage.
      *
-     * <p>Ce runner s'execute au lancement de l'application. Il verifie si les
-     * utilisateurs par defaut existent deja (par email) et les cree uniquement
+     * <p>Ce runner s'exécuté au lancement de l'application. Il vérifié si les
+     * utilisateurs par defaut existent déjà (par email) et les créé uniquement
      * s'ils sont absents. Cela evite les doublons lors des redemarrages.</p>
      *
      * <p>Utilisateurs crees :</p>
@@ -61,7 +61,7 @@ public class AppConfig {
      *   <li><b>user@nexa.fr</b>  / user123  - Role USER</li>
      * </ul>
      *
-     * @param repo    le repository d'acces aux utilisateurs
+     * @param repo    le repository d'accès aux utilisateurs
      * @param encoder l'encodeur de mot de passe pour hacher les mots de passe
      * @return un {@link CommandLineRunner} qui initialise les donnees
      */

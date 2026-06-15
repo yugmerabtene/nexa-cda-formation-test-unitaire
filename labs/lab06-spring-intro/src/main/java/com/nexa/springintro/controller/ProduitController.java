@@ -45,7 +45,7 @@ public class ProduitController {
      * Recupere un produit par son identifiant.
      *
      * @param id identifiant du produit
-     * @return une reponse 200 avec le produit, ou 404 si introuvable
+     * @return une réponse 200 avec le produit, ou 404 si introuvable
      */
     @GetMapping("/{id}")
     public ResponseEntity<Produit> trouverParId(@PathVariable Long id) {
@@ -55,10 +55,10 @@ public class ProduitController {
     }
 
     /**
-     * Cree un nouveau produit. Le corps de la requete est valide avec {@code @Valid}.
+     * Cree un nouveau produit. Le corps de la requête est validé avec {@code @Valid}.
      *
-     * @param produit le produit a creer (valide)
-     * @return le produit cree avec le statut 201
+     * @param produit le produit a creer (validé)
+     * @return le produit créé avec le statut 201
      */
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
@@ -92,7 +92,7 @@ public class ProduitController {
     /**
      * Recherche des produits par correspondance partielle sur le nom.
      *
-     * @param nom fragment du nom a rechercher (parametre de requete)
+     * @param nom fragment du nom a rechercher (paramètre de requête)
      * @return la liste des produits correspondants
      */
     @GetMapping("/recherche")

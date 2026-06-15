@@ -20,19 +20,19 @@ import java.util.Date;
  * La cle secrete est derivee d'une chaine de caracteres d'au moins 256 bits
  * pour respecter les exigences de l'algorithme HS256.
  * <p>
- * Les tokens generes ont une duree de validite de 1 heure (3600000 ms).
+ * Les tokens generes ont une durée de validite de 1 heure (3600000 ms).
  */
 @Component
 public class JwtUtil {
 
-    /** Cle secrete utilisee pour signer et verifier les tokens JWT.
+    /** Cle secrete utilisé́e pour signer et verifier les tokens JWT.
      * Doit contenir au moins 256 bits (32 caracteres) pour HS256. */
-    private static final String SECRET = "cette-cle-est-un-secret-tres-long-dau-moins-256-bits-pour-hs256";
+    private static final String SECRET = "cette-cle-est-un-secret-très-long-dau-moins-256-bits-pour-hs256";
 
     /** Duree de validite des tokens en millisecondes (1 heure = 3 600 000 ms). */
     private static final long EXPIRATION_MS = 3600000;
 
-    /** Cle de signature HMAC generee a partir de la chaine secrete. */
+    /** Cle de signature HMAC générée a partir de la chaine secrete. */
     private final SecretKey key;
 
     /**
@@ -89,13 +89,13 @@ public class JwtUtil {
     }
 
     /**
-     * Verifie si un token JWT est valide (signature correcte et non expire).
+     * Verifie si un token JWT est validé (signature correcte et non expire).
      * <p>
      * Toute exception lors de l'analyse (signature invalide, token expire,
      * format incorrect) entraine le retour de {@code false}.
      *
      * @param token le token JWT a valider
-     * @return {@code true} si le token est valide, {@code false} sinon
+     * @return {@code true} si le token est validé, {@code false} sinon
      */
     public boolean estTokenValide(String token) {
         try {
@@ -107,9 +107,9 @@ public class JwtUtil {
     }
 
     /**
-     * Analyse et verifie un token JWT, puis retourne ses claims (payload).
+     * Analyse et vérifié un token JWT, puis retourne ses claims (payload).
      * <p>
-     * Methode privee utilisee en interne par {@link #extraireUsername},
+     * Methode privee utilisé́e en interne par {@link #extraireUsername},
      * {@link #extraireRole} et {@link #estTokenValide}.
      *
      * @param token le token JWT a analyser

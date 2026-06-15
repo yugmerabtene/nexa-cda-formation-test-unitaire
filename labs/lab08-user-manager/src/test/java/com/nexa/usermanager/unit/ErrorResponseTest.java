@@ -11,8 +11,8 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * Tests unitaires pour le DTO {@link ErrorResponse}.
  *
- * <p>Verifie la construction et les accesseurs de la classe de reponse
- * d'erreur RFC 7807, utilisee pour structurer les messages d'erreur
+ * <p>Verifie la construction et les accesseurs de la classe de réponse
+ * d'erreur RFC 7807, utilisé́e pour structurer les messages d'erreur
  * de l'API REST.</p>
  */
 @DisplayName("Tests unitaires : ErrorResponse (RFC 7807)")

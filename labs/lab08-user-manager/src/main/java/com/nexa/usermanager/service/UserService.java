@@ -20,7 +20,7 @@ import java.util.Optional;
  * creation, lecture, mise a jour, suppression, desactivation, recherche
  * et comptage.</p>
  *
- * <p>Les methodes sont transactionnelles (heritees de l'annotation au niveau
+ * <p>Les méthodes sont transactionnelles (heritees de l'annotation au niveau
  * de la classe) pour garantir la coherence des donnees en base.</p>
  *
  * <p>Les mots de passe sont systematiquement hashes avec BCrypt avant
@@ -30,14 +30,14 @@ import java.util.Optional;
 @Transactional
 public class UserService {
 
-    /** Repository d'acces aux donnees utilisateur. */
+    /** Repository d'accès aux donnees utilisateur. */
     private final UserRepository repo;
 
     /** Encodeur de mot de passe (BCrypt). */
     private final PasswordEncoder encoder;
 
     /**
-     * Constructeur avec injection de dependances.
+     * Constructeur avec injection de dépendances.
      *
      * @param repo    le repository utilisateur
      * @param encoder l'encodeur de mot de passe BCrypt
@@ -48,26 +48,26 @@ public class UserService {
     }
 
     /**
-     * Cree un nouvel utilisateur apres verification d'unicite de l'email
+     * Cree un nouvel utilisateur après verification d'unicite de l'email
      * et hachage du mot de passe.
      *
      * <p>Le mot de passe fourni en clair est hache avec BCrypt avant
      * d'etre stocke en base de donnees.</p>
      *
      * @param user l'utilisateur a creer (avec mot de passe en clair)
-     * @return l'utilisateur cree avec son identifiant genere
-     * @throws RuntimeException si l'email est deja utilise par un autre utilisateur
+     * @return l'utilisateur créé avec son identifiant genere
+     * @throws RuntimeException si l'email est déjà utilisé par un autre utilisateur
      */
     public User creer(User user) {
         if (repo.existsByEmail(user.getEmail())) {
-            throw new RuntimeException("Email deja utilise");
+            throw new RuntimeException("Email déjà utilisé");
         }
         user.setPassword(encoder.encode(user.getPassword()));
         return repo.save(user);
     }
 
     /**
-     * Retourne la liste complete de tous les utilisateurs.
+     * Retourne la liste complète de tous les utilisateurs.
      *
      * @return la liste de tous les utilisateurs en base
      */
@@ -78,7 +78,7 @@ public class UserService {
     /**
      * Retourne une page d'utilisateurs avec pagination.
      *
-     * @param pageable les parametres de pagination (numero de page, taille, tri)
+     * @param pageable les paramètrès de pagination (numero de page, taille, tri)
      * @return une page contenant les utilisateurs correspondants
      */
     public Page<User> listerPagine(Pageable pageable) {
@@ -155,10 +155,10 @@ public class UserService {
      * <p>Le compte est conserve en base mais marque comme inactif,
      * empechant son utilisation jusqu'a reactivation eventuelle.</p>
      *
-     * @param id l'identifiant de l'utilisateur a desactiver
+     * @param id l'identifiant de l'utilisateur a désactiver
      * @throws ResourceNotFoundException si l'utilisateur n'existe pas
      */
-    public void desactiver(Long id) {
+    public void désactiver(Long id) {
         User u = trouverParId(id);
         u.setActif(false);
         repo.save(u);
@@ -184,7 +184,7 @@ public class UserService {
     }
 
     /**
-     * Compte le nombre d'utilisateurs ayant un role specifique.
+     * Compte le nombre d'utilisateurs ayant un role spécifique.
      *
      * @param role le role pour lequel compter les utilisateurs (USER ou ADMIN)
      * @return le nombre d'utilisateurs avec ce role

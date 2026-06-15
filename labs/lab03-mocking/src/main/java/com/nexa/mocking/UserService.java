@@ -4,12 +4,12 @@ package com.nexa.mocking;
  * Service metier de gestion des utilisateurs.
  *
  * Ce service depend de deux interfaces :
- * - UserRepository : pour l'acces aux donnees (lecture/ecriture en base)
+ * - UserRepository : pour l'accès aux donnees (lecture/ecriture en base)
  * - EmailService : pour l'envoi d'emails de notification
  *
- * Ces dependances sont injectees via le constructeur (Injection de Dependances).
+ * Ces dépendances sont injectees via le constructeur (Injection de Dependances).
  * Dans les tests, elles seront remplacees par des mocks Mockito pour isoler
- * la logique metier et eviter les acces reels a une base de donnees ou un serveur SMTP.
+ * la logique metier et eviter les accès reels a une base de donnees ou un serveur SMTP.
  *
  * Pattern : cette classe est le SUT (System Under Test) dans UserServiceTest.
  *
@@ -25,7 +25,7 @@ public class UserService {
     private final EmailService emailService;
 
     /**
-     * Constructeur avec injection de dependances.
+     * Constructeur avec injection de dépendances.
      *
      * @param userRepository le repository d'utilisateurs (non null)
      * @param emailService le service d'envoi d'emails (non null)
@@ -57,21 +57,21 @@ public class UserService {
      * Cree un nouvel utilisateur et envoie un email de bienvenue.
      *
      * Algorithme :
-     * 1. Verifier que l'email n'est pas deja utilise (unicite)
+     * 1. Verifier que l'email n'est pas déjà utilisé (unicite)
      * 2. Creer un nouvel objet User (actif par defaut)
      * 3. Sauvegarder en base (via le repository)
      * 4. Envoyer un email de bienvenue
      *
      * @param nom le nom de l'utilisateur
      * @param email l'adresse email (doit etre unique)
-     * @return l'utilisateur cree et sauvegarde (avec son ID)
-     * @throws IllegalArgumentException si l'email est deja utilise
+     * @return l'utilisateur créé et sauvegarde (avec son ID)
+     * @throws IllegalArgumentException si l'email est déjà utilisé
      */
     public User creerUtilisateur(String nom, String email) {
         // Verification d'unicite de l'email
-        // Si l'email existe deja, on refuse la creation
+        // Si l'email existe déjà, on refuse la creation
         if (userRepository.existsByEmail(email)) {
-            throw new IllegalArgumentException("Cet email est deja utilise : " + email);
+            throw new IllegalArgumentException("Cet email est déjà utilisé : " + email);
         }
 
         // Creation de l'utilisateur avec l'ID null (sera attribue par la base)
@@ -83,7 +83,7 @@ public class UserService {
         // Envoi d'un email de bienvenue (mocke en test)
         emailService.envoyerEmail(email,
             "Bienvenue " + nom + " !",
-            "Votre compte a ete cree avec succes.");
+            "Votre compte a ete créé avec succès.");
 
         return saved;
     }
@@ -92,19 +92,19 @@ public class UserService {
      * Desactive le compte d'un utilisateur.
      *
      * Algorithme :
-     * 1. Rechercher l'utilisateur par ID (leve exception si introuvable)
+     * 1. Rechercher l'utilisateur par ID (lève exception si introuvable)
      * 2. Passer le flag actif a false
      * 3. Sauvegarder la modification
      * 4. Envoyer un email de notification
      *
-     * @param id l'identifiant de l'utilisateur a desactiver
+     * @param id l'identifiant de l'utilisateur a désactiver
      * @throws UserNotFoundException si l'utilisateur n'existe pas
      */
     public void desactiverUtilisateur(Long id) {
         // Reutilise trouverParId() pour la recherche et la gestion d'erreur
         User user = trouverParId(id);
 
-        // Modification de l'etat
+        // Modification de l'état
         user.setActif(false);
 
         // Sauvegarde de la modification en base
@@ -112,7 +112,7 @@ public class UserService {
 
         // Notification par email
         emailService.envoyerEmail(user.getEmail(),
-            "Compte desactive",
-            "Votre compte a ete desactive.");
+            "Compte désactivé",
+            "Votre compte a ete désactivé.");
     }
 }

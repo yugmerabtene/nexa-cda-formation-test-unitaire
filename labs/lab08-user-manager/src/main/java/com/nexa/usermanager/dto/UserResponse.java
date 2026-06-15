@@ -4,14 +4,14 @@ import com.nexa.usermanager.entity.User;
 import java.time.LocalDateTime;
 
 /**
- * DTO (Data Transfer Object) representant la reponse envoyee au client
+ * DTO (Data Transfer Object) representant la réponse envoyee au client
  * lors de la consultation d'un utilisateur.
  *
  * <p>Ce DTO est conçu pour ne jamais exposer le mot de passe de l'utilisateur,
- * garantissant ainsi la securite des donnees sensibles.</p>
+ * garantissant ainsi la sécurité des donnees sensibles.</p>
  *
- * <p>La methode statique {@link #from(User)} permet de convertir facilement
- * une entite JPA {@link User} en DTO de reponse.</p>
+ * <p>La méthode statique {@link #from(User)} permet de convertir facilement
+ * une entité JPA {@link User} en DTO de réponse.</p>
  */
 public class UserResponse {
 
@@ -29,16 +29,16 @@ public class UserResponse {
     private boolean actif;
     /** Date de creation du compte. */
     private LocalDateTime dateCreation;
-    /** Date de derniere modification du compte. */
+    /** Date de dernière modification du compte. */
     private LocalDateTime dateModification;
 
     /**
-     * Cree un {@code UserResponse} a partir d'une entite {@link User}.
+     * Cree un {@code UserResponse} a partir d'une entité {@link User}.
      *
-     * <p>Le mot de passe n'est <b>jamais</b> copie dans le DTO de reponse.</p>
+     * <p>Le mot de passe n'est <b>jamais</b> copie dans le DTO de réponse.</p>
      *
-     * @param user l'entite JPA source
-     * @return le DTO de reponse correspondant
+     * @param user l'entité JPA source
+     * @return le DTO de réponse correspondant
      */
     public static UserResponse from(User user) {
         UserResponse r = new UserResponse();
@@ -81,7 +81,7 @@ public class UserResponse {
     public LocalDateTime getDateCreation() { return dateCreation; }
     /** @param dateCreation la date de creation a definir */
     public void setDateCreation(LocalDateTime dateCreation) { this.dateCreation = dateCreation; }
-    /** @return la date de derniere modification */
+    /** @return la date de dernière modification */
     public LocalDateTime getDateModification() { return dateModification; }
     /** @param dateModification la date de modification a definir */
     public void setDateModification(LocalDateTime dateModification) { this.dateModification = dateModification; }

@@ -23,12 +23,12 @@ import static org.junit.jupiter.api.Assertions.*;
 class SanitizerXSSTest {
 
     /**
-     * Instance du sanitizer XSS utilisee dans tous les tests.
+     * Instance du sanitizer XSS utilisé́e dans tous les tests.
      */
     private final SanitizerXSS sanitizer = new SanitizerXSS();
 
     /**
-     * Tests des attaques XSS : injection, neutralisation, detection et echappement.
+     * Tests des attaques XSS : injection, neutralisation, detection et échappement.
      */
     @Nested
     @DisplayName("Attaques XSS")
@@ -36,14 +36,14 @@ class SanitizerXSSTest {
 
         /**
          * Verifie que la page vulnerable contient la balise script sans
-         * modification, prouvant la vulnerabilite XSS.
+         * modification, prouvant la vulnérabilité XSS.
          */
         @Test
         @DisplayName("Page vulnerable : le script est injecte tel quel")
         void pageVulnerableScriptNonEchappe() {
             String page = sanitizer.genererPageAccueilVulnerable("<script>alert('XSS')</script>");
             assertTrue(page.contains("<script>"),
-                "Preuve de vulnerabilite : la balise script est presente");
+                "Preuve de vulnérabilité : la balise script est presente");
         }
 
         /**
@@ -98,7 +98,7 @@ class SanitizerXSSTest {
         }
 
         /**
-         * Verifie que l'echappement d'une entree nulle retourne une chaine vide.
+         * Verifie que l'échappement d'une entree nulle retourne une chaine vide.
          */
         @Test
         @DisplayName("Entree null retourne chaine vide")
@@ -108,8 +108,8 @@ class SanitizerXSSTest {
     }
 
     /**
-     * Test parametre verifiant que les vecteurs XSS les plus connus sont
-     * neutralises par l'echappement HTML (plus de balise script active).
+     * Test paramètre verifiant que les vecteurs XSS les plus connus sont
+     * neutralises par l'échappement HTML (plus de balise script active).
      *
      * @param vecteur la charge utile XSS a neutraliser
      */

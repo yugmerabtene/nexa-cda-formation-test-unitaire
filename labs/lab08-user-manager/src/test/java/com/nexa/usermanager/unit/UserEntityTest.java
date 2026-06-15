@@ -10,11 +10,11 @@ import java.time.LocalDateTime;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Tests unitaires pour l'entite JPA {@link User}.
+ * Tests unitaires pour l'entité JPA {@link User}.
  *
- * <p>Cette classe verifie le bon fonctionnement de l'entite User :</p>
+ * <p>Cette classe vérifié le bon fonctionnement de l'entité User :</p>
  * <ul>
- *   <li>Les constructeurs (par defaut et parametre).</li>
+ *   <li>Les constructeurs (par defaut et paramètre).</li>
  *   <li>Les valeurs par defaut (role USER, compte actif, date de creation).</li>
  *   <li>Tous les setters et getters.</li>
  *   <li>L'enum {@code Role} et ses valeurs.</li>
@@ -24,17 +24,17 @@ import static org.junit.jupiter.api.Assertions.*;
 class UserEntityTest {
 
     /**
-     * Tests regroupes pour les constructeurs de l'entite User.
+     * Tests regroupes pour les constructeurs de l'entité User.
      */
     @Nested
     @DisplayName("Construction")
     class Construction {
 
         /**
-         * Verifie que le constructeur parametre initialise correctement tous les champs.
+         * Verifie que le constructeur paramètre initialise correctement tous les champs.
          */
         @Test
-        @DisplayName("Constructeur parametre initialise correctement")
+        @DisplayName("Constructeur paramètre initialise correctement")
         void constructeurParametre() {
             User user = new User("Martin", "Paul", "paul@test.com", "password", User.Role.ADMIN);
             assertEquals("Martin", user.getNom());
@@ -47,11 +47,11 @@ class UserEntityTest {
         }
 
         /**
-         * Verifie que le constructeur par defaut cree un utilisateur avec
+         * Verifie que le constructeur par defaut créé un utilisateur avec
          * le role USER et le compte actif.
          */
         @Test
-        @DisplayName("Le constructeur par defaut cree un objet avec role USER")
+        @DisplayName("Le constructeur par defaut créé un objet avec role USER")
         void constructeurDefaut() {
             User user = new User();
             assertEquals(User.Role.USER, user.getRole());

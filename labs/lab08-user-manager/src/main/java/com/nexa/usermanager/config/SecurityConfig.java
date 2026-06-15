@@ -16,20 +16,20 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 /**
- * Configuration de la securite Spring Security pour l'API REST.
+ * Configuration de la sécurité Spring Security pour l'API REST.
  *
- * <p>Cette classe definit la chaine de filtres de securite, les regles
+ * <p>Cette classe definit la chaine de filtres de sécurité, les regles
  * d'autorisation HTTP, l'encodeur de mots de passe et le gestionnaire
  * d'authentification.</p>
  *
- * <p>Politique de securite :</p>
+ * <p>Politique de sécurité :</p>
  * <ul>
- *   <li>CSRF desactive (API REST stateless).</li>
+ *   <li>CSRF désactivé (API REST stateless).</li>
  *   <li>Sessions desactivees ({@code STATELESS}).</li>
  *   <li>Endpoints d'authentification et health check publics.</li>
  *   <li>Lecture ({@code GET}) accessible aux roles ADMIN et USER.</li>
  *   <li>Ecriture ({@code POST}, {@code PUT}, {@code DELETE}) reservee au role ADMIN.</li>
- *   <li>Le filtre JWT est execute avant le filtre d'authentification standard.</li>
+ *   <li>Le filtre JWT est exécuté avant le filtre d'authentification standard.</li>
  * </ul>
  */
 @Configuration
@@ -50,19 +50,19 @@ public class SecurityConfig {
     }
 
     /**
-     * Configure la chaine de filtres de securite HTTP.
+     * Configure la chaine de filtres de sécurité HTTP.
      *
-     * <p>Cette methode definit :</p>
+     * <p>Cette méthode definit :</p>
      * <ol>
      *   <li>La desactivation de la protection CSRF.</li>
      *   <li>La gestion des sessions en mode stateless.</li>
-     *   <li>Les regles d'autorisation par URL et methode HTTP.</li>
+     *   <li>Les regles d'autorisation par URL et méthode HTTP.</li>
      *   <li>L'insertion du filtre JWT dans la chaine.</li>
      * </ol>
      *
-     * @param http le constructeur de configuration de securite HTTP
-     * @return la chaine de filtres de securite construite
-     * @throws Exception si la configuration echoue
+     * @param http le constructeur de configuration de sécurité HTTP
+     * @return la chaine de filtres de sécurité construite
+     * @throws Exception si la configuration échoué
      */
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -103,7 +103,7 @@ public class SecurityConfig {
      *
      * @param config la configuration d'authentification de Spring Security
      * @return le gestionnaire d'authentification
-     * @throws Exception si la creation du gestionnaire echoue
+     * @throws Exception si la creation du gestionnaire échoué
      */
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {

@@ -17,7 +17,7 @@ import java.util.Optional;
 public class ProduitService {
 
     /**
-     * Repository d'acces aux donnees des produits.
+     * Repository d'accès aux donnees des produits.
      */
     private final ProduitRepository repository;
 
@@ -31,7 +31,7 @@ public class ProduitService {
     }
 
     /**
-     * Retourne la liste complete de tous les produits.
+     * Retourne la liste complète de tous les produits.
      *
      * @return liste de tous les produits en base
      */
@@ -50,15 +50,15 @@ public class ProduitService {
     }
 
     /**
-     * Cree un nouveau produit apres verification de l'unicite du nom.
+     * Cree un nouveau produit après verification de l'unicite du nom.
      *
      * @param produit le produit a creer
      * @return le produit persiste avec son identifiant genere
-     * @throws IllegalArgumentException si un produit avec le meme nom existe deja
+     * @throws IllegalArgumentException si un produit avec le même nom existe déjà
      */
     public Produit creer(Produit produit) {
         if (repository.existsByNomIgnoreCase(produit.getNom())) {
-            throw new IllegalArgumentException("Un produit avec ce nom existe deja");
+            throw new IllegalArgumentException("Un produit avec ce nom existe déjà");
         }
         return repository.save(produit);
     }

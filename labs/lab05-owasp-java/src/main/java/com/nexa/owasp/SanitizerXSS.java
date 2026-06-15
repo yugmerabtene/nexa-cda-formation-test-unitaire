@@ -5,8 +5,8 @@ import java.util.regex.Pattern;
 /**
  * Classe de protection contre les attaques Cross-Site Scripting (XSS).
  *
- * <p>Fournit des methodes vulnerables et securisees pour la generation de
- * contenu HTML, ainsi que des fonctions d'echappement et de detection de
+ * <p>Fournit des méthodes vulnerables et securisees pour la generation de
+ * contenu HTML, ainsi que des fonctions d'échappement et de detection de
  * scripts malveillants.</p>
  *
  * <p>Le XSS (A03:2021 dans le Top 10 OWASP) permet a un attaquant d'injecter
@@ -18,8 +18,8 @@ public class SanitizerXSS {
      * Genere une page d'accueil vulnerable au XSS.
      *
      * <p>Le nom utilisateur est insere directement dans le HTML sans
-     * echappement. Un attaquant peut fournir {@code <script>alert(1)</script>}
-     * qui sera execute par le navigateur de la victime.</p>
+     * échappement. Un attaquant peut fournir {@code <script>alert(1)</script>}
+     * qui sera exécuté par le navigateur de la victime.</p>
      *
      * @param nom le nom utilisateur non echappe
      * @return une page HTML vulnerable contenant potentiellement du code malveillant
@@ -53,7 +53,7 @@ public class SanitizerXSS {
      *   <li>{@code '} → {@code &amp;#39;}</li>
      * </ul>
      *
-     * @param input la chaine a echapper, peut etre nulle
+     * @param input la chaine a échapper, peut etre nulle
      * @return la chaine echappee, ou une chaine vide si l'entree est nulle
      */
     public String echapperHtml(String input) {
@@ -78,7 +78,7 @@ public class SanitizerXSS {
      *   <li>{@code onclick=} — gestionnaire d'evenement de clic</li>
      * </ul>
      *
-     * <p>Cette detection est une heuristique et ne remplace pas un echappement
+     * <p>Cette detection est une heuristique et ne remplace pas un échappement
      * systematique.</p>
      *
      * @param input la chaine a analyser, peut etre nulle

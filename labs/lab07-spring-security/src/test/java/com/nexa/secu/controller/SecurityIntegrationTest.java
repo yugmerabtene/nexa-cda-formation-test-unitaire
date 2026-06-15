@@ -12,17 +12,17 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /**
- * Tests d'integration de la couche de securite Spring Security + JWT.
+ * Tests d'integration de la couche de sécurité Spring Security + JWT.
  * <p>
- * Cette classe utilise {@link MockMvc} pour simuler des requetes HTTP
- * et verifier que les regles de controle d'acces sont correctement appliquees.
- * Le contexte Spring complet est charge (y compris H2 et les utilisateurs
+ * Cette classe utilisé {@link MockMvc} pour simuler des requetes HTTP
+ * et verifier que les regles de controle d'accès sont correctement appliquees.
+ * Le contexte Spring complèt est charge (y compris H2 et les utilisateurs
  * par defaut initialises via {@code CommandLineRunner}).
  * <p>
  * Les tests couvrent trois scenarios :
  * <ul>
  *   <li>Acces public : endpoints accessibles sans authentification</li>
- *   <li>Controle d'acces par role : verification des roles ADMIN et USER</li>
+ *   <li>Controle d'accès par role : verification des roles ADMIN et USER</li>
  *   <li>Authentification : rejet des tokens invalides, absents ou mal formates</li>
  * </ul>
  */
@@ -49,7 +49,7 @@ class SecurityIntegrationTest {
 
         /**
          * Verifie que l'endpoint {@code /api/produits/public} retourne 200
-         * meme sans header Authorization.
+         * même sans header Authorization.
          */
         @Test
         @DisplayName("Sans token : l'endpoint public est accessible")
@@ -72,7 +72,7 @@ class SecurityIntegrationTest {
     }
 
     /**
-     * Tests verifiant que le controle d'acces par role fonctionne correctement :
+     * Tests verifiant que le controle d'accès par role fonctionne correctement :
      * ADMIN accede a tout, USER est limite aux endpoints autorises.
      */
     @Nested
@@ -92,7 +92,7 @@ class SecurityIntegrationTest {
         }
 
         /**
-         * Verifie qu'un token avec le role USER recoit un 403 Forbidden
+         * Verifie qu'un token avec le role USER reçoit un 403 Forbidden
          * en tentant d'acceder a l'espace admin.
          */
         @Test

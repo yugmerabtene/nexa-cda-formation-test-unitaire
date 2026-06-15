@@ -4,11 +4,11 @@ package com.nexa.mocking;
  * Interface du repository d'utilisateurs.
  *
  * Cette interface sera mockee dans les tests unitaires de UserService
- * pour isoler la couche metier de la couche d'acces aux donnees.
+ * pour isoler la couche metier de la couche d'accès aux donnees.
  *
  * En production, cette interface serait implementee par une classe
  * utilisant JPA, JDBC, ou tout autre mecanisme de persistance.
- * En test, Mockito cree un mock qui simule les appels sans base de donnees.
+ * En test, Mockito créé un mock qui simule les appels sans base de donnees.
  *
  * @see UserService
  * @see UserServiceTest
@@ -32,17 +32,17 @@ public interface UserRepository {
     User findByEmail(String email);
 
     /**
-     * Verifie si un email est deja utilise par un utilisateur existant.
+     * Verifie si un email est déjà utilisé par un utilisateur existant.
      *
      * @param email l'email a verifier
-     * @return true si l'email existe deja en base
+     * @return true si l'email existe déjà en base
      */
     boolean existsByEmail(String email);
 
     /**
      * Sauvegarde un utilisateur (creation ou mise a jour).
      *
-     * En base de donnees reelle, cette methode attribuerait un ID
+     * En base de donnees réelle, cette méthode attribuerait un ID
      * automatiquement. Dans les tests, on simule ce comportement avec
      * thenAnswer() ou en retournant l'objet tel quel.
      *

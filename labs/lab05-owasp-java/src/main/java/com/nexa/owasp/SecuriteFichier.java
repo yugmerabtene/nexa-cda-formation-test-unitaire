@@ -4,24 +4,24 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 /**
- * Classe de securite des acces fichiers illustrant la vulnerabilite de
+ * Classe de sécurité des accès fichiers illustrant la vulnérabilité de
  * Path Traversal (ou Directory Traversal).
  *
  * <p>La version vulnerable concatene directement le nom de fichier au chemin
  * de base, permettant a un attaquant de remonter l'arborescence avec {@code ../}
  * pour acceder a des fichiers sensibles ({@code /etc/passwd}, etc.).</p>
  *
- * <p>La version securisee valide le nom de fichier, bloque les caracteres
+ * <p>La version securisee validé le nom de fichier, bloque les caracteres
  * interdits, et normalise le chemin en verifiant qu'il reste dans le
  * repertoire autorise.</p>
  *
- * <p>Cette vulnerabilite correspond a A01:2021 (Controle d'acces defaillant)
+ * <p>Cette vulnérabilité correspond a A01:2021 (Controle d'accès defaillant)
  * du Top 10 OWASP.</p>
  */
 public class SecuriteFichier {
 
     /**
-     * Repertoire de base autorise pour les acces fichiers.
+     * Repertoire de base autorise pour les accès fichiers.
      *
      * <p>Tout chemin construit doit rester a l'interieur de ce repertoire.
      * Dans un environnement de production, cette valeur serait chargee depuis
@@ -33,12 +33,12 @@ public class SecuriteFichier {
      * Construit un chemin de fichier vulnerable au Path Traversal.
      *
      * <p>Le nom de fichier est directement concatene au repertoire autorise
-     * sans validation. Un attaquant peut utiliser {@code ../../etc/passwd}
+     * sans validation. Un attaquant peut utilisé́r {@code ../../etc/passwd}
      * (ou {@code ..\..\windows\system32} sous Windows) pour sortir du
-     * repertoire et lire des fichiers systeme.</p>
+     * repertoire et lire des fichiers système.</p>
      *
-     * @param nomFichier le nom de fichier non valide
-     * @return le chemin complet potentiellement dangereux
+     * @param nomFichier le nom de fichier non validé
+     * @return le chemin complèt potentiellement dangereux
      */
     public String construireCheminVulnerable(String nomFichier) {
         return REPERTOIRE_AUTORISE + nomFichier;

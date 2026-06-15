@@ -9,23 +9,23 @@ import org.junit.jupiter.params.provider.ValueSource;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Tests unitaires de securite pour la classe {@code RequeteurSQL}.
+ * Tests unitaires de sécurité pour la classe {@code RequeteurSQL}.
  *
- * <p>Valide la vulnerabilite d'injection SQL par concatenation de chaines
- * et l'efficacite de la protection par parametre prepare.</p>
+ * <p>Valide la vulnérabilité d'injection SQL par concatenation de chaines
+ * et l'efficacite de la protection par paramètre prepare.</p>
  *
  * <p>Les tests verifient que :</p>
  * <ul>
  *   <li>Les charges utiles SQL sont presentes dans les requetes vulnerables.</li>
- *   <li>Les requetes securisees utilisent des parametres prepares sans injection possible.</li>
+ *   <li>Les requetes securisees utilisent des paramètrès prepares sans injection possible.</li>
  *   <li>Les vecteurs d'attaque multiples sont correctement geres.</li>
  * </ul>
  */
-@DisplayName("OWASP : Tests de securite du RequeteurSQL")
+@DisplayName("OWASP : Tests de sécurité du RequeteurSQL")
 class RequeteurSQLTest {
 
     /**
-     * Instance du requeteur SQL utilisee dans tous les tests.
+     * Instance du requeteur SQL utilisé́e dans tous les tests.
      */
     private final RequeteurSQL requeteur = new RequeteurSQL();
 
@@ -37,33 +37,33 @@ class RequeteurSQLTest {
     class InjectionSQL {
 
         /**
-         * Verifie que la requete vulnerable contient la charge utile d'injection,
+         * Verifie que la requête vulnerable contient la charge utile d'injection,
          * prouvant l'absence de filtrage des entrees utilisateur.
          */
         @Test
         @DisplayName("Requete vulnerable : l'injection SQL est possible")
         void requeteVulnerableInjectionPossible() {
-            String requete = requeteur.construireRequeteVulnerable("' OR '1'='1' --");
-            assertTrue(requete.contains("' OR '1'='1' --"),
-                "Preuve de vulnerabilite : la chaine d'injection est dans la requete");
+            String requête = requeteur.construireRequeteVulnerable("' OR '1'='1' --");
+            assertTrue(requête.contains("' OR '1'='1' --"),
+                "Preuve de vulnérabilité : la chaine d'injection est dans la requête");
         }
 
         /**
-         * Verifie que la requete securisee utilise un parametre prepare {@code ?}
-         * et que les donnees utilisateur ne sont pas presentes dans la requete.
+         * Verifie que la requête securisee utilisé un paramètre prepare {@code ?}
+         * et que les donnees utilisateur ne sont pas presentes dans la requête.
          */
         @Test
-        @DisplayName("Requete securisee : pas possible d'injecter — le parametre '?' est utilise")
+        @DisplayName("Requete securisee : pas possible d'injecter — le paramètre '?' est utilisé")
         void requeteSecuriseePasInjection() {
-            String requete = requeteur.construireRequeteSecurisee("' OR '1'='1' --");
-            assertTrue(requete.contains("?"),
-                "La requete utilise un parametre ?");
-            assertFalse(requete.contains("' OR '1'='1"),
-                "Les donnees utilisateur NE sont PAS dans la requete");
+            String requête = requeteur.construireRequeteSecurisee("' OR '1'='1' --");
+            assertTrue(requête.contains("?"),
+                "La requête utilisé un paramètre ?");
+            assertFalse(requête.contains("' OR '1'='1"),
+                "Les donnees utilisateur NE sont PAS dans la requête");
         }
 
         /**
-         * Test parametre verifiant que chaque vecteur d'injection SQL est
+         * Test paramètre verifiant que chaque vecteur d'injection SQL est
          * present dans la version vulnerable et absent de la version securisee.
          *
          * @param injection la charge utile d'injection SQL a tester

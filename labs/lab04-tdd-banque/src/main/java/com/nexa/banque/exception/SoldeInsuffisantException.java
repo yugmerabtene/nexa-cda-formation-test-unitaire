@@ -1,7 +1,7 @@
 package com.nexa.banque.exception;
 
 /**
- * Exception metier levee lorsqu'une operation bancaire est tente avec un solde insuffisant.
+ * Exception metier levee lorsqu'une opération bancaire est tente avec un solde insuffisant.
  * <p>
  * Herite de {@link RuntimeException} (exception non controlee) pour permettre
  * une propagation simplifiee sans obligation de {@code try/catch} ou de clause {@code throws}.

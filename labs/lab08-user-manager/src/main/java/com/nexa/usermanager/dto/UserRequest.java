@@ -3,9 +3,9 @@ package com.nexa.usermanager.dto;
 import jakarta.validation.constraints.*;
 
 /**
- * DTO (Data Transfer Object) representant la requete de creation ou mise a jour d'un utilisateur.
+ * DTO (Data Transfer Object) representant la requête de creation ou mise a jour d'un utilisateur.
  *
- * <p>Cette classe est utilisee pour deserialiser le corps JSON des requetes HTTP
+ * <p>Cette classe est utilisé́e pour deserialiser le corps JSON des requetes HTTP
  * entrantes sur les endpoints de creation ({@code POST /api/users}) et de mise a jour
  * ({@code PUT /api/users/{id}}).</p>
  *
@@ -24,7 +24,7 @@ public class UserRequest {
     @Size(min = 2, max = 50, message = "Le prenom doit contenir entre 2 et 50 caracteres")
     private String prenom;
 
-    /** Adresse email (obligatoire, format email valide). */
+    /** Adresse email (obligatoire, format email validé). */
     @NotBlank(message = "L'email est obligatoire")
     @Email(message = "Format d'email invalide")
     private String email;

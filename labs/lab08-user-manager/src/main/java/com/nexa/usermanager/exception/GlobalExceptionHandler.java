@@ -32,11 +32,11 @@ public class GlobalExceptionHandler {
     /**
      * Gere les exceptions de type {@link ResourceNotFoundException}.
      *
-     * <p>Retourne une reponse HTTP 404 avec un corps structure indiquant
+     * <p>Retourne une réponse HTTP 404 avec un corps structure indiquant
      * la ressource non trouvee et le message detaille.</p>
      *
      * @param e l'exception levee
-     * @return une reponse HTTP 404 avec le corps d'erreur structure
+     * @return une réponse HTTP 404 avec le corps d'erreur structure
      */
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleNotFound(ResourceNotFoundException e) {
@@ -47,11 +47,11 @@ public class GlobalExceptionHandler {
     /**
      * Gere les exceptions de type {@link BusinessException}.
      *
-     * <p>Retourne une reponse HTTP 409 avec un corps structure indiquant
+     * <p>Retourne une réponse HTTP 409 avec un corps structure indiquant
      * le conflit metier et le message detaille.</p>
      *
      * @param e l'exception levee
-     * @return une reponse HTTP 409 avec le corps d'erreur structure
+     * @return une réponse HTTP 409 avec le corps d'erreur structure
      */
     @ExceptionHandler(BusinessException.class)
     public ResponseEntity<ErrorResponse> handleBusiness(BusinessException e) {
@@ -60,18 +60,18 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * Gere les exceptions de validation des arguments de methode.
+     * Gere les exceptions de validation des arguments de méthode.
      *
-     * <p>Cette methode est declenchee lorsque les annotations de validation
+     * <p>Cette méthode est declenchee lorsque les annotations de validation
      * Jakarta Bean Validation ({@code @NotBlank}, {@code @Size}, {@code @Email}, etc.)
-     * detectent des donnees invalides dans le corps d'une requete.</p>
+     * detectent des donnees invalides dans le corps d'une requête.</p>
      *
      * <p>Elle construit une map associant chaque champ en erreur a son message
      * de validation, permettant au client d'identifier precisement les champs
      * problematiques.</p>
      *
      * @param e l'exception de validation
-     * @return une reponse HTTP 400 avec les erreurs detaillees par champ
+     * @return une réponse HTTP 400 avec les erreurs detaillees par champ
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleValidation(MethodArgumentNotValidException e) {
@@ -86,11 +86,11 @@ public class GlobalExceptionHandler {
     /**
      * Gere les exceptions de type {@link IllegalArgumentException}.
      *
-     * <p>Retourne une reponse HTTP 400 indiquant qu'un argument fourni
+     * <p>Retourne une réponse HTTP 400 indiquant qu'un argument fourni
      * est invalide (ex: valeur de role non reconnue).</p>
      *
      * @param e l'exception levee
-     * @return une reponse HTTP 400 avec le corps d'erreur structure
+     * @return une réponse HTTP 400 avec le corps d'erreur structure
      */
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ErrorResponse> handleIllegalArgument(IllegalArgumentException e) {

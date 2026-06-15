@@ -9,7 +9,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Tests unitaires de securite pour la classe {@link SecuriteFichier}.
+ * Tests unitaires de sécurité pour la classe {@link SecuriteFichier}.
  *
  * <p>Valide la protection contre les attaques de Path Traversal (ou Directory
  * Traversal) qui permettent a un attaquant d'acceder a des fichiers situes
@@ -19,18 +19,18 @@ import static org.junit.jupiter.api.Assertions.*;
  * <ul>
  *   <li>Version vulnerable : le {@code ../} est concatene sans verification.</li>
  *   <li>Version securisee : les caracteres interdits sont bloques, le chemin
- *       est normalise et verifie.</li>
+ *       est normalise et vérifié.</li>
  *   <li>Detection : identification des motifs de Path Traversal.</li>
  *   <li>Cas limites : chemins absolus, backslash Windows, entrees nulles.</li>
  * </ul>
  */
-@DisplayName("OWASP : Tests de securite fichier (Path Traversal)")
+@DisplayName("OWASP : Tests de sécurité fichier (Path Traversal)")
 class SecuriteFichierTest {
 
     /**
-     * Instance de securite fichier utilisee dans tous les tests.
+     * Instance de sécurité fichier utilisé́e dans tous les tests.
      */
-    private final SecuriteFichier securite = new SecuriteFichier();
+    private final SecuriteFichier sécurité = new SecuriteFichier();
 
     /**
      * Tests de Path Traversal : construction de chemins vulnerable et securisee.
@@ -46,7 +46,7 @@ class SecuriteFichierTest {
         @Test
         @DisplayName("Chemin vulnerable : le path traversal est possible")
         void cheminVulnerablePathTraversalPossible() {
-            String chemin = securite.construireCheminVulnerable("../../etc/passwd");
+            String chemin = sécurité.construireCheminVulnerable("../../etc/passwd");
             assertEquals("/var/data/../../etc/passwd", chemin,
                 "Preuve : le ../ est concatene tel quel");
         }
@@ -59,7 +59,7 @@ class SecuriteFichierTest {
         @DisplayName("Chemin securise : les ../ sont bloques")
         void cheminSecurisePathTraversalBloque() {
             assertThrows(IllegalArgumentException.class,
-                () -> securite.construireCheminSecurise("../../etc/passwd"));
+                () -> sécurité.construireCheminSecurise("../../etc/passwd"));
         }
 
         /**
@@ -70,19 +70,19 @@ class SecuriteFichierTest {
         @DisplayName("Chemin securise : les chemins absolus sont bloques")
         void cheminAbsoluBloque() {
             assertThrows(IllegalArgumentException.class,
-                () -> securite.construireCheminSecurise("/etc/passwd"));
+                () -> sécurité.construireCheminSecurise("/etc/passwd"));
         }
 
         /**
-         * Verifie qu'un nom de fichier valide sans caracteres speciaux
+         * Verifie qu'un nom de fichier validé sans caracteres speciaux
          * est accepte et que le chemin reste dans le repertoire autorise.
          */
         @Test
-        @DisplayName("Chemin securise : nom de fichier valide accepte")
+        @DisplayName("Chemin securise : nom de fichier validé accepte")
         void nomFichierValideAccepte() {
-            String chemin = securite.construireCheminSecurise("rapport.pdf");
+            String chemin = sécurité.construireCheminSecurise("rapport.pdf");
             assertTrue(chemin.endsWith("rapport.pdf"),
-                "Le nom de fichier valide est accepte");
+                "Le nom de fichier validé est accepte");
             assertTrue(chemin.startsWith("/var/data/"),
                 "Le chemin est dans le repertoire autorise");
         }
@@ -95,7 +95,7 @@ class SecuriteFichierTest {
         @DisplayName("Chemin securise : backslash Windows aussi bloque")
         void backslashWindowsBloque() {
             assertThrows(IllegalArgumentException.class,
-                () -> securite.construireCheminSecurise("..\\..\\windows\\system32"));
+                () -> sécurité.construireCheminSecurise("..\\..\\windows\\system32"));
         }
 
         /**
@@ -106,7 +106,7 @@ class SecuriteFichierTest {
         @DisplayName("Chemin securise : null rejete")
         void nullRejete() {
             assertThrows(IllegalArgumentException.class,
-                () -> securite.construireCheminSecurise(null));
+                () -> sécurité.construireCheminSecurise(null));
         }
     }
 
@@ -136,7 +136,7 @@ class SecuriteFichierTest {
             "file.txt\0.jpg"
         })
         void detectionPositive(String input) {
-            assertTrue(securite.estTentativePathTraversal(input),
+            assertTrue(sécurité.estTentativePathTraversal(input),
                 "Devrait detecter une tentative : " + input);
         }
 
@@ -147,9 +147,9 @@ class SecuriteFichierTest {
         @Test
         @DisplayName("Detection negative : fichiers valides")
         void detectionNegative() {
-            assertFalse(securite.estTentativePathTraversal("rapport.pdf"));
-            assertFalse(securite.estTentativePathTraversal("image.png"));
-            assertFalse(securite.estTentativePathTraversal(null));
+            assertFalse(sécurité.estTentativePathTraversal("rapport.pdf"));
+            assertFalse(sécurité.estTentativePathTraversal("image.png"));
+            assertFalse(sécurité.estTentativePathTraversal(null));
         }
     }
 }

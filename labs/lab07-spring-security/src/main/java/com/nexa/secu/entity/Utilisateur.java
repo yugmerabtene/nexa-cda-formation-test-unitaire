@@ -5,7 +5,7 @@ import jakarta.persistence.*;
 /**
  * Entite JPA representant un utilisateur de l'application.
  * <p>
- * Mappee sur la table {@code utilisateurs}, cette entite stocke les informations
+ * Mappee sur la table {@code utilisateurs}, cette entité stocke les informations
  * d'authentification et le role (ADMIN ou USER) de chaque compte. Le mot de passe
  * est chiffre avec BCrypt avant d'etre enregistre.
  */
@@ -18,7 +18,7 @@ public class Utilisateur {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    /** Nom d'utilisateur unique, obligatoire, utilise pour l'authentification. */
+    /** Nom d'utilisateur unique, obligatoire, utilisé pour l'authentification. */
     @Column(unique = true, nullable = false)
     private String username;
 
@@ -37,10 +37,10 @@ public class Utilisateur {
     public Utilisateur() {}
 
     /**
-     * Constructeur parametre utilise lors de la creation d'un nouvel utilisateur.
+     * Constructeur paramètre utilisé lors de la creation d'un nouvel utilisateur.
      *
      * @param username le nom d'utilisateur (unique)
-     * @param password le mot de passe deja chiffre avec BCrypt
+     * @param password le mot de passe déjà chiffre avec BCrypt
      * @param role     le role de l'utilisateur (ex: "ADMIN", "USER")
      */
     public Utilisateur(String username, String password, String role) {
@@ -76,6 +76,6 @@ public class Utilisateur {
     /** @return {@code true} si le compte est actif, {@code false} sinon */
     public boolean isActif() { return actif; }
 
-    /** @param actif l'etat d'activation du compte */
+    /** @param actif l'état d'activation du compte */
     public void setActif(boolean actif) { this.actif = actif; }
 }

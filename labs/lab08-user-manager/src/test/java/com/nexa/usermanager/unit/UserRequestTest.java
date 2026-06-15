@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * Tests unitaires pour le DTO d'entree {@link UserRequest}.
  *
  * <p>Verifie que les setters et getters fonctionnent correctement
- * pour tous les champs du DTO de requete (nom, prenom, email,
+ * pour tous les champs du DTO de requête (nom, prenom, email,
  * password, role).</p>
  *
  * <p>Note : la validation des annotations Jakarta Bean Validation

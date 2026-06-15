@@ -30,15 +30,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * Tests d'integration MVC pour le controleur {@link UserController}.
  *
  * <p>Cette classe teste tous les endpoints REST de l'API avec MockMvc.
- * Elle verifie :</p>
+ * Elle vérifié :</p>
  * <ul>
  *   <li>Les codes de statut HTTP retournes (200, 201, 204, 400, 403, 404).</li>
- *   <li>Le controle d'acces par role (ADMIN vs USER vs anonyme).</li>
+ *   <li>Le controle d'accès par role (ADMIN vs USER vs anonyme).</li>
  *   <li>La validation des donnees d'entree.</li>
  *   <li>Le contenu JSON des reponses (via JsonPath).</li>
  * </ul>
  *
- * <p>Les dependances (service, JWT, auth) sont mockees avec {@code @MockBean}
+ * <p>Les dépendances (service, JWT, auth) sont mockees avec {@code @MockBean}
  * pour isoler la couche controleur.</p>
  */
 @WebMvcTest
@@ -104,7 +104,7 @@ class UserControllerTest {
     }
 
     /**
-     * Verifie qu'un utilisateur non authentifie recoit un 403 Forbidden.
+     * Verifie qu'un utilisateur non authentifie reçoit un 403 Forbidden.
      */
     @Test
     @DisplayName("GET /api/users sans authentification -> 403")

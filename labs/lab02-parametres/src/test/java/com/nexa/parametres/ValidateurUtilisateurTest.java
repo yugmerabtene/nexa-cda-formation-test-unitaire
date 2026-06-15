@@ -1,4 +1,4 @@
-package com.nexa.parametres;
+package com.nexa.paramètrès;
 
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.*;
@@ -11,15 +11,15 @@ import static org.junit.jupiter.params.provider.EnumSource.Mode.EXCLUDE;
 import static org.junit.jupiter.params.provider.EnumSource.Mode.INCLUDE;
 
 /**
- * Tests parametres du validateur d'utilisateur.
+ * Tests paramètrès du validateur d'utilisateur.
  *
- * Ce fichier illustre TOUTES les sources de parametres de JUnit 5 :
+ * Ce fichier illustre TOUTES les sources de paramètrès de JUnit 5 :
  *
  * @ValueSource      : liste de valeurs simples (String, int, etc.)
- * @CsvSource        : couples de valeurs (entree, resultat attendu)
+ * @CsvSource        : couples de valeurs (entree, résultat attendu)
  * @CsvFileSource    : fichier CSV externe dans src/test/resources/
  * @EnumSource       : iteration sur les valeurs d'un enum
- * @MethodSource     : methode factory retournant Stream<Arguments>
+ * @MethodSource     : méthode factory retournant Stream<Arguments>
  * @NullSource       : injecter null
  * @EmptySource      : injecter chaine vide
  * @NullAndEmptySource : injecter null ET chaine vide
@@ -27,52 +27,52 @@ import static org.junit.jupiter.params.provider.EnumSource.Mode.INCLUDE;
  * La conversion automatique de types est egalement illustree :
  * JUnit convertit automatiquement les String du CSV en int, boolean, etc.
  */
-@DisplayName("Tests parametres du ValidateurUtilisateur")
+@DisplayName("Tests paramètrès du ValidateurUtilisateur")
 class ValidateurUtilisateurTest {
 
     /**
      * Instance du validateur, partagee entre tous les tests.
-     * JUnit cree une nouvelle instance de la classe de test avant chaque test,
+     * JUnit créé une nouvelle instance de la classe de test avant chaque test,
      * donc ce champ est reinitialise a chaque iteration parametree.
      */
     private final ValidateurUtilisateur validateur = new ValidateurUtilisateur();
 
     // ================================================================
-    // @ValueSource — Tests parametres avec valeurs simples
+    // @ValueSource — Tests paramètrès avec valeurs simples
     // ================================================================
 
     /**
-     * Test parametre avec @ValueSource pour les emails VALIDES.
+     * Test paramètre avec @ValueSource pour les emails VALIDES.
      *
-     * Chaque chaine dans @ValueSource est injectee comme parametre 'email'.
-     * JUnit execute cette methode 5 fois (une par valeur).
+     * Chaque chaine dans @ValueSource est injectee comme paramètre 'email'.
+     * JUnit exécuté cette méthode 5 fois (une par valeur).
      *
-     * Le parametre 'name' personnalise l'affichage dans le rapport de test :
+     * Le paramètre 'name' personnalise l'affichage dans le rapport de test :
      * - {index} : numero de l'iteration (commence a 1)
-     * - {0}    : valeur du premier parametre (l'email ici)
+     * - {0}    : valeur du premier paramètre (l'email ici)
      *
      * Resultat dans le rapport :
-     *   [1] : email "test@example.com" est valide -> true
-     *   [2] : email "user.name@domain.co" est valide -> true
+     *   [1] : email "test@example.com" est validé -> true
+     *   [2] : email "user.name@domain.co" est validé -> true
      *   ...
      */
-    @ParameterizedTest(name = "{index} : email \"{0}\" est valide -> {1}")
+    @ParameterizedTest(name = "{index} : email \"{0}\" est validé -> {1}")
     @DisplayName("Validation d'emails valides")
     @ValueSource(strings = {
         "test@example.com",        // Format standard
         "user.name@domain.co",     // Point dans la partie locale
-        "a@b.co",                  // Format minimal valide
+        "a@b.co",                  // Format minimal validé
         "contact@entreprise.fr",   // Domaine .fr
         "nom.prenom@site.gouv.fr"  // Sous-domaine
     })
     void emailsValides(String email) {
         assertTrue(validateur.estEmailValide(email),
-            // Supplier<String> : le message n'est construit que si le test echoue
-            () -> "L'email '" + email + "' devrait etre valide");
+            // Supplier<String> : le message n'est construit que si le test échoué
+            () -> "L'email '" + email + "' devrait etre validé");
     }
 
     /**
-     * Test parametre avec @ValueSource pour les emails INVALIDES.
+     * Test paramètre avec @ValueSource pour les emails INVALIDES.
      *
      * Chaque cas teste une regle de validation differente :
      * 1. Chaine vide -> invalide
@@ -82,15 +82,15 @@ class ValidateurUtilisateurTest {
      * 5. Pas de point dans le domaine -> invalide
      * 6. Double arobase -> invalide
      *
-     * assertFalse verifie que la methode retourne false pour chaque cas.
+     * assertFalse vérifié que la méthode retourne false pour chaque cas.
      */
     @ParameterizedTest(name = "\"{0}\" -> email INVALIDE")
     @DisplayName("Validation d'emails invalides")
     @ValueSource(strings = {
         "",                    // Chaine vide
         "pasd'arobase",        // Pas de @
-        "@domaine.com",        // @ en premiere position (pas de partie locale)
-        "user@",               // @ en derniere position (pas de domaine)
+        "@domaine.com",        // @ en première position (pas de partie locale)
+        "user@",               // @ en dernière position (pas de domaine)
         "user@domaine",        // Pas de point dans le domaine
         "user@@domaine.com"    // Double @ interdit
     })
@@ -100,11 +100,11 @@ class ValidateurUtilisateurTest {
     }
 
     // ================================================================
-    // @CsvSource — Tests avec entree et resultat attendu
+    // @CsvSource — Tests avec entree et résultat attendu
     // ================================================================
 
     /**
-     * Test parametre avec @CsvSource pour le score de mot de passe.
+     * Test paramètre avec @CsvSource pour le score de mot de passe.
      *
      * Chaque ligne du CSV contient deux colonnes :
      * - Colonne 1 : le mot de passe (String)
@@ -117,7 +117,7 @@ class ValidateurUtilisateurTest {
      * - Mot de passe trop court : score 0
      * - 8 caracteres : +25 (longueur)
      * - + majuscule : +20
-     * - + caractere special : +10
+     * - + caractere spécial : +10
      * - Tous les criteres : 100 (plafonne)
      */
     @ParameterizedTest(name = "\"{0}\" -> score = {1}/100")
@@ -126,7 +126,7 @@ class ValidateurUtilisateurTest {
         "abc,              0",   // Trop court, aucun critere
         "abcd1234,        40",   // 8+ chars (25) + chiffre (15) = 40
         "Abcd1234,        60",   // 8+ chars (25) + maj (20) + min (15) = 60
-        "Abcd1234!,        70",  // + caractere special (10) = 70
+        "Abcd1234!,        70",  // + caractere spécial (10) = 70
         "MotDePasseTresLong123!, 100", // Tous les criteres -> 100 (plafonne)
         "12345678,         25"   // 8+ chars (25) uniquement
     })
@@ -136,14 +136,14 @@ class ValidateurUtilisateurTest {
     }
 
     /**
-     * Test parametre avec gestion de la valeur null dans un CSV.
+     * Test paramètre avec gestion de la valeur null dans un CSV.
      *
      * nullValues = "N/A" indique a JUnit que la chaine "N/A"
      * doit etre interpretee comme la valeur null (pas la chaine "N/A").
      *
      * Sans cette option, JUnit passerait la chaine "N/A" telle quelle.
      */
-    @ParameterizedTest(name = "email = {0} est valide -> {1}")
+    @ParameterizedTest(name = "email = {0} est validé -> {1}")
     @DisplayName("Emails : cas limites avec null")
     @CsvSource(value = {
         "N/A, false",  // N/A est converti en null par nullValues
@@ -168,8 +168,8 @@ class ValidateurUtilisateurTest {
     /**
      * Test avec @EnumSource en mode EXCLUDE.
      *
-     * EXCLUDE : execute le test pour TOUTES les valeurs SAUF celles listees.
-     * Ici, le test s'execute pour ACTIF, INACTIF, SUSPENDU (pas SUPPRIME).
+     * EXCLUDE : exécuté le test pour TOUTES les valeurs SAUF celles listees.
+     * Ici, le test s'exécuté pour ACTIF, INACTIF, SUSPENDU (pas SUPPRIME).
      *
      * Utile quand on veut tester "tout sauf un cas particulier".
      */
@@ -184,10 +184,10 @@ class ValidateurUtilisateurTest {
     /**
      * Test avec @EnumSource en mode INCLUDE.
      *
-     * INCLUDE : execute le test UNIQUEMENT pour les valeurs listees.
+     * INCLUDE : exécuté le test UNIQUEMENT pour les valeurs listees.
      * Ici, seuls ACTIF et SUSPENDU sont testes.
      *
-     * Utile pour tester un sous-ensemble specifique.
+     * Utile pour tester un sous-ensemble spécifique.
      */
     @ParameterizedTest
     @DisplayName("Seuls ACTIF et SUSPENDU sont testes ici")
@@ -206,34 +206,34 @@ class ValidateurUtilisateurTest {
      * Le fichier est cherche dans src/test/resources/.
      * Le '/' initial indique la racine du classpath.
      *
-     * numLinesToSkip = 1 : ignore la premiere ligne (en-tete du CSV).
+     * numLinesToSkip = 1 : ignore la première ligne (en-tete du CSV).
      *
      * Format du fichier telephones-test.csv :
-     *   telephone,valide
+     *   telephone,validé
      *   0612345678,true
      *   061234567,false
      *   ...
      *
      * @see src/test/resources/telephones-test.csv
      */
-    @ParameterizedTest(name = "Telephone \"{0}\" valide -> {1}")
+    @ParameterizedTest(name = "Telephone \"{0}\" validé -> {1}")
     @DisplayName("Validation telephones via fichier CSV externe")
     @CsvFileSource(resources = "/telephones-test.csv", numLinesToSkip = 1)
     void telephonesDepuisFichier(String telephone, boolean attendu) {
         assertEquals(attendu, validateur.estTelephoneValide(telephone),
-            "Echec pour le telephone : " + telephone);
+            "Échec pour le telephone : " + telephone);
     }
 
     // ================================================================
-    // @MethodSource — Arguments complexes via methode factory
+    // @MethodSource — Arguments complexes via méthode factory
     // ================================================================
 
     /**
-     * Test parametre avec @MethodSource.
+     * Test paramètre avec @MethodSource.
      *
-     * La methode referencee doit etre static et retourner un
-     * Stream<Arguments>. Chaque Arguments.of(...) contient les parametres
-     * dans l'ordre de la methode de test.
+     * La méthode referencee doit etre static et retourner un
+     * Stream<Arguments>. Chaque Arguments.of(...) contient les paramètrès
+     * dans l'ordre de la méthode de test.
      *
      * Avantages par rapport a @CsvSource :
      * - Les types sont preserves (pas de conversion String -> int)
@@ -243,7 +243,7 @@ class ValidateurUtilisateurTest {
      * Ici, on teste les 6 categories d'age avec leurs bornes.
      * Chaque ligne teste un cas limite important.
      */
-    @ParameterizedTest(name = "{0} ans -> categorie \"{1}\"")
+    @ParameterizedTest(name = "{0} ans -> catégorie \"{1}\"")
     @DisplayName("Categorisation par age (via @MethodSource)")
     @MethodSource("fournirAgesEtCategories")
     void categorisationAge(int age, String categorieAttendue) {
@@ -255,9 +255,9 @@ class ValidateurUtilisateurTest {
      * Methode factory pour @MethodSource.
      *
      * Retourne un flux d'arguments couvrant toutes les bornes de categories.
-     * Chaque Arguments contient un age (int) et la categorie attendue (String).
+     * Chaque Arguments contient un age (int) et la catégorie attendue (String).
      *
-     * Les bornes sont choisies pour tester les changements de categorie :
+     * Les bornes sont choisies pour tester les changements de catégorie :
      * - 0 et 17 : MINEUR
      * - 18 et 24 : JEUNE_ADULTE
      * - 25 et 59 : ADULTE
@@ -282,21 +282,21 @@ class ValidateurUtilisateurTest {
     /**
      * Test avec @MethodSource retournant Stream<Integer> (pas Stream<Arguments>).
      *
-     * Quand la methode de test n'a qu'un seul parametre, la factory
+     * Quand la méthode de test n'a qu'un seul paramètre, la factory
      * peut retourner Stream<T> directement au lieu de Stream<Arguments>.
-     * C'est plus simple et plus lisible pour les tests a un parametre.
+     * C'est plus simple et plus lisible pour les tests a un paramètre.
      */
     @ParameterizedTest
     @DisplayName("Ages valides (via @MethodSource d'entiers)")
     @MethodSource("agesValides")
     void agesValides(int age) {
         assertTrue(validateur.estAgeValide(age),
-            "L'age " + age + " devrait etre valide");
+            "L'age " + age + " devrait etre validé");
     }
 
     /**
-     * Factory retournant directement des entiers (1 parametre).
-     * Pas besoin de Arguments.of() car un seul parametre.
+     * Factory retournant directement des entiers (1 paramètre).
+     * Pas besoin de Arguments.of() car un seul paramètre.
      */
     static Stream<Integer> agesValides() {
         return Stream.of(18, 25, 30, 60, 100, 120);
@@ -309,7 +309,7 @@ class ValidateurUtilisateurTest {
     /**
      * @NullAndEmptySource combine @NullSource et @EmptySource.
      *
-     * Le test est execute DEUX fois :
+     * Le test est exécuté DEUX fois :
      * - Une fois avec email = null
      * - Une fois avec email = ""
      *
@@ -340,12 +340,12 @@ class ValidateurUtilisateurTest {
     /**
      * Combinaison de @NullAndEmptySource avec @ValueSource.
      *
-     * Le test est execute TROIS fois :
+     * Le test est exécuté TROIS fois :
      * - null
      * - "" (chaine vide)
      * - " " (une espace, via @ValueSource)
      *
-     * On verifie que les entrees non significatives donnent un score de 0.
+     * On vérifié que les entrees non significatives donnent un score de 0.
      */
     @ParameterizedTest
     @DisplayName("Score = 0 pour null et chaine vide")
@@ -365,7 +365,7 @@ class ValidateurUtilisateurTest {
      * @CsvSource permet de lister plusieurs formats sur une seule ligne.
      * Verifie que le nettoyage (espaces, points, tirets) fonctionne.
      */
-    @ParameterizedTest(name = "Telephone \"{0}\" doit etre valide")
+    @ParameterizedTest(name = "Telephone \"{0}\" doit etre validé")
     @DisplayName("Telephones valides (formats varies)")
     @CsvSource({
         "0612345678",           // Format compact
@@ -376,7 +376,7 @@ class ValidateurUtilisateurTest {
     })
     void telephonesValidesFormatsVaries(String telephone) {
         assertTrue(validateur.estTelephoneValide(telephone),
-            "Format attendu valide : " + telephone);
+            "Format attendu validé : " + telephone);
     }
 
     /**
@@ -396,9 +396,9 @@ class ValidateurUtilisateurTest {
     @ParameterizedTest
     @DisplayName("Conversion automatique : String -> int -> boolean")
     @CsvSource({
-        "18, true",    // Age valide (18-120)
+        "18, true",    // Age validé (18-120)
         "17, false",   // Trop jeune
-        "120, true",   // Age maximum valide
+        "120, true",   // Age maximum validé
         "121, false",  // Trop vieux
         "0, false"     // Bien en dessous du minimum
     })

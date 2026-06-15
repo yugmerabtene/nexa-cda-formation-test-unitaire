@@ -1,11 +1,11 @@
 package com.nexa.owasp;
 
 /**
- * Classe demonstrant les vulnerabilites de securite OWASP liees a l'injection SQL
+ * Classe demonstrant les vulnerabilites de sécurité OWASP liees a l'injection SQL
  * et au Cross-Site Scripting (XSS) dans une application Java.
  *
  * <p>Chaque fonctionnalite expose une version vulnerable (concatenation directe)
- * et une version securisee (parametre prepare ou echappement HTML).</p>
+ * et une version securisee (paramètre prepare ou échappement HTML).</p>
  *
  * <p>Les tests unitaires associes dans {@code AuthentificateurTest} prouvent
  * l'existence des failles et verifient l'efficacite des correctifs.</p>
@@ -13,25 +13,25 @@ package com.nexa.owasp;
 public class Authentificateur {
 
     /**
-     * Construit une requete SQL vulnerable a l'injection SQL.
+     * Construit une requête SQL vulnerable a l'injection SQL.
      *
      * <p>L'entree utilisateur est directement concatenee dans la clause WHERE,
-     * permettant a un attaquant de modifier la structure de la requete.</p>
+     * permettant a un attaquant de modifier la structure de la requête.</p>
      *
      * @param login le login utilisateur non filtre
-     * @return une requete SQL contenant l'entree utilisateur sans validation
+     * @return une requête SQL contenant l'entree utilisateur sans validation
      */
     public String rechercherUtilisateur(String login) {
         return "SELECT * FROM users WHERE login = '" + login + "'";
     }
 
     /**
-     * Construit une requete SQL securisee utilisant un parametre prepare.
+     * Construit une requête SQL securisee utilisant un paramètre prepare.
      *
-     * <p>Le point d'interrogation (?) est un placeholder pour un parametre lie,
-     * empechant toute modification de la structure de la requete.</p>
+     * <p>Le point d'interrogation (?) est un placeholder pour un paramètre lie,
+     * empechant toute modification de la structure de la requête.</p>
      *
-     * @return une requete SQL avec parametre prepare, immunisee contre l'injection
+     * @return une requête SQL avec paramètre prepare, immunisee contre l'injection
      */
     public String rechercherUtilisateurSecurisee() {
         return "SELECT * FROM users WHERE login = ?";
@@ -41,7 +41,7 @@ public class Authentificateur {
      * Genere une page HTML vulnerable au Cross-Site Scripting (XSS).
      *
      * <p>Le contenu HTML fourni est insere tel quel sans filtrage, permettant
-     * l'injection de balises script et l'execution de code JavaScript malveillant.</p>
+     * l'injection de balises script et l'exécution de code JavaScript malveillant.</p>
      *
      * @param html le contenu HTML utilisateur non echappe
      * @return une page HTML vulnerable contenant le code injecte
@@ -73,7 +73,7 @@ public class Authentificateur {
      *
      * <p>Retourne une chaine vide si l'entree est nulle.</p>
      *
-     * @param input la chaine a echapper, peut etre nulle
+     * @param input la chaine a échapper, peut etre nulle
      * @return la chaine echappee, ou une chaine vide si l'entree est nulle
      */
     public String echapperHtml(String input) {

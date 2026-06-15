@@ -9,13 +9,13 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  * Represente un compte bancaire avec gestion des depots, retraits et virements.
  * <p>
- * Cette classe est thread-safe : toutes les methodes publiques modifiant ou lisant
- * l'etat du compte sont synchronisees sur l'instance. Les montants sont manipules
+ * Cette classe est thread-safe : toutes les méthodes publiques modifiant ou lisant
+ * l'état du compte sont synchronisees sur l'instance. Les montants sont manipules
  * exclusivement avec {@link BigDecimal} pour eviter les erreurs d'arrondi liees aux
  * nombres a virgule flottante.
  * </p>
  *
- * <p>Chaque operation reussie (depot, retrait, virement) est enregistree dans un
+ * <p>Chaque opération reussie (dépôt, retrait, virement) est enregistree dans un
  * historique de {@link Transaction}. Les identifiants de transaction sont generes
  * de maniere atomique via {@link AtomicLong}.</p>
  *
@@ -40,8 +40,8 @@ public class CompteBancaire {
      * Generateur atomique d'identifiants de transaction.
      * <p>
      * Initialise a 1 et incremente a chaque nouvelle transaction.
-     * L'utilisation d'{@link AtomicLong} garantit l'unicite des IDs meme
-     * en presence d'acces concurrents.
+     * L'utilisation d'{@link AtomicLong} garantit l'unicite des IDs même
+     * en presence d'accès concurrents.
      * </p>
      */
     private final AtomicLong transactionIdGenerator;
@@ -83,7 +83,7 @@ public class CompteBancaire {
      * Retourne le solde actuel du compte.
      * <p>
      * La synchronisation garantit la lecture d'un solde coherent
-     * meme en presence d'ecritures concurrentes.
+     * même en presence d'ecritures concurrentes.
      * </p>
      *
      * @return le solde actuel (jamais null, jamais negatif)
@@ -91,7 +91,7 @@ public class CompteBancaire {
     public synchronized BigDecimal getSolde() { return solde; }
 
     /**
-     * Effectue un depot d'argent sur le compte.
+     * Effectue un dépôt d'argent sur le compte.
      * <p>
      * Le montant doit etre strictement positif. Le solde est incremente
      * du montant, et une transaction de type {@code DEPOT} est enregistree
@@ -99,12 +99,12 @@ public class CompteBancaire {
      * </p>
      *
      * @param montant     somme a deposer, doit etre strictement positive
-     * @param description libelle descriptif de l'operation
+     * @param description libelle descriptif de l'opération
      * @throws IllegalArgumentException si le montant est negatif ou egal a zero
      */
     public synchronized void deposer(BigDecimal montant, String description) {
         if (montant.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new IllegalArgumentException("Le montant du depot doit etre strictement positif");
+            throw new IllegalArgumentException("Le montant du dépôt doit etre strictement positif");
         }
         this.solde = this.solde.add(montant);
         historique.add(new Transaction(transactionIdGenerator.getAndIncrement(),
@@ -120,7 +120,7 @@ public class CompteBancaire {
      * </p>
      *
      * @param montant     somme a retirer, doit etre strictement positive et inferieure ou egale au solde
-     * @param description libelle descriptif de l'operation
+     * @param description libelle descriptif de l'opération
      * @throws IllegalArgumentException si le montant est negatif, nul, ou superieur au solde disponible
      */
     public synchronized void retirer(BigDecimal montant, String description) {
@@ -139,7 +139,7 @@ public class CompteBancaire {
     /**
      * Recoit un virement entrant et credite le compte.
      * <p>
-     * Contrairement a {@link #deposer(BigDecimal, String)}, cette methode
+     * Contrairement a {@link #deposer(BigDecimal, String)}, cette méthode
      * n'effectue pas de validation du montant (la validation est deleguee
      * au {@code ServiceVirement}). Une transaction de type
      * {@code VIREMENT_RECU} est enregistree.
@@ -207,13 +207,13 @@ public class CompteBancaire {
     }
 
     /**
-     * Retourne la derniere transaction enregistree, ou null si l'historique est vide.
+     * Retourne la dernière transaction enregistree, ou null si l'historique est vide.
      * <p>
-     * Cas particulier : si aucune operation n'a ete effectuee (compte neuf),
-     * cette methode retourne {@code null}.
+     * Cas particulier : si aucune opération n'a ete effectuee (compte neuf),
+     * cette méthode retourne {@code null}.
      * </p>
      *
-     * @return la derniere {@link Transaction}, ou {@code null} si l'historique est vide
+     * @return la dernière {@link Transaction}, ou {@code null} si l'historique est vide
      */
     public synchronized Transaction getDerniereTransaction() {
         if (historique.isEmpty()) return null;

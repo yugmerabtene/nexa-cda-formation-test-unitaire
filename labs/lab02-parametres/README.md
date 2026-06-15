@@ -1,4 +1,4 @@
-# Lab 02 : Tests parametres avec JUnit 5
+# Lab 02 : Tests paramètrès avec JUnit 5
 
 **Objectif :** Maitriser la parametrisation des tests avec les annotations `@ParameterizedTest`, `@ValueSource`, `@CsvSource`, `@CsvFileSource`, `@EnumSource`, `@MethodSource`, `@NullSource`, `@EmptySource`, `@NullAndEmptySource`.
 
@@ -6,9 +6,9 @@
 
 ---
 
-## Enonce
+## Énoncé
 
-Vous devez implementer un `ValidateurUtilisateur` et ecrire une batterie de tests parametres couvrant tous les cas possibles.
+Vous devez implementer un `ValidateurUtilisateur` et écrire une batterie de tests paramètrès couvrant tous les cas possibles.
 
 ### Fonctionnalites a implementer
 
@@ -18,15 +18,15 @@ Vous devez implementer un `ValidateurUtilisateur` et ecrire une batterie de test
 | `estTelephoneValide` | `boolean estTelephoneValide(String telephone)` | Accepte les formats francais : 10 chiffres commencant par 0, avec espaces/points/tirets optionnels, ou +33. |
 | `scoreMotDePasse` | `int scoreMotDePasse(String mdp)` | Calcule un score de robustesse (0-100) base sur la longueur, majuscules, minuscules, chiffres, caracteres speciaux. |
 | `estAgeValide` | `boolean estAgeValide(int age)` | Retourne `true` si l'age est entre 18 et 120 inclus. |
-| `categorieAge` | `String categorieAge(int age)` | Retourne la categorie : MINEUR, JEUNE_ADULTE, ADULTE, SENIOR, CENTENAIRE. |
+| `categorieAge` | `String categorieAge(int age)` | Retourne la catégorie : MINEUR, JEUNE_ADULTE, ADULTE, SENIOR, CENTENAIRE. |
 
-### Annotations a utiliser (minimum)
+### Annotations a utilisé́r (minimum)
 
 | Annotation | Usage |
 |---|---|
-| `@ParameterizedTest` | Remplacer `@Test` pour les tests parametres |
+| `@ParameterizedTest` | Remplacer `@Test` pour les tests paramètrès |
 | `@ValueSource` | Liste de valeurs simples (emails valides/invalides) |
-| `@CsvSource` | Couples (entree, resultat attendu) — score mot de passe, age |
+| `@CsvSource` | Couples (entree, résultat attendu) — score mot de passe, age |
 | `@CsvFileSource` | Fichier CSV externe (`telephones-test.csv`) |
 | `@EnumSource` | Iterer sur un enum avec modes INCLUDE/EXCLUDE |
 | `@MethodSource` | Methode factory retournant `Stream<Arguments>` pour la categorisation d'age |
@@ -35,39 +35,39 @@ Vous devez implementer un `ValidateurUtilisateur` et ecrire une batterie de test
 
 ---
 
-## Prerequis
+## Prérequis
 
 - Lab 01 termine (maitrise de `@Test` et des assertions)
 - Java 17, Maven 3.9+
 
 ---
 
-## Etape par etape
+## Étape par étape
 
-### Etape 1 : Structure du projet
+### Étape 1 : Structure du projet
 
 ```
-lab02-parametres/
+lab02-paramètrès/
   pom.xml
   src/
-    main/java/com/nexa/parametres/
+    main/java/com/nexa/paramètrès/
       ValidateurUtilisateur.java
     test/
-      java/com/nexa/parametres/
+      java/com/nexa/paramètrès/
         ValidateurUtilisateurTest.java
       resources/
         telephones-test.csv
 ```
 
-### Etape 2 : Implementer ValidateurUtilisateur
+### Étape 2 : Implementer ValidateurUtilisateur
 
-Implementez les 5 methodes dans `ValidateurUtilisateur.java`.
+Implementez les 5 méthodes dans `ValidateurUtilisateur.java`.
 
 **Validation email :**
 - Rejeter `null` et chaine vide
 - Rejeter si `@` absent, au debut ou a la fin
 - Rejeter si plusieurs `@`
-- Verifier que le domaine contient un `.` apres le `@`
+- Verifier que le domaine contient un `.` après le `@`
 
 **Validation telephone :**
 - Nettoyer espaces, points, tirets avec `replaceAll("[\\s.+-]", "")`
@@ -80,15 +80,15 @@ Implementez les 5 methodes dans `ValidateurUtilisateur.java`.
 - Au moins une majuscule : +20
 - Au moins une minuscule : +15
 - Au moins un chiffre : +15
-- Au moins un caractere special : +10
+- Au moins un caractere spécial : +10
 - Plafonner a 100
 
-### Etape 3 : Ecrire les tests parametres
+### Étape 3 : Ecrire les tests paramètrès
 
 #### @ValueSource — emails valides et invalides
 
 ```java
-@ParameterizedTest(name = "{index} : email \"{0}\" est valide")
+@ParameterizedTest(name = "{index} : email \"{0}\" est validé")
 @ValueSource(strings = {"test@example.com", "user@domain.co", "a@b.co"})
 void emailsValides(String email) {
     assertTrue(validateur.estEmailValide(email));
@@ -112,14 +112,14 @@ void scoreMotDePasse(String mdp, int scoreAttendu) {
 #### @CsvFileSource — fichier CSV externe
 
 ```java
-@ParameterizedTest(name = "Telephone \"{0}\" valide -> {1}")
+@ParameterizedTest(name = "Telephone \"{0}\" validé -> {1}")
 @CsvFileSource(resources = "/telephones-test.csv", numLinesToSkip = 1)
 void telephonesDepuisFichier(String telephone, boolean attendu) {
     assertEquals(attendu, validateur.estTelephoneValide(telephone));
 }
 ```
 
-Le fichier `telephones-test.csv` a un en-tete et deux colonnes : telephone, valide (true/false).
+Le fichier `telephones-test.csv` a un en-tete et deux colonnes : telephone, validé (true/false).
 
 #### @EnumSource — iteration sur les valeurs d'un enum
 
@@ -136,7 +136,7 @@ void statutsValides(StatutUtilisateur statut) {
 #### @MethodSource — arguments complexes
 
 ```java
-@ParameterizedTest(name = "{0} ans -> categorie \"{1}\"")
+@ParameterizedTest(name = "{0} ans -> catégorie \"{1}\"")
 @MethodSource("fournirAgesEtCategories")
 void categorisationAge(int age, String categorieAttendue) {
     assertEquals(categorieAttendue, validateur.categorieAge(age));
@@ -153,18 +153,18 @@ static Stream<Arguments> fournirAgesEtCategories() {
 }
 ```
 
-### Etape 4 : Personnaliser l'affichage des tests
+### Étape 4 : Personnaliser l'affichage des tests
 
-Le parametre `name` de `@ParameterizedTest` utilise des placeholders :
-- `{0}` : premier parametre
-- `{1}` : deuxieme parametre
+Le paramètre `name` de `@ParameterizedTest` utilisé des placeholders :
+- `{0}` : premier paramètre
+- `{1}` : deuxieme paramètre
 - `{index}` : numero du test (commence a 1)
 
 ```java
-@ParameterizedTest(name = "{index} : email \"{0}\" est valide -> {1}")
+@ParameterizedTest(name = "{index} : email \"{0}\" est validé -> {1}")
 ```
 
-### Etape 5 : Tests null/empty
+### Étape 5 : Tests null/empty
 
 ```java
 @ParameterizedTest
@@ -180,17 +180,17 @@ void emailNullOuVide(String email) {
 
 ---
 
-## Execution
+## Exécution
 
 ```bash
-cd labs/lab02-parametres
+cd labs/lab02-paramètrès
 mvn clean test
 ```
 
-## Criteres de reussite
+## Criteres de réussite
 
-- Les 5 methodes sont implementees dans `ValidateurUtilisateur`
-- Chaque annotation de test parametre est utilisee au moins une fois
+- Les 5 méthodes sont implementees dans `ValidateurUtilisateur`
+- Chaque annotation de test paramètre est utilisé́e au moins une fois
 - Tests pour emails valides ET invalides
 - Tests pour tous les cas de categorisation d'age (6 categories)
 - Test null et empty pour emails, telephone, score

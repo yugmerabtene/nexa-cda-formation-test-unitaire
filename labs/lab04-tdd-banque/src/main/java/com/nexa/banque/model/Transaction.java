@@ -7,19 +7,19 @@ import java.util.Objects;
 /**
  * Represente une transaction bancaire enregistree dans l'historique d'un compte.
  * <p>
- * Chaque transaction est immuable apres sa creation : elle capture l'etat du compte
- * (solde apres operation) au moment de l'operation. Les types de transactions sont
+ * Chaque transaction est immuable après sa creation : elle capture l'état du compte
+ * (solde après opération) au moment de l'opération. Les types de transactions sont
  * definis par l'enum interne {@link Type}.
  * </p>
  *
- * <p>Deux transactions sont considerees egales si elles partagent le meme identifiant.</p>
+ * <p>Deux transactions sont considerees egales si elles partagent le même identifiant.</p>
  */
 public class Transaction {
 
     /**
      * Enumeration des types d'operations bancaires possibles.
      * <ul>
-     *   <li>{@code DEPOT} : depot d'argent sur le compte</li>
+     *   <li>{@code DEPOT} : dépôt d'argent sur le compte</li>
      *   <li>{@code RETRAIT} : retrait d'argent depuis le compte</li>
      *   <li>{@code VIREMENT_EMIS} : virement sortant du compte</li>
      *   <li>{@code VIREMENT_RECU} : virement entrant sur le compte</li>
@@ -30,34 +30,34 @@ public class Transaction {
     /** Identifiant unique de la transaction, genere par le compte proprietaire. */
     private final Long id;
 
-    /** Type de l'operation (depot, retrait, virement emis ou recu). */
+    /** Type de l'opération (dépôt, retrait, virement emis ou reçu). */
     private final Type type;
 
-    /** Montant de l'operation, toujours strictement positif en valeur absolue. */
+    /** Montant de l'opération, toujours strictement positif en valeur absolue. */
     private final BigDecimal montant;
 
-    /** Solde du compte immediatement apres l'execution de l'operation. */
+    /** Solde du compte immediatement après l'exécution de l'opération. */
     private final BigDecimal soldeApresOperation;
 
-    /** Description libre de l'operation (motif, reference, etc.). */
+    /** Description libre de l'opération (motif, reference, etc.). */
     private final String description;
 
-    /** Horodatage de la creation de la transaction (instant de l'operation). */
+    /** Horodatage de la creation de la transaction (instant de l'opération). */
     private final LocalDateTime dateHeure;
 
     /**
      * Construit une transaction bancaire immuable.
      * <p>
      * La date et l'heure sont automatiquement initialisees a l'instant de la creation
-     * via {@link LocalDateTime#now()}. Le soldeApresOperation reflete l'etat du compte
-     * apres application du montant.
+     * via {@link LocalDateTime#now()}. Le soldeApresOperation reflete l'état du compte
+     * après application du montant.
      * </p>
      *
      * @param id                   identifiant unique de la transaction (genere par {@code AtomicLong})
-     * @param type                 type d'operation ({@link Type})
-     * @param montant              montant positif de l'operation (valeur absolue)
-     * @param soldeApresOperation  solde du compte apres execution de l'operation
-     * @param description          libelle descriptif de l'operation (ne peut pas etre null)
+     * @param type                 type d'opération ({@link Type})
+     * @param montant              montant positif de l'opération (valeur absolue)
+     * @param soldeApresOperation  solde du compte après exécution de l'opération
+     * @param description          libelle descriptif de l'opération (ne peut pas etre null)
      */
     public Transaction(Long id, Type type, BigDecimal montant,
                        BigDecimal soldeApresOperation, String description) {
@@ -77,23 +77,23 @@ public class Transaction {
     public Long getId() { return id; }
 
     /**
-     * Retourne le type d'operation de la transaction.
+     * Retourne le type d'opération de la transaction.
      *
      * @return le {@link Type} (DEPOT, RETRAIT, VIREMENT_EMIS, VIREMENT_RECU)
      */
     public Type getType() { return type; }
 
     /**
-     * Retourne le montant de l'operation en valeur absolue.
+     * Retourne le montant de l'opération en valeur absolue.
      *
      * @return le montant positif de la transaction
      */
     public BigDecimal getMontant() { return montant; }
 
     /**
-     * Retourne le solde du compte apres execution de cette operation.
+     * Retourne le solde du compte après exécution de cette opération.
      *
-     * @return le solde resultant, tel qu'il etait immediatement apres la transaction
+     * @return le solde resultant, tel qu'il etait immediatement après la transaction
      */
     public BigDecimal getSoldeApresOperation() { return soldeApresOperation; }
 
@@ -107,19 +107,19 @@ public class Transaction {
     /**
      * Retourne la date et l'heure exactes de la creation de la transaction.
      *
-     * @return le {@link LocalDateTime} de l'operation
+     * @return le {@link LocalDateTime} de l'opération
      */
     public LocalDateTime getDateHeure() { return dateHeure; }
 
     /**
      * Compare deux transactions par leur identifiant.
      * <p>
-     * Deux transactions sont egales si et seulement si elles ont le meme ID.
+     * Deux transactions sont egales si et seulement si elles ont le même ID.
      * Les autres champs (type, montant, date, etc.) ne sont pas pris en compte.
      * </p>
      *
      * @param o l'objet a comparer
-     * @return {@code true} si les deux transactions ont le meme ID, {@code false} sinon
+     * @return {@code true} si les deux transactions ont le même ID, {@code false} sinon
      */
     @Override
     public boolean equals(Object o) {

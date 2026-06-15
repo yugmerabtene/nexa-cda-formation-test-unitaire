@@ -18,11 +18,11 @@ import java.util.Map;
 /**
  * Controleur REST gerant l'authentification des utilisateurs.
  * <p>
- * Expose l'endpoint {@code POST /api/auth/login} qui valide les identifiants,
- * genere un token JWT et le retourne au client. En cas d'echec d'authentification,
+ * Expose l'endpoint {@code POST /api/auth/login} qui validé les identifiants,
+ * genere un token JWT et le retourne au client. En cas d'échec d'authentification,
  * un statut HTTP 401 est renvoye.
  * <p>
- * Ce controleur est explicitement exclu de la securite dans {@code SecurityConfig}
+ * Ce controleur est explicitement exclu de la sécurité dans {@code SecurityConfig}
  * via {@code .requestMatchers("/api/auth/**").permitAll()}.
  */
 @RestController
@@ -38,11 +38,11 @@ public class AuthController {
     /** Service de chargement des informations utilisateur depuis la base de donnees. */
     private final UserDetailsService userDetailsService;
 
-    /** Encodeur de mots de passe (non utilise directement ici mais disponible). */
+    /** Encodeur de mots de passe (non utilisé directement ici mais disponible). */
     private final PasswordEncoder passwordEncoder;
 
     /**
-     * Constructeur avec injection de dependances.
+     * Constructeur avec injection de dépendances.
      *
      * @param authManager        le gestionnaire d'authentification
      * @param jwtUtil            l'utilitaire JWT
@@ -60,15 +60,15 @@ public class AuthController {
     /**
      * Authentifie un utilisateur a partir de son nom d'utilisateur et mot de passe.
      * <p>
-     * En cas de succes, un token JWT est genere avec le username comme sujet
+     * En cas de succès, un token JWT est genere avec le username comme sujet
      * et le role de l'utilisateur comme claim personnalise. Le token est retourne
-     * dans le corps de la reponse au format JSON.
+     * dans le corps de la réponse au format JSON.
      * <p>
-     * En cas d'echec (identifiants invalides), un statut HTTP 401 est renvoye
+     * En cas d'échec (identifiants invalides), un statut HTTP 401 est renvoye
      * avec un message d'erreur.
      *
      * @param request une map contenant les cles "username" et "password"
-     * @return une reponse HTTP contenant le token JWT ou un message d'erreur
+     * @return une réponse HTTP contenant le token JWT ou un message d'erreur
      */
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Map<String, String> request) {
@@ -90,7 +90,7 @@ public class AuthController {
             String token = jwtUtil.genererToken(username, role);
             return ResponseEntity.ok(Map.of("token", token));
         } catch (AuthenticationException e) {
-            // Echec de l'authentification : retour d'une erreur 401
+            // Échec de l'authentification : retour d'une erreur 401
             return ResponseEntity.status(401).body(Map.of("error", "Identifiants invalides"));
         }
     }

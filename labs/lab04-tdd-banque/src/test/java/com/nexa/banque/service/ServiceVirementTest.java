@@ -15,13 +15,13 @@ import static org.junit.jupiter.api.Assertions.*;
  * <p>
  * Verifie le comportement du virement entre deux comptes : debit de la source,
  * credit de la destination, creation des transactions, conservation de la masse
- * monetaire, et rejet des parametres invalides.
+ * monetaire, et rejet des paramètrès invalides.
  * </p>
  *
  * <p>Organisation via {@link Nested} :</p>
  * <ul>
  *   <li>Virement standard : cas nominaux</li>
- *   <li>Cas d'erreur : validations des parametres</li>
+ *   <li>Cas d'erreur : validations des paramètrès</li>
  * </ul>
  */
 @DisplayName("TDD : Service de Virement")
@@ -80,15 +80,15 @@ class ServiceVirementTest {
         }
 
         /**
-         * Verifie qu'un virement cree une transaction chez l'emetteur et le beneficiaire.
+         * Verifie qu'un virement créé une transaction chez l'emetteur et le beneficiaire.
          * <p>
-         * Le compte source recoit une transaction {@code VIREMENT_EMIS} et
-         * le compte destination recoit une transaction {@code VIREMENT_RECU}.
-         * Chaque compte doit avoir exactement 1 transaction apres le virement.
+         * Le compte source reçoit une transaction {@code VIREMENT_EMIS} et
+         * le compte destination reçoit une transaction {@code VIREMENT_RECU}.
+         * Chaque compte doit avoir exactement 1 transaction après le virement.
          * </p>
          */
         @Test
-        @DisplayName("Le virement cree une transaction chez l'emetteur et le beneficiaire")
+        @DisplayName("Le virement créé une transaction chez l'emetteur et le beneficiaire")
         void virementCreeTransactions() {
             service.effectuerVirement(compteAlice, compteBob,
                 new BigDecimal("100.00"), "Cadeau");
@@ -104,15 +104,15 @@ class ServiceVirementTest {
         }
 
         /**
-         * Verifie que la somme des soldes des deux comptes est conservee apres virement.
+         * Verifie que la somme des soldes des deux comptes est conservee après virement.
          * <p>
          * Propriete d'invariance : la masse monetaire totale (somme des soldes)
-         * doit etre identique avant et apres le virement. Aucune creation ni
+         * doit etre identique avant et après le virement. Aucune creation ni
          * destruction d'argent.
          * </p>
          */
         @Test
-        @DisplayName("Somme des soldes conservee apres virement")
+        @DisplayName("Somme des soldes conservee après virement")
         void sommeSoldesConservee() {
             BigDecimal sommeAvant = compteAlice.getSolde().add(compteBob.getSolde());
 
@@ -127,7 +127,7 @@ class ServiceVirementTest {
 
     /**
      * Tests des cas d'erreur lors d'un virement.
-     * <p>Verifie que les parametres invalides (meme compte, montant nul/negatif,
+     * <p>Verifie que les paramètrès invalides (même compte, montant nul/negatif,
      * solde insuffisant) sont correctement rejetes avec une exception.</p>
      */
     @Nested
@@ -135,16 +135,16 @@ class ServiceVirementTest {
     class CasErreur {
 
         /**
-         * Verifie qu'un virement d'un compte vers lui-meme est interdit.
+         * Verifie qu'un virement d'un compte vers lui-même est interdit.
          * <p>Cas d'erreur : source et destination identiques. Cela n'a pas de sens
          * metier et pourrait creer des incoherences.</p>
          */
         @Test
-        @DisplayName("Virement vers le meme compte interdit")
+        @DisplayName("Virement vers le même compte interdit")
         void virementMemeCompteInterdit() {
             assertThrows(IllegalArgumentException.class,
                 () -> service.effectuerVirement(compteAlice, compteAlice,
-                    new BigDecimal("100.00"), "Moi-meme"));
+                    new BigDecimal("100.00"), "Moi-même"));
         }
 
         /**

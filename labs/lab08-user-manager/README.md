@@ -2,14 +2,14 @@
 
 ## Objectif
 
-Developper une API REST complete de gestion d'utilisateurs avec Spring Boot, integrant l'authentification JWT, la gestion des roles (RBAC), la pagination, la validation des donnees, et la gestion centralisee des exceptions. L'application permet de creer, lire, mettre a jour et supprimer des utilisateurs de maniere securisee.
+Developper une API REST complète de gestion d'utilisateurs avec Spring Boot, integrant l'authentification JWT, la gestion des roles (RBAC), la pagination, la validation des donnees, et la gestion centralisee des exceptions. L'application permet de creer, lire, mettre a jour et supprimer des utilisateurs de maniere securisee.
 
-## Enonce
+## Énoncé
 
 Vous devez realiser une API REST de gestion d'utilisateurs (CRUD) avec les fonctionnalites suivantes :
 
 - Authentification par JWT (JSON Web Token).
-- Controle d'acces base sur les roles (ADMIN et USER).
+- Controle d'accès base sur les roles (ADMIN et USER).
 - Operations CRUD completes sur les utilisateurs.
 - Pagination des resultats de recherche.
 - Validation des donnees d'entree avec Jakarta Bean Validation.
@@ -33,18 +33,18 @@ L'application expose les endpoints suivants :
 | GET     | `/api/users/actifs`       | ADMIN, USER      | Lister les utilisateurs actifs  |
 | GET     | `/actuator/health`        | Public           | Health check                    |
 
-## Prerequis
+## Prérequis
 
 - Java 17 ou superieur.
 - Maven 3.8 ou superieur.
-- PostgreSQL (pour l'execution en production ; H2 est utilise pour les tests).
+- PostgreSQL (pour l'exécution en production ; H2 est utilisé pour les tests).
 - Connaissance de base de Spring Boot, Spring Security et JPA.
 
-## Deroule etapes
+## Deroule étapes
 
-### Etape 1 : Creation du projet et configuration Maven
+### Étape 1 : Creation du projet et configuration Maven
 
-Creer un projet Spring Boot avec les dependances suivantes dans le fichier `pom.xml` :
+Creer un projet Spring Boot avec les dépendances suivantes dans le fichier `pom.xml` :
 - `spring-boot-starter-web` : pour les controleurs REST.
 - `spring-boot-starter-security` : pour l'authentification et l'autorisation.
 - `spring-boot-starter-data-jpa` : pour la persistance avec JPA/Hibernate.
@@ -56,27 +56,27 @@ Creer un projet Spring Boot avec les dependances suivantes dans le fichier `pom.
 - `spring-boot-starter-test`, `spring-security-test`, `testcontainers`, `rest-assured` : frameworks de test.
 - `jacoco-maven-plugin` : couverture de code (minimum 80% lignes, 70% branches).
 - `pitest-maven` : tests de mutation.
-- `owasp/dependency-check-maven` : analyse des vulnerabilites des dependances.
+- `owasp/dependency-check-maven` : analyse des vulnerabilites des dépendances.
 
-### Etape 2 : Creation de l'entite JPA
+### Étape 2 : Creation de l'entité JPA
 
 Creer la classe `User` dans le package `entity` avec les annotations JPA :
 - `@Entity`, `@Table(name = "users")` pour le mapping.
-- `@Id` avec `@GeneratedValue(strategy = GenerationType.IDENTITY)` pour la cle primaire auto-generee.
+- `@Id` avec `@GeneratedValue(strategy = GenerationType.IDENTITY)` pour la cle primaire auto-générée.
 - Champs : `nom`, `prenom`, `email` (unique), `password`, `role` (enum USER/ADMIN), `actif`, `dateCreation`, `dateModification`.
 - Contraintes de validation avec `@NotBlank`, `@Size`, `@Email`, `@NotNull`.
 - Enum interne `Role` avec les valeurs `USER` et `ADMIN`.
 
-### Etape 3 : Creation des DTOs
+### Étape 3 : Creation des DTOs
 
 Creer les objets de transfert de donnees dans le package `dto` :
 - `UserRequest` : DTO d'entree avec validation (`@NotBlank`, `@Size`, `@Email`, `@NotNull`) pour les champs nom, prenom, email, password, role.
-- `UserResponse` : DTO de sortie sans le mot de passe, avec methode statique `from(User)` pour la conversion entite vers DTO.
+- `UserResponse` : DTO de sortie sans le mot de passe, avec méthode statique `from(User)` pour la conversion entité vers DTO.
 - `ErrorResponse` : DTO pour les reponses d'erreur conforme au standard RFC 7807 (Problem Details), avec champs status, title, detail, errors.
 
-### Etape 4 : Creation du repository et du service
+### Étape 4 : Creation du repository et du service
 
-Creer l'interface `UserRepository` dans le package `repository` qui etend `JpaRepository<User, Long>` avec les methodes de requete derivees :
+Creer l'interface `UserRepository` dans le package `repository` qui etend `JpaRepository<User, Long>` avec les méthodes de requête derivees :
 - `findByEmail` : recherche par email.
 - `existsByEmail` : verification d'existence par email.
 - `findByNomContainingIgnoreCase` : recherche insensible a la casse par nom.
@@ -84,20 +84,20 @@ Creer l'interface `UserRepository` dans le package `repository` qui etend `JpaRe
 - `findByRole` avec `Pageable` : recherche paginee par role.
 - `countByRole` : comptage par role.
 
-Creer la classe `UserService` dans le package `service` avec les methodes metier :
+Creer la classe `UserService` dans le package `service` avec les méthodes metier :
 - `creer(User)` : creation avec hachage BCrypt du mot de passe et verification d'unicite de l'email.
-- `listerTous()` : liste complete.
+- `listerTous()` : liste complète.
 - `listerPagine(Pageable)` : liste paginee.
-- `trouverParId(Long)` : recherche par ID, leve `ResourceNotFoundException` si absent.
+- `trouverParId(Long)` : recherche par ID, lève `ResourceNotFoundException` si absent.
 - `trouverParEmail(String)` : recherche par email.
 - `mettreAJour(Long, User)` : mise a jour partielle, ne modifie le mot de passe que s'il est fourni.
 - `supprimer(Long)` : suppression avec verification d'existence.
-- `desactiver(Long)` : desactivation logique.
+- `désactiver(Long)` : desactivation logique.
 - `rechercherParNom(String)` : recherche par nom partiel.
 - `listerActifs()` : liste des utilisateurs actifs.
 - `compterParRole(Role)` : comptage par role.
 
-### Etape 5 : Securite - JWT et Spring Security
+### Étape 5 : Securite - JWT et Spring Security
 
 Creer la classe `JwtUtil` dans le package `security` :
 - Generer des tokens JWT signes avec HMAC-SHA256.
@@ -106,7 +106,7 @@ Creer la classe `JwtUtil` dans le package `security` :
 - Cle secrete de 256 bits minimum, expiration a 1 heure (3600000 ms).
 
 Creer la classe `JwtFilter` qui etend `OncePerRequestFilter` :
-- Intercepter chaque requete HTTP.
+- Intercepter chaque requête HTTP.
 - Extraire le token du header `Authorization: Bearer <token>`.
 - Valider le token et definir le contexte d'authentification Spring Security avec le role.
 
@@ -117,7 +117,7 @@ Configurer Spring Security dans `SecurityConfig` :
 - Ajouter `JwtFilter` avant `UsernamePasswordAuthenticationFilter`.
 - Configurer `BCryptPasswordEncoder` et `AuthenticationManager`.
 
-### Etape 6 : Controleur REST et gestion des exceptions
+### Étape 6 : Controleur REST et gestion des exceptions
 
 Creer la classe `UserController` dans le package `controller` :
 - `POST /api/auth/login` : authentification par email/mot de passe, retourne un token JWT.
@@ -140,26 +140,26 @@ Creer `GlobalExceptionHandler` avec `@RestControllerAdvice` :
 - `MethodArgumentNotValidException` -> 400 avec details par champ.
 - `IllegalArgumentException` -> 400.
 
-### Etape 7 : Configuration et initialisation
+### Étape 7 : Configuration et initialisation
 
 Creer `AppConfig` dans le package `config` :
 - Definir le bean `UserDetailsService` qui charge un utilisateur par email depuis le repository.
 - Definir le bean `CommandLineRunner` qui initialise deux utilisateurs par defaut au demarrage si la base est vide : `admin@nexa.fr` (role ADMIN, mot de passe `admin123`) et `user@nexa.fr` (role USER, mot de passe `user123`).
 
-### Etape 8 : Tests unitaires et d'integration
+### Étape 8 : Tests unitaires et d'integration
 
 Ecrire les tests pour chaque couche de l'application :
 
-- **Tests d'entite** (`UserEntityTest`) : constructeurs, setters/getters, enum Role.
+- **Tests d'entité** (`UserEntityTest`) : constructeurs, setters/getters, enum Role.
 - **Tests DTO** (`UserRequestTest`, `UserResponseTest`, `ErrorResponseTest`) : conversion, validation.
-- **Tests repository** (`UserRepositoryTest`) : toutes les methodes de requete derivees, unicite email, CRUD de base avec `@DataJpaTest`.
-- **Tests service** (`UserServiceTest`) : toutes les methodes metier avec Mockito, cas d'erreur, cas nominaux.
+- **Tests repository** (`UserRepositoryTest`) : toutes les méthodes de requête derivees, unicite email, CRUD de base avec `@DataJpaTest`.
+- **Tests service** (`UserServiceTest`) : toutes les méthodes metier avec Mockito, cas d'erreur, cas nominaux.
 - **Tests controleur** (`UserControllerTest`) : tous les endpoints avec `@WebMvcTest`, `MockMvc`, `@WithMockUser`.
-- **Tests securite** (`SecurityTests`) : acces anonyme, acces par role, refus d'acces.
+- **Tests sécurité** (`SecurityTests`) : accès anonyme, accès par role, refus d'accès.
 - **Tests JWT** (`JwtUtilTest`) : generation, extraction, validation, cas d'erreur.
 - **Tests exceptions** (`ExceptionsTest`, `GlobalExceptionHandlerTest`) : messages, codes HTTP.
 
-## Execution
+## Exécution
 
 ### Compilation et tests
 
@@ -168,7 +168,7 @@ cd labs/lab08-user-manager
 mvn clean test
 ```
 
-### Execution de l'application
+### Exécution de l'application
 
 ```bash
 mvn spring-boot:run
@@ -190,13 +190,13 @@ Le rapport est genere dans `target/site/jacoco/index.html`.
 mvn pitest:mutationCoverage
 ```
 
-## Criteres de reussite
+## Criteres de réussite
 
 1. **Compilation sans erreur** : le projet compile avec `mvn compile` sans aucune erreur.
-2. **Tous les tests passent** : les 74 tests s'executent avec succes (`mvn test`).
-3. **Couverture de code** : minimum 80% de couverture de lignes et 70% de couverture de branches (verifie par JaCoCo).
+2. **Tous les tests passent** : les 74 tests s'executent avec succès (`mvn test`).
+3. **Couverture de code** : minimum 80% de couverture de lignes et 70% de couverture de branches (vérifié par JaCoCo).
 4. **API fonctionnelle** : tous les endpoints CRUD repondent correctement avec les bons codes HTTP.
-5. **Securite** : l'authentification JWT fonctionne, les roles sont respectes, les acces non autorises retournent 403.
+5. **Securite** : l'authentification JWT fonctionne, les roles sont respectes, les accès non autorises retournent 403.
 6. **Validation** : les donnees invalides sont rejetees avec un code 400 et des messages d'erreur precis.
 7. **Exceptions** : les erreurs metier et les ressources non trouvees sont gerees proprement avec des messages structures.
 8. **Mots de passe** : les mots de passe sont hashes avec BCrypt et jamais exposes dans les reponses API.

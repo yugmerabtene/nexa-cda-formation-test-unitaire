@@ -11,7 +11,7 @@ import java.util.Date;
 /**
  * Utilitaire de gestion des tokens JWT (JSON Web Token).
  *
- * <p>Cette classe fournit les methodes pour :</p>
+ * <p>Cette classe fournit les méthodes pour :</p>
  * <ul>
  *   <li>Generer un token JWT signe avec HMAC-SHA256</li>
  *   <li>Extraire l'email (subject) d'un token</li>
@@ -20,7 +20,7 @@ import java.util.Date;
  * </ul>
  *
  * <p>Les tokens contiennent l'email en tant que sujet ({@code sub}) et le role
- * en tant que claim personnalise ({@code role}). La duree de validite est de
+ * en tant que claim personnalise ({@code role}). La durée de validite est de
  * 1 heure (3600000 ms).</p>
  *
  * <p>La cle secrete doit faire au moins 256 bits pour etre compatible avec
@@ -30,10 +30,10 @@ import java.util.Date;
 public class JwtUtil {
 
     /**
-     * Cle secrete utilisee pour signer et verifier les tokens JWT.
+     * Cle secrete utilisé́e pour signer et verifier les tokens JWT.
      * Doit faire au moins 256 bits (32 caracteres) pour HS256.
      */
-    private static final String SECRET = "cette-cle-est-un-secret-tres-long-dau-moins-256-bits-pour-hs256-user-manager";
+    private static final String SECRET = "cette-cle-est-un-secret-très-long-dau-moins-256-bits-pour-hs256-user-manager";
 
     /** Duree de validite des tokens en millisecondes (1 heure = 3600000 ms). */
     private static final long EXPIRATION = 3600000;
@@ -53,9 +53,9 @@ public class JwtUtil {
      * Genere un token JWT pour un utilisateur donne.
      *
      * <p>Le token contient l'email comme sujet et le role comme claim personnalise.
-     * Il est signe avec la cle HMAC et expire apres 1 heure.</p>
+     * Il est signe avec la cle HMAC et expire après 1 heure.</p>
      *
-     * @param email l'adresse email de l'utilisateur (utilisee comme sujet)
+     * @param email l'adresse email de l'utilisateur (utilisé́e comme sujet)
      * @param role  le role de l'utilisateur (USER ou ADMIN)
      * @return le token JWT signe sous forme de chaine compacte
      */
@@ -92,10 +92,10 @@ public class JwtUtil {
     }
 
     /**
-     * Verifie si un token JWT est valide (signature correcte et non expire).
+     * Verifie si un token JWT est validé (signature correcte et non expire).
      *
      * @param token le token JWT a valider
-     * @return {@code true} si le token est valide, {@code false} sinon
+     * @return {@code true} si le token est validé, {@code false} sinon
      */
     public boolean estValide(String token) {
         try {
@@ -107,11 +107,11 @@ public class JwtUtil {
     }
 
     /**
-     * Parse et verifie un token JWT, puis retourne les claims (payload).
+     * Parse et vérifié un token JWT, puis retourne les claims (payload).
      *
-     * <p>Cette methode verifie la signature et l'expiration du token.
+     * <p>Cette méthode vérifié la signature et l'expiration du token.
      * Toute anomalie (signature invalide, token expire, format incorrect)
-     * leve une {@link JwtException} ou {@link IllegalArgumentException}.</p>
+     * lève une {@link JwtException} ou {@link IllegalArgumentException}.</p>
      *
      * @param token le token JWT a parser et verifier
      * @return les claims extraits du token

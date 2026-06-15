@@ -12,7 +12,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 /**
- * Configuration applicative centralisant les beans de securite.
+ * Configuration applicative centralisant les beans de sécurité.
  * <p>
  * Cette classe definit :
  * <ul>
@@ -29,7 +29,7 @@ public class AppConfig {
      * depuis la base de donnees via le repository et le transforme en objet
      * utilisable par Spring Security.
      *
-     * @param repo le repository d'acces aux utilisateurs en base
+     * @param repo le repository d'accès aux utilisateurs en base
      * @return une implementation de {@link UserDetailsService}
      */
     @Bean
@@ -46,13 +46,13 @@ public class AppConfig {
     }
 
     /**
-     * Expose le {@link AuthenticationManager} gere par Spring Security,
+     * Expose le {@link AuthenticationManager} gère par Spring Security,
      * necessaire pour l'authentification manuelle dans le controleur
      * de connexion ({@code AuthController}).
      *
      * @param config la configuration d'authentification fournie par Spring
      * @return le gestionnaire d'authentification
-     * @throws Exception si la recuperation du gestionnaire echoue
+     * @throws Exception si la recuperation du gestionnaire échoué
      */
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
@@ -61,7 +61,7 @@ public class AppConfig {
 
     /**
      * Initialise les utilisateurs par defaut dans la base H2 au demarrage
-     * de l'application, si ceux-ci n'existent pas deja.
+     * de l'application, si ceux-ci n'existent pas déjà.
      * <p>
      * Deux comptes sont crees :
      * <ul>
@@ -70,9 +70,9 @@ public class AppConfig {
      * </ul>
      * Les mots de passe sont chiffres avec BCrypt avant d'etre persistes.
      *
-     * @param repo    le repository d'acces aux utilisateurs
+     * @param repo    le repository d'accès aux utilisateurs
      * @param encoder l'encodeur de mots de passe BCrypt
-     * @return un {@link CommandLineRunner} execute au demarrage
+     * @return un {@link CommandLineRunner} exécuté au demarrage
      */
     @Bean
     public CommandLineRunner initUsers(UtilisateurRepository repo, PasswordEncoder encoder) {

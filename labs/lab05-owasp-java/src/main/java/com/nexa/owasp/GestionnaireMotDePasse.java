@@ -23,8 +23,8 @@ public class GestionnaireMotDePasse {
     /**
      * Hache un mot de passe avec SHA-256 sans sel (version vulnerable).
      *
-     * <p>Ce hachage est deterministe : deux appels avec le meme mot de passe
-     * produisent le meme resultat. Un attaquant peut utiliser des tables
+     * <p>Ce hachage est deterministe : deux appels avec le même mot de passe
+     * produisent le même résultat. Un attaquant peut utilisé́r des tables
      * arc-en-ciel (rainbow tables) pour inverser le hash.</p>
      *
      * @param motDePasse le mot de passe en clair a hacher
@@ -45,10 +45,10 @@ public class GestionnaireMotDePasse {
      * Hache un mot de passe avec SHA-256 et un sel aleatoire (version securisee).
      *
      * <p>Un sel de 16 octets est genere via {@link SecureRandom}. Le sel est
-     * d'abord injecte dans le digest, puis le mot de passe est hache. Le resultat
+     * d'abord injecte dans le digest, puis le mot de passe est hache. Le résultat
      * est au format {@code selBase64:hashBase64}.</p>
      *
-     * <p>Chaque appel produit un hash different meme pour le meme mot de passe,
+     * <p>Chaque appel produit un hash différent même pour le même mot de passe,
      * rendant les rainbow tables inoperantes.</p>
      *
      * @param motDePasse le mot de passe en clair a hacher
@@ -74,8 +74,8 @@ public class GestionnaireMotDePasse {
     /**
      * Verifie un mot de passe contre un hash stocke au format {@code sel:hash}.
      *
-     * <p>La methode decode le sel depuis la partie gauche du hash stocke,
-     * recalcule le hash du mot de passe fourni avec ce meme sel, puis compare
+     * <p>La méthode decode le sel depuis la partie gauche du hash stocke,
+     * recalcule le hash du mot de passe fourni avec ce même sel, puis compare
      * les deux hashs.</p>
      *
      * <p>Retourne {@code false} si le format est invalide, si le sel est

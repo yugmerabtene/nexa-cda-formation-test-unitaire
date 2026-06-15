@@ -24,7 +24,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * <p>Groupes de tests :</p>
  * <ul>
  *   <li>Creation du compte</li>
- *   <li>Operations de depot</li>
+ *   <li>Operations de dépôt</li>
  *   <li>Operations de retrait</li>
  *   <li>Historique des transactions</li>
  *   <li>Virements internes au compte</li>
@@ -45,11 +45,11 @@ class CompteBancaireTest {
     class CreationCompte {
 
         /**
-         * Verifie qu'un compte est cree avec l'ID, le titulaire et le solde initial fournis.
-         * <p>Cas nominal : tous les parametres sont valides.</p>
+         * Verifie qu'un compte est créé avec l'ID, le titulaire et le solde initial fournis.
+         * <p>Cas nominal : tous les paramètrès sont valides.</p>
          */
         @Test
-        @DisplayName("Un compte est cree avec un solde initial correct")
+        @DisplayName("Un compte est créé avec un solde initial correct")
         void creationAvecSoldeInitial() {
             CompteBancaire compte = new CompteBancaire(1L, "Alice", new BigDecimal("1000.00"));
 
@@ -59,18 +59,18 @@ class CompteBancaireTest {
         }
 
         /**
-         * Verifie qu'un compte peut etre cree avec un solde initial de zero.
+         * Verifie qu'un compte peut etre créé avec un solde initial de zero.
          * <p>Cas limite : le solde zero est accepte (compte sans provision).</p>
          */
         @Test
-        @DisplayName("Un compte peut etre cree avec un solde initial de zero")
+        @DisplayName("Un compte peut etre créé avec un solde initial de zero")
         void creationSoldeZero() {
             CompteBancaire compte = new CompteBancaire(2L, "Bob", BigDecimal.ZERO);
             assertEquals(BigDecimal.ZERO, compte.getSolde());
         }
 
         /**
-         * Verifie que la creation avec un solde initial negatif leve une exception.
+         * Verifie que la creation avec un solde initial negatif lève une exception.
          * <p>Cas d'erreur : le constructeur doit rejeter un solde negatif.</p>
          */
         @Test
@@ -82,20 +82,20 @@ class CompteBancaireTest {
     }
 
     /**
-     * Tests des operations de depot sur un compte bancaire.
+     * Tests des operations de dépôt sur un compte bancaire.
      * <p>Verifie l'incrementation correcte du solde et le rejet des depots
      * nuls ou negatifs.</p>
      */
     @Nested
-    @DisplayName("Operations de depot")
+    @DisplayName("Operations de dépôt")
     class Depot {
 
         /**
-         * Verifie qu'un depot augmente le solde du montant exact depose.
-         * <p>Cas nominal : depot positif sur un compte provisionne.</p>
+         * Verifie qu'un dépôt augmente le solde du montant exact depose.
+         * <p>Cas nominal : dépôt positif sur un compte provisionne.</p>
          */
         @Test
-        @DisplayName("Un depot augmente le solde")
+        @DisplayName("Un dépôt augmente le solde")
         void depotAugmenteSolde() {
             CompteBancaire compte = new CompteBancaire(1L, "Alice", new BigDecimal("500.00"));
             compte.deposer(new BigDecimal("150.00"), "Salaire");
@@ -103,7 +103,7 @@ class CompteBancaireTest {
         }
 
         /**
-         * Verifie qu'un depot de zero est interdit.
+         * Verifie qu'un dépôt de zero est interdit.
          * <p>Cas d'erreur : le montant doit etre strictement positif.</p>
          */
         @Test
@@ -115,8 +115,8 @@ class CompteBancaireTest {
         }
 
         /**
-         * Verifie qu'un depot negatif est interdit.
-         * <p>Cas d'erreur : un depot ne doit pas pouvoir diminuer le solde.</p>
+         * Verifie qu'un dépôt negatif est interdit.
+         * <p>Cas d'erreur : un dépôt ne doit pas pouvoir diminuer le solde.</p>
          */
         @Test
         @DisplayName("Depot negatif est interdit")
@@ -200,7 +200,7 @@ class CompteBancaireTest {
 
         /**
          * Verifie qu'un retrait negatif est interdit.
-         * <p>Cas d'erreur : un retrait negatif serait un depot deguise.</p>
+         * <p>Cas d'erreur : un retrait negatif serait un dépôt deguise.</p>
          */
         @Test
         @DisplayName("Retrait negatif interdit")
@@ -213,7 +213,7 @@ class CompteBancaireTest {
 
     /**
      * Tests de l'historique des transactions.
-     * <p>Verifie que chaque operation est correctement enregistree, que
+     * <p>Verifie que chaque opération est correctement enregistree, que
      * l'historique respecte l'ordre chronologique, et que la liste exposee
      * est immuable.</p>
      */
@@ -223,7 +223,7 @@ class CompteBancaireTest {
 
         /**
          * Verifie que l'historique est vide a la creation du compte.
-         * <p>Cas nominal : aucun appel a une methode d'operation, l'historique
+         * <p>Cas nominal : aucun appel a une méthode d'opération, l'historique
          * est une liste vide et le nombre de transactions est 0.</p>
          */
         @Test
@@ -235,45 +235,45 @@ class CompteBancaireTest {
         }
 
         /**
-         * Verifie qu'un depot cree une transaction de type DEPOT avec les bons attributs.
+         * Verifie qu'un dépôt créé une transaction de type DEPOT avec les bons attributs.
          * <p>Controle : type = DEPOT, montant = montant depose,
-         * soldeApresOperation = solde initial + depot.</p>
+         * soldeApresOperation = solde initial + dépôt.</p>
          */
         @Test
-        @DisplayName("Un depot cree une transaction dans l'historique")
+        @DisplayName("Un dépôt créé une transaction dans l'historique")
         void depotCreeTransaction() {
             CompteBancaire compte = new CompteBancaire(1L, "Alice", new BigDecimal("100.00"));
             compte.deposer(new BigDecimal("50.00"), "Depot test");
 
             assertEquals(1, compte.getNombreTransactions());
-            Transaction derniere = compte.getDerniereTransaction();
-            assertNotNull(derniere);
-            assertEquals(Transaction.Type.DEPOT, derniere.getType());
-            assertEquals(new BigDecimal("50.00"), derniere.getMontant());
-            assertEquals(new BigDecimal("150.00"), derniere.getSoldeApresOperation());
+            Transaction dernière = compte.getDerniereTransaction();
+            assertNotNull(dernière);
+            assertEquals(Transaction.Type.DEPOT, dernière.getType());
+            assertEquals(new BigDecimal("50.00"), dernière.getMontant());
+            assertEquals(new BigDecimal("150.00"), dernière.getSoldeApresOperation());
         }
 
         /**
-         * Verifie qu'un retrait cree une transaction de type RETRAIT avec les bons attributs.
+         * Verifie qu'un retrait créé une transaction de type RETRAIT avec les bons attributs.
          * <p>Controle : type = RETRAIT, montant = montant retire,
          * soldeApresOperation = solde initial - retrait.</p>
          */
         @Test
-        @DisplayName("Un retrait cree une transaction dans l'historique")
+        @DisplayName("Un retrait créé une transaction dans l'historique")
         void retraitCreeTransaction() {
             CompteBancaire compte = new CompteBancaire(1L, "Alice", new BigDecimal("100.00"));
             compte.retirer(new BigDecimal("30.00"), "Retrait test");
 
-            Transaction derniere = compte.getDerniereTransaction();
-            assertEquals(Transaction.Type.RETRAIT, derniere.getType());
-            assertEquals(new BigDecimal("30.00"), derniere.getMontant());
-            assertEquals(new BigDecimal("70.00"), derniere.getSoldeApresOperation());
+            Transaction dernière = compte.getDerniereTransaction();
+            assertEquals(Transaction.Type.RETRAIT, dernière.getType());
+            assertEquals(new BigDecimal("30.00"), dernière.getMontant());
+            assertEquals(new BigDecimal("70.00"), dernière.getSoldeApresOperation());
         }
 
         /**
-         * Verifie que plusieurs operations sont enregistrees dans l'ordre d'execution.
+         * Verifie que plusieurs operations sont enregistrees dans l'ordre d'exécution.
          * <p>Test de sequence : Depot(1000) -> Retrait(200) -> Depot(50).
-         * Les soldes apres operation sont verifies pour chaque etape.</p>
+         * Les soldes après opération sont verifies pour chaque étape.</p>
          */
         @Test
         @DisplayName("Plusieurs operations creent des transactions ordonnees")
@@ -314,7 +314,7 @@ class CompteBancaireTest {
 
         /**
          * Verifie que getDerniereTransaction() retourne null quand l'historique est vide.
-         * <p>Cas limite : aucun appel a une methode d'operation.</p>
+         * <p>Cas limite : aucun appel a une méthode d'opération.</p>
          */
         @Test
         @DisplayName("getDerniereTransaction retourne null si historique vide")
@@ -326,7 +326,7 @@ class CompteBancaireTest {
 
     /**
      * Tests des operations de virement internes au compte (emission et reception).
-     * <p>Ces methodes sont utilisees par {@code ServiceVirement} mais sont testees
+     * <p>Ces méthodes sont utilisees par {@code ServiceVirement} mais sont testees
      * independamment pour verifier leur comportement unitaire.</p>
      */
     @Nested
@@ -362,7 +362,7 @@ class CompteBancaireTest {
          * <p>Controle du type de transaction genere.</p>
          */
         @Test
-        @DisplayName("Le virement emis cree une transaction de type VIREMENT_EMIS")
+        @DisplayName("Le virement emis créé une transaction de type VIREMENT_EMIS")
         void transactionVirementEmis() {
             CompteBancaire compte = new CompteBancaire(1L, "Alice", new BigDecimal("500.00"));
             compte.emettreVirement(new BigDecimal("100.00"), "Test virement");
@@ -375,7 +375,7 @@ class CompteBancaireTest {
          * <p>Controle du type de transaction genere.</p>
          */
         @Test
-        @DisplayName("Le virement recu cree une transaction de type VIREMENT_RECU")
+        @DisplayName("Le virement reçu créé une transaction de type VIREMENT_RECU")
         void transactionVirementRecu() {
             CompteBancaire compte = new CompteBancaire(1L, "Alice", new BigDecimal("500.00"));
             compte.recevoirVirement(new BigDecimal("100.00"), "Test reception");
@@ -459,7 +459,7 @@ class CompteBancaireTest {
          * 5 threads sont repartis : 3 effectuent 50 depots de 1€ chacun,
          * 2 effectuent 50 retraits de 1€ chacun. Le solde initial est de 1000€.
          * Le solde final attendu est de 1000 + 150 - 100 = 1050€.
-         * Ce test verifie que les sections critiques de {@code deposer()} et
+         * Ce test vérifié que les sections critiques de {@code deposer()} et
          * {@code retirer()} ne s'interferent pas.
          * </p>
          *
@@ -476,7 +476,7 @@ class CompteBancaireTest {
             ExecutorService executor = Executors.newFixedThreadPool(nbThreads);
             CountDownLatch latch = new CountDownLatch(nbThreads);
 
-            // 3 threads de depot (indices 0, 1, 2)
+            // 3 threads de dépôt (indices 0, 1, 2)
             for (int i = 0; i < nbThreads / 2 + 1; i++) {
                 executor.submit(() -> {
                     try {
@@ -521,24 +521,24 @@ class CompteBancaireTest {
     /**
      * Test de stabilite repete 10 fois pour verifier le determinisme des operations.
      * <p>
-     * La meme sequence d'operations (depot 50, retrait 30, depot 20) est executee
-     * sur un compte partant de 100€. Le resultat attendu est toujours 140€,
+     * La même sequence d'operations (dépôt 50, retrait 30, dépôt 20) est executee
+     * sur un compte partant de 100€. Le résultat attendu est toujours 140€,
      * quelle que soit l'iteration. L'annotation {@link RepeatedTest} garantit
-     * que le test est execute 10 fois de suite.
+     * que le test est exécuté 10 fois de suite.
      * </p>
      * <p>
-     * Ce test permet de detecter d'eventuels problemes de synchronisation subtils
+     * Ce test permet de detecter d'eventuels problèmes de synchronisation subtils
      * qui pourraient apparaitre de maniere non deterministe.
      * </p>
      */
     @RepeatedTest(value = 10, name = "{displayName} — repetition {currentRepetition}/{totalRepetitions}")
-    @DisplayName("Stabilite : le solde apres 3 operations est toujours correct")
+    @DisplayName("Stabilite : le solde après 3 operations est toujours correct")
     void stabiliteSoldeApresOperations() {
         CompteBancaire compte = new CompteBancaire(1L, "Test", new BigDecimal("100.00"));
         compte.deposer(new BigDecimal("50.00"), "Depot");
         compte.retirer(new BigDecimal("30.00"), "Retrait");
         compte.deposer(new BigDecimal("20.00"), "Depot 2");
         assertEquals(new BigDecimal("140.00"), compte.getSolde(),
-            "Apres 100+50-30+20 le solde doit toujours etre 140.00");
+            "Après 100+50-30+20 le solde doit toujours etre 140.00");
     }
 }

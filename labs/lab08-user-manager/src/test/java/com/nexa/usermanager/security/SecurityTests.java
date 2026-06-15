@@ -22,10 +22,10 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /**
- * Tests d'integration pour la configuration de securite Spring Security.
+ * Tests d'integration pour la configuration de sécurité Spring Security.
  *
- * <p>Cette classe verifie le controle d'acces aux endpoints en fonction
- * des roles et de l'etat d'authentification :</p>
+ * <p>Cette classe vérifié le controle d'accès aux endpoints en fonction
+ * des roles et de l'état d'authentification :</p>
  * <ul>
  *   <li>Les endpoints publics ({@code /api/auth/**}, {@code /actuator/health})
  *       sont accessibles sans authentification.</li>
@@ -36,7 +36,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  */
 @WebMvcTest
 @Import(SecurityConfig.class)
-@DisplayName("Tests de securite : Controle d'acces")
+@DisplayName("Tests de sécurité : Controle d'accès")
 class SecurityTests {
 
     /** MockMvc pour simuler les requetes HTTP. */
@@ -90,10 +90,10 @@ class SecurityTests {
     }
 
     /**
-     * Classe interne regroupant les tests de controle d'acces par role.
+     * Classe interne regroupant les tests de controle d'accès par role.
      */
     @Nested
-    @DisplayName("Controle d'acces par role")
+    @DisplayName("Controle d'accès par role")
     class ControleParRole {
 
         /**

@@ -7,8 +7,8 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 /**
- * Repository Spring Data JPA pour l'entite {@link Produit}.
- * Fournit des methodes de requete derivees pour interroger la table produits.
+ * Repository Spring Data JPA pour l'entité {@link Produit}.
+ * Fournit des méthodes de requête derivees pour interroger la table produits.
  */
 @Repository
 public interface ProduitRepository extends JpaRepository<Produit, Long> {
@@ -38,7 +38,7 @@ public interface ProduitRepository extends JpaRepository<Produit, Long> {
     List<Produit> findByQuantiteGreaterThan(int quantiteMin);
 
     /**
-     * Verifie si un produit portant exactement ce nom existe deja (insensible a la casse).
+     * Verifie si un produit portant exactement ce nom existe déjà (insensible a la casse).
      *
      * @param nom nom du produit a verifier
      * @return true si un produit avec ce nom existe, false sinon

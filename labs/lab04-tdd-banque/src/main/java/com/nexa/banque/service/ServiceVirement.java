@@ -7,15 +7,15 @@ import java.math.BigDecimal;
 /**
  * Service metier orchestrant les virements entre deux comptes bancaires.
  * <p>
- * Ce service valide les parametres du virement (comptes distincts, montant positif)
- * puis delegue les operations de debit et credit aux methodes specialisees
+ * Ce service validé les paramètrès du virement (comptes distincts, montant positif)
+ * puis delegue les operations de debit et credit aux méthodes specialisees
  * de {@link CompteBancaire} : {@code emettreVirement} sur le compte source et
  * {@code recevoirVirement} sur le compte destination.
  * </p>
  *
  * <p>
- * La securite des threads est assuree par la synchronisation interne de
- * {@link CompteBancaire}. Le service lui-meme est sans etat (stateless)
+ * La sécurité des threads est assuree par la synchronisation interne de
+ * {@link CompteBancaire}. Le service lui-même est sans état (stateless)
  * et donc thread-safe par construction.
  * </p>
  *
@@ -23,7 +23,7 @@ import java.math.BigDecimal;
  * <ul>
  *   <li>Les comptes source et destination doivent etre distincts.</li>
  *   <li>Le montant doit etre strictement positif.</li>
- *   <li>Le solde du compte source doit etre suffisant (valide par {@code emettreVirement}).</li>
+ *   <li>Le solde du compte source doit etre suffisant (validé par {@code emettreVirement}).</li>
  * </ul>
  */
 public class ServiceVirement {
@@ -38,8 +38,8 @@ public class ServiceVirement {
      * </p>
      *
      * <p>
-     * Cas d'erreur : si l'une des validations echoue, aucune ecriture n'a lieu
-     * car les methodes de {@code CompteBancaire} valident avant de modifier le solde.
+     * Cas d'erreur : si l'une des validations échoué, aucune ecriture n'a lieu
+     * car les méthodes de {@code CompteBancaire} valident avant de modifier le solde.
      * </p>
      *
      * @param source      compte emetteur du virement (sera debite)
@@ -54,7 +54,7 @@ public class ServiceVirement {
     public void effectuerVirement(CompteBancaire source, CompteBancaire destination,
                                   BigDecimal montant, String motif) {
         if (source.equals(destination)) {
-            throw new IllegalArgumentException("Impossible de virer vers le meme compte");
+            throw new IllegalArgumentException("Impossible de virer vers le même compte");
         }
         if (montant.compareTo(BigDecimal.ZERO) <= 0) {
             throw new IllegalArgumentException("Le montant du virement doit etre strictement positif");

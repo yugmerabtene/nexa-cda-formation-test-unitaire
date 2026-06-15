@@ -9,39 +9,39 @@ import org.junit.jupiter.params.provider.ValueSource;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Tests unitaires de securite pour la classe {@link Authentificateur}.
+ * Tests unitaires de sécurité pour la classe {@link Authentificateur}.
  *
- * <p>Cette classe de test valide deux categories de vulnerabilites OWASP :</p>
+ * <p>Cette classe de test validé deux categories de vulnerabilites OWASP :</p>
  * <ul>
  *   <li>Injection SQL : verification que la version vulnerable accepte les
- *       charges utiles et que la version securisee utilise un parametre prepare.</li>
+ *       charges utiles et que la version securisee utilisé un paramètre prepare.</li>
  *   <li>Cross-Site Scripting (XSS) : verification que les scripts sont injectes
  *       dans la version vulnerable et echappes dans la version securisee.</li>
  * </ul>
  *
  * <p>Les cas nominaux et les cas limites (entrees nulles) sont egalement testes.</p>
  */
-@DisplayName("OWASP : Tests de securite de l'Authentificateur")
+@DisplayName("OWASP : Tests de sécurité de l'Authentificateur")
 class AuthentificateurTest {
 
     /**
-     * Instance de l'authentificateur utilisee dans tous les tests.
+     * Instance de l'authentificateur utilisé́e dans tous les tests.
      */
     private final Authentificateur auth = new Authentificateur();
 
     /**
      * Tests d'injection SQL.
      *
-     * <p>Demontre que la methode vulnerable permet l'injection de charges
-     * utiles SQL dans la requete, tandis que la methode securisee utilise
-     * un parametre prepare qui empeche toute manipulation.</p>
+     * <p>Demontre que la méthode vulnerable permet l'injection de charges
+     * utiles SQL dans la requête, tandis que la méthode securisee utilisé
+     * un paramètre prepare qui empeche toute manipulation.</p>
      */
     @Nested
     @DisplayName("Injection SQL")
     class InjectionSQL {
 
         /**
-         * Verifie que la requete vulnerable contient la charge utile d'injection SQL.
+         * Verifie que la requête vulnerable contient la charge utile d'injection SQL.
          *
          * <p>L'injection {@code ' OR '1'='1' --} modifie la clause WHERE
          * pour qu'elle retourne toujours vrai, contournant l'authentification.</p>
@@ -49,27 +49,27 @@ class AuthentificateurTest {
         @Test
         @DisplayName("Requete vulnerable : injection SQL possible")
         void vulnerableInjectionPossible() {
-            String requete = auth.rechercherUtilisateur("' OR '1'='1' --");
-            assertTrue(requete.contains("' OR '1'='1' --"),
-                "Preuve de vulnerabilite : la charge utile est dans la requete");
+            String requête = auth.rechercherUtilisateur("' OR '1'='1' --");
+            assertTrue(requête.contains("' OR '1'='1' --"),
+                "Preuve de vulnérabilité : la charge utile est dans la requête");
         }
 
         /**
-         * Verifie que la requete securisee utilise un parametre prepare {@code ?}
+         * Verifie que la requête securisee utilisé un paramètre prepare {@code ?}
          * et ne contient aucun guillemet issu de l'utilisateur.
          */
         @Test
-        @DisplayName("Requete securisee : injection impossible avec parametre ?")
+        @DisplayName("Requete securisee : injection impossible avec paramètre ?")
         void securiseePasInjection() {
-            String requete = auth.rechercherUtilisateurSecurisee();
-            assertTrue(requete.contains("?"));
-            assertFalse(requete.contains("'"),
-                "Aucun guillemet utilisateur dans la requete securisee");
+            String requête = auth.rechercherUtilisateurSecurisee();
+            assertTrue(requête.contains("?"));
+            assertFalse(requête.contains("'"),
+                "Aucun guillemet utilisateur dans la requête securisee");
         }
 
         /**
          * Verifie que plusieurs vecteurs d'injection SQL connus sont presents
-         * dans la requete vulnerable, prouvant l'absence de filtrage.
+         * dans la requête vulnerable, prouvant l'absence de filtrage.
          *
          * @param payload la charge utile d'injection SQL a tester
          */
@@ -83,9 +83,9 @@ class AuthentificateurTest {
             "' OR 1=1 --"
         })
         void detectionMultiVecteurs(String payload) {
-            String requete = auth.rechercherUtilisateur(payload);
-            assertTrue(requete.contains(payload),
-                "La charge utile '" + payload + "' atteint la requete vulnerable");
+            String requête = auth.rechercherUtilisateur(payload);
+            assertTrue(requête.contains(payload),
+                "La charge utile '" + payload + "' atteint la requête vulnerable");
         }
     }
 
@@ -108,7 +108,7 @@ class AuthentificateurTest {
         void vulnerableScriptInjection() {
             String html = auth.afficherProfil("<script>alert('xss')</script>");
             assertTrue(html.contains("<script>"),
-                "Preuve de vulnerabilite XSS : le script est dans le HTML");
+                "Preuve de vulnérabilité XSS : le script est dans le HTML");
         }
 
         /**
@@ -126,7 +126,7 @@ class AuthentificateurTest {
         }
 
         /**
-         * Verifie l'echappement de plusieurs vecteurs XSS courants dans la
+         * Verifie l'échappement de plusieurs vecteurs XSS courants dans la
          * version securisee (balises script, gestionnaires d'evenements).
          *
          * @param payload la charge utile XSS a tester
@@ -157,13 +157,13 @@ class AuthentificateurTest {
     class CasNominaux {
 
         /**
-         * Verifie qu'un login normal est correctement insere dans la requete.
+         * Verifie qu'un login normal est correctement insere dans la requête.
          */
         @Test
         @DisplayName("Login normal fonctionne")
         void loginNormal() {
-            String requete = auth.rechercherUtilisateur("jean.dupont");
-            assertTrue(requete.contains("jean.dupont"));
+            String requête = auth.rechercherUtilisateur("jean.dupont");
+            assertTrue(requête.contains("jean.dupont"));
         }
 
         /**
@@ -186,13 +186,13 @@ class AuthentificateurTest {
     class CasNull {
 
         /**
-         * Verifie que l'echappement d'une entree nulle retourne une chaine vide.
+         * Verifie que l'échappement d'une entree nulle retourne une chaine vide.
          */
         @Test
         @DisplayName("Echappement de null retourne chaine vide")
         void echapperNull() {
-            String resultat = auth.echapperHtml(null);
-            assertEquals("", resultat);
+            String résultat = auth.echapperHtml(null);
+            assertEquals("", résultat);
         }
     }
 }

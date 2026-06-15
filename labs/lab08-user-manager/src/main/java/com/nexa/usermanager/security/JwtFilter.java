@@ -14,18 +14,18 @@ import java.io.IOException;
 import java.util.List;
 
 /**
- * Filtre HTTP qui intercepte chaque requete pour extraire et valider le token JWT.
+ * Filtre HTTP qui intercepte chaque requête pour extraire et valider le token JWT.
  *
- * <p>Ce filtre s'execute une fois par requete HTTP (herite de {@link OncePerRequestFilter})
- * et verifie la presence d'un header {@code Authorization} au format Bearer.</p>
+ * <p>Ce filtre s'exécuté une fois par requête HTTP (herite de {@link OncePerRequestFilter})
+ * et vérifié la presence d'un header {@code Authorization} au format Bearer.</p>
  *
- * <p>Si le token est valide, le filtre extrait l'email et le role du token,
+ * <p>Si le token est validé, le filtre extrait l'email et le role du token,
  * puis definit le contexte d'authentification Spring Security. Cela permet
- * aux annotations {@code @PreAuthorize} et a la configuration de securite
+ * aux annotations {@code @PreAuthorize} et a la configuration de sécurité
  * de fonctionner correctement.</p>
  *
- * <p>Si le token est absent ou invalide, la requete continue sans authentification,
- * et sera eventuellement rejetee par les regles de securite si l'endpoint l'exige.</p>
+ * <p>Si le token est absent ou invalide, la requête continue sans authentification,
+ * et sera eventuellement rejetee par les regles de sécurité si l'endpoint l'exige.</p>
  */
 @Component
 public class JwtFilter extends OncePerRequestFilter {
@@ -34,7 +34,7 @@ public class JwtFilter extends OncePerRequestFilter {
     private final JwtUtil jwtUtil;
 
     /**
-     * Constructeur avec injection de dependance.
+     * Constructeur avec injection de dépendance.
      *
      * @param jwtUtil l'utilitaire JWT pour la validation et l'extraction des tokens
      */
@@ -43,21 +43,21 @@ public class JwtFilter extends OncePerRequestFilter {
     }
 
     /**
-     * Filtre chaque requete HTTP entrante pour extraire et valider le token JWT.
+     * Filtre chaque requête HTTP entrante pour extraire et valider le token JWT.
      *
      * <p>Etapes du traitement :</p>
      * <ol>
-     *   <li>Extraire le header {@code Authorization} de la requete.</li>
+     *   <li>Extraire le header {@code Authorization} de la requête.</li>
      *   <li>Verifier qu'il commence par {@code "Bearer "}.</li>
-     *   <li>Extraire le token (apres le prefixe "Bearer ").</li>
+     *   <li>Extraire le token (après le prefixe "Bearer ").</li>
      *   <li>Valider le token avec {@link JwtUtil#estValide(String)}.</li>
-     *   <li>Si valide, extraire l'email et le role, et definir l'authentification
+     *   <li>Si validé, extraire l'email et le role, et definir l'authentification
      *       dans le {@link SecurityContextHolder}.</li>
      *   <li>Passer la main au filtre suivant dans la chaine.</li>
      * </ol>
      *
-     * @param request  la requete HTTP entrante
-     * @param response la reponse HTTP sortante
+     * @param request  la requête HTTP entrante
+     * @param response la réponse HTTP sortante
      * @param chain    la chaine de filtres restants
      * @throws ServletException en cas d'erreur de servlet
      * @throws IOException      en cas d'erreur d'entree/sortie

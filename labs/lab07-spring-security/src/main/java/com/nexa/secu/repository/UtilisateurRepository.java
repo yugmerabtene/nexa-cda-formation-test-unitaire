@@ -6,9 +6,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 
 /**
- * Repository Spring Data JPA pour l'entite {@link Utilisateur}.
+ * Repository Spring Data JPA pour l'entité {@link Utilisateur}.
  * <p>
- * Fournit les methodes d'acces aux donnees pour la table {@code utilisateurs},
+ * Fournit les méthodes d'accès aux donnees pour la table {@code utilisateurs},
  * incluant la recherche par nom d'utilisateur et la verification d'existence.
  */
 public interface UtilisateurRepository extends JpaRepository<Utilisateur, Long> {
@@ -22,7 +22,7 @@ public interface UtilisateurRepository extends JpaRepository<Utilisateur, Long> 
     Optional<Utilisateur> findByUsername(String username);
 
     /**
-     * Verifie si un utilisateur avec ce nom d'utilisateur existe deja en base.
+     * Verifie si un utilisateur avec ce nom d'utilisateur existe déjà en base.
      *
      * @param username le nom d'utilisateur a verifier
      * @return {@code true} si le nom d'utilisateur existe, {@code false} sinon

@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * <p>Cette classe teste les fonctionnalites de generation, extraction
  * et validation des tokens JWT :</p>
  * <ul>
- *   <li>Generation d'un token valide.</li>
+ *   <li>Generation d'un token validé.</li>
  *   <li>Extraction de l'email (sujet) du token.</li>
  *   <li>Extraction du role (claim) du token.</li>
  *   <li>Rejet des tokens null, vides ou modifies.</li>
@@ -18,14 +18,14 @@ import static org.junit.jupiter.api.Assertions.*;
 @DisplayName("Tests unitaires : JwtUtil")
 class JwtUtilTest {
 
-    /** Instance de JwtUtil creee directement (sans Spring). */
+    /** Instance de JwtUtil créée directement (sans Spring). */
     private final JwtUtil jwtUtil = new JwtUtil();
 
     /**
-     * Verifie que le token genere est non null et valide.
+     * Verifie que le token genere est non null et validé.
      */
     @Test
-    @DisplayName("Genere un token valide")
+    @DisplayName("Genere un token validé")
     void genererTokenValide() {
         String token = jwtUtil.genererToken("user@nexa.fr", "USER");
         assertNotNull(token);

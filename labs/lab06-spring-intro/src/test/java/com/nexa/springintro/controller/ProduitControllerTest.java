@@ -101,7 +101,7 @@ class ProduitControllerTest {
     }
 
     /**
-     * Teste le endpoint {@code POST /api/produits} avec un produit valide -> 201 Created.
+     * Teste le endpoint {@code POST /api/produits} avec un produit validé -> 201 Created.
      */
     @Test
     @DisplayName("POST /api/produits -> 201 Created")
@@ -118,7 +118,7 @@ class ProduitControllerTest {
 
     /**
      * Teste le endpoint {@code POST /api/produits} avec un produit invalide -> 400 Bad Request.
-     * La validation Jakarta (nom vide, prix negatif) doit rejeter la requete.
+     * La validation Jakarta (nom vide, prix negatif) doit rejeter la requête.
      */
     @Test
     @DisplayName("POST /api/produits avec nom vide -> 400 Bad Request")
@@ -132,7 +132,7 @@ class ProduitControllerTest {
     }
 
     /**
-     * Teste le endpoint {@code PUT /api/produits/1} avec un produit valide -> 200 OK.
+     * Teste le endpoint {@code PUT /api/produits/1} avec un produit validé -> 200 OK.
      */
     @Test
     @DisplayName("PUT /api/produits/1 -> 200 OK")
@@ -177,14 +177,14 @@ class ProduitControllerTest {
 
     /**
      * Teste le endpoint {@code POST /api/produits} en cas de conflit de nom.
-     * Le service leve une {@link IllegalArgumentException}, le controleur laisse
+     * Le service lève une {@link IllegalArgumentException}, le controleur laisse
      * remonter l'exception en erreur 500.
      */
     @Test
-    @DisplayName("POST creation avec conflit -> 500 (gere par le service)")
+    @DisplayName("POST creation avec conflit -> 500 (gère par le service)")
     void creer_conflit() throws Exception {
         when(produitService.creer(any(Produit.class)))
-            .thenThrow(new IllegalArgumentException("Un produit avec ce nom existe deja"));
+            .thenThrow(new IllegalArgumentException("Un produit avec ce nom existe déjà"));
 
         mockMvc.perform(post("/api/produits")
                 .contentType(MediaType.APPLICATION_JSON)

@@ -16,10 +16,10 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * Tests d'integration pour le repository {@link UserRepository}.
  *
- * <p>Cette classe utilise {@code @DataJpaTest} pour tester les interactions
- * avec la base de donnees H2 en memoire. Elle verifie :</p>
+ * <p>Cette classe utilisé {@code @DataJpaTest} pour tester les interactions
+ * avec la base de donnees H2 en memoire. Elle vérifié :</p>
  * <ul>
- *   <li>Les methodes de requete derivees (findByEmail, existsByEmail, etc.).</li>
+ *   <li>Les méthodes de requête derivees (findByEmail, existsByEmail, etc.).</li>
  *   <li>La persistance, la mise a jour et la suppression des entites.</li>
  *   <li>La contrainte d'unicite sur l'email.</li>
  *   <li>La pagination des resultats.</li>
@@ -175,7 +175,7 @@ class UserRepositoryTest {
 
     /**
      * Verifie que la contrainte d'unicite sur l'email est bien appliquee.
-     * Une tentative d'insertion d'un email deja existant doit lever une exception.
+     * Une tentative d'insertion d'un email déjà existant doit lever une exception.
      */
     @Test
     @DisplayName("La contrainte d'unicite sur l'email est respectee")

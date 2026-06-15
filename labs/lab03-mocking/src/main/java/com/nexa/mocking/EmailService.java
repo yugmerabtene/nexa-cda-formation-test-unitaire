@@ -8,7 +8,7 @@ package com.nexa.mocking;
  *
  * Pourquoi une interface ?
  * - Elle definit un contrat sans implementation
- * - Un mock Mockito cree une implementation automatiquement
+ * - Un mock Mockito créé une implementation automatiquement
  * - En production, une vraie implementation (SMTP, SendGrid, etc.) sera injectee
  *
  * @see UserService
@@ -22,7 +22,7 @@ public interface EmailService {
      * @param destinataire l'adresse email du destinataire
      * @param sujet le sujet de l'email
      * @param contenu le corps de l'email
-     * @return true si l'envoi a reussi, false sinon
+     * @return true si l'envoi a réussi, false sinon
      */
     boolean envoyerEmail(String destinataire, String sujet, String contenu);
 }

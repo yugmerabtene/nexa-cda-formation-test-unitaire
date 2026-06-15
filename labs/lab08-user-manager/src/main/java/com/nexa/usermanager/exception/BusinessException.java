@@ -5,12 +5,12 @@ package com.nexa.usermanager.exception;
  *
  * <p>Exemples d'utilisation :</p>
  * <ul>
- *   <li>Tentative de creation d'un utilisateur avec un email deja existant.</li>
- *   <li>Operation non autorisee selon l'etat courant d'une ressource.</li>
+ *   <li>Tentative de creation d'un utilisateur avec un email déjà existant.</li>
+ *   <li>Operation non autorisee selon l'état courant d'une ressource.</li>
  * </ul>
  *
  * <p>Cette exception est interceptee par le {@link GlobalExceptionHandler}
- * et convertie en reponse HTTP 409 (Conflict).</p>
+ * et convertie en réponse HTTP 409 (Conflict).</p>
  */
 public class BusinessException extends RuntimeException {
 

@@ -50,7 +50,7 @@ class ProduitServiceTest {
     }
 
     /**
-     * Teste la methode {@code creer} : sauvegarde et retourne le produit
+     * Teste la méthode {@code creer} : sauvegarde et retourne le produit
      * quand le nom n'existe pas encore en base.
      */
     @Test
@@ -59,17 +59,17 @@ class ProduitServiceTest {
         when(repository.existsByNomIgnoreCase("Clavier")).thenReturn(false);
         when(repository.save(any(Produit.class))).thenReturn(produit);
 
-        Produit resultat = service.creer(produit);
-        assertNotNull(resultat);
-        assertEquals("Clavier", resultat.getNom());
+        Produit résultat = service.creer(produit);
+        assertNotNull(résultat);
+        assertEquals("Clavier", résultat.getNom());
     }
 
     /**
-     * Teste la methode {@code creer} en cas de conflit : leve une exception
-     * si un produit avec le meme nom existe deja, sans appeler {@code save}.
+     * Teste la méthode {@code creer} en cas de conflit : lève une exception
+     * si un produit avec le même nom existe déjà, sans appeler {@code save}.
      */
     @Test
-    @DisplayName("creer : echoue si le nom existe deja")
+    @DisplayName("creer : échoué si le nom existe déjà")
     void creer_nomExistant() {
         when(repository.existsByNomIgnoreCase("Clavier")).thenReturn(true);
         assertThrows(IllegalArgumentException.class, () -> service.creer(produit));
@@ -77,20 +77,20 @@ class ProduitServiceTest {
     }
 
     /**
-     * Teste la methode {@code trouverParId} : retourne un {@link Optional}
+     * Teste la méthode {@code trouverParId} : retourne un {@link Optional}
      * contenant le produit quand il existe.
      */
     @Test
     @DisplayName("trouverParId : retourne le produit")
     void trouverParId() {
         when(repository.findById(1L)).thenReturn(Optional.of(produit));
-        Optional<Produit> resultat = service.trouverParId(1L);
-        assertTrue(resultat.isPresent());
+        Optional<Produit> résultat = service.trouverParId(1L);
+        assertTrue(résultat.isPresent());
     }
 
     /**
-     * Teste la methode {@code supprimer} : supprime le produit quand il existe.
-     * Verifie que {@code deleteById} est bien appele.
+     * Teste la méthode {@code supprimer} : supprime le produit quand il existe.
+     * Verifie que {@code deleteById} est bien appelé.
      */
     @Test
     @DisplayName("supprimer : supprime le produit existant")
@@ -101,18 +101,18 @@ class ProduitServiceTest {
     }
 
     /**
-     * Teste la methode {@code supprimer} quand le produit n'existe pas :
+     * Teste la méthode {@code supprimer} quand le produit n'existe pas :
      * doit lever une {@link IllegalArgumentException}.
      */
     @Test
-    @DisplayName("supprimer : echoue si le produit n'existe pas")
+    @DisplayName("supprimer : échoué si le produit n'existe pas")
     void supprimer_inexistant() {
         when(repository.existsById(99L)).thenReturn(false);
         assertThrows(IllegalArgumentException.class, () -> service.supprimer(99L));
     }
 
     /**
-     * Teste la methode {@code rechercherParNom} : retourne les produits
+     * Teste la méthode {@code rechercherParNom} : retourne les produits
      * correspondant au fragment de nom fourni.
      */
     @Test

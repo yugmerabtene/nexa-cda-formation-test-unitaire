@@ -10,10 +10,10 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * Tests unitaires pour le DTO de sortie {@link UserResponse}.
  *
- * <p>Verifie le bon fonctionnement de la methode de conversion
+ * <p>Verifie le bon fonctionnement de la méthode de conversion
  * {@link UserResponse#from(User)} et des accesseurs :</p>
  * <ul>
- *   <li>Conversion correcte d'une entite User en DTO.</li>
+ *   <li>Conversion correcte d'une entité User en DTO.</li>
  *   <li>Le mot de passe n'est jamais expose dans le DTO.</li>
  *   <li>Prise en charge des roles ADMIN et USER.</li>
  *   <li>Prise en charge du statut actif/inactif.</li>
@@ -23,11 +23,11 @@ import static org.junit.jupiter.api.Assertions.*;
 class UserResponseTest {
 
     /**
-     * Verifie la conversion d'une entite User en UserResponse.
+     * Verifie la conversion d'une entité User en UserResponse.
      * Tous les champs (sauf le mot de passe) doivent etre correctement copies.
      */
     @Test
-    @DisplayName("from : convertit une entite User en DTO")
+    @DisplayName("from : convertit une entité User en DTO")
     void fromUser() {
         User user = new User("Dupont", "Jean", "jean@test.com", "pass1234", User.Role.USER);
         user.setId(1L);
@@ -43,8 +43,8 @@ class UserResponseTest {
     }
 
     /**
-     * Verifie que le mot de passe n'est PAS expose dans le DTO de reponse.
-     * C'est un test de securite important : le champ password de UserResponse
+     * Verifie que le mot de passe n'est PAS expose dans le DTO de réponse.
+     * C'est un test de sécurité important : le champ password de UserResponse
      * n'existe pas, donc le mot de passe ne peut pas fuiter.
      */
     @Test
