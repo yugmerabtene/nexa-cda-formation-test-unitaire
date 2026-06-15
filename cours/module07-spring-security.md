@@ -333,6 +333,8 @@ echo "eyJzdWIiOiJhZG1pbiIsInJvbGUiOiJBRE1JTiJ9" | base64 -d
 
 ### 5.5 Dépendances Maven pour JJWT
 
+JJWT est divisé en trois artefacts Maven. jjwt-api contient les interfaces (nécessaire à la compilation, scope compile). jjwt-impl fournit l'implémentation (uniquement au runtime). jjwt-jackson gère la sérialisation JSON des claims. Cette séparation permet de changer d'implémentation sans recompiler le code applicatif.
+
 ```xml
 <!-- API JJWT (compile) -->
 <dependency>
@@ -403,6 +405,8 @@ lab07-spring-security/
 ---
 
 ### pom.xml — Dépendances clés
+
+Ce pom.xml déclare 5 starters Spring Boot et 3 artefacts JJWT. Les deux dépendances critiques sont spring-boot-starter-security (qui active automatiquement l'authentification sur toutes les requêtes) et spring-security-test (qui fournit @WithMockUser pour simuler des utilisateurs dans les tests).
 
 ```xml
 <parent>

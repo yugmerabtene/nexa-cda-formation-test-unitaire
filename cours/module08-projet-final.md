@@ -465,6 +465,8 @@ lab08-user-manager/
 
  `labs/lab08-user-manager/pom.xml`
 
+Ce pom.xml est le plus complet de la formation. Il déclare les versions des 5 outils de qualité (JaCoCo, Failsafe, PIT, OWASP Check) en plus des starters Spring Boot. Les propriétés centralisent les numéros de version pour faciliter les mises à jour.
+
 ```xml
 <parent>
  <groupId>org.springframework.boot</groupId>
@@ -487,6 +489,8 @@ lab08-user-manager/
 ```
 
 ### Dépendances principales
+
+Cinq starters Spring Boot forment le socle : Web (REST + Tomcat), Security (JWT), Data JPA (persistance), Validation (Bean Validation), et Actuator (health checks). C'est la combinaison standard pour une API REST professionnelle.
 
 ```xml
 <dependencies>
@@ -515,6 +519,8 @@ lab08-user-manager/
 
 ### Base de données
 
+Deux bases cohabitent : PostgreSQL en production (scope runtime) et H2 en mémoire pour les tests (scope test). Ce pattern est le standard industriel pour les applications Spring Boot.
+
 ```xml
  <!-- PostgreSQL en production -->
  <dependency>
@@ -538,6 +544,8 @@ lab08-user-manager/
 
 ### JWT
 
+JJWT 0.12.5 est intégré avec le même découpage en trois artefacts : jjwt-api (interfaces), jjwt-impl (implémentation), jjwt-jackson (sérialisation JSON).
+
 ```xml
  <dependency>
  <groupId>io.jsonwebtoken</groupId>
@@ -560,9 +568,11 @@ lab08-user-manager/
 
 ### Tests
 
+Les deux dépendances de test sont spring-boot-starter-test (JUnit 5, Mockito, MockMvc) et spring-security-test (@WithMockUser, @WithAnonymousUser). Ensemble, elles couvrent tous les types de tests de la pyramide.
+
 ```xml
  <dependency>
- <groupId>org.springframework.boot</groupId>
+  <groupId>org.springframework.boot</groupId>
  <artifactId>spring-boot-starter-test</artifactId>
  <scope>test</scope>
  </dependency>
@@ -576,6 +586,8 @@ lab08-user-manager/
 ### Plugins de build
 
 #### JaCoCo — Couverture de code
+
+JaCoCo est configuré en trois phases : prepare-agent instrumente le bytecode, report génère un rapport HTML, et check fait échouer le build si les seuils de couverture (lignes >80%, branches >70%) ne sont pas atteints.
 
 ```xml
 <plugin>
@@ -647,10 +659,12 @@ Si la couverture est insuffisante, le build **échoue** (`mvn test` → BUILD FA
 
 #### PIT Mutation Testing — Tests de mutation
 
+PIT modifie le code source (ex: > devient >=, && devient ||) et vérifie que les tests détectent ces mutations. Si une mutation survit (les tests restent verts), cela révèle un test insuffisant. La configuration cible le package service avec le mutateur STRONGER.
+
 ```xml
 <plugin>
- <groupId>org.pitest</groupId>
- <artifactId>pitest-maven</artifactId>
+  <groupId>org.pitest</groupId>
+  <artifactId>pitest-maven</artifactId>
  <version>${pitest.version}</version>
  <configuration>
  <targetClasses>

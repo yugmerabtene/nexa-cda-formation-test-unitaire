@@ -975,6 +975,8 @@ Test d'intégration (@SpringBootTest)
 
 ### MockMvc — patterns de requête
 
+Ces patterns couvrent les 5 opérations REST standard (GET, POST, PUT, DELETE, PATCH). Chaque variante illustre un mécanisme d'injection de paramètres différent : @PathVariable pour les identifiants dans l'URL, @RequestParam pour les filtres en query string, et @RequestBody pour les données JSON.
+
 ```java
 // GET simple
 mockMvc.perform(get("/api/produits"))
@@ -1000,6 +1002,8 @@ mockMvc.perform(delete("/api/produits/1"))
 ```
 
 ### MockMvc — patterns de vérification
+
+status() valide le contrat HTTP (le code de retour), jsonPath() valide le contenu métier (les champs JSON). La combinaison des deux garantit qu'un endpoint REST respecte à la fois le protocole et le domaine. exists() et doesNotExist() vérifient la présence/absence d'un champ sans vérifier sa valeur.
 
 ```java
 .andExpect(status().isOk()) // 200

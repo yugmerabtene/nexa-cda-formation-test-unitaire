@@ -77,6 +77,8 @@ Tout test unitaire bien écrit suit le pattern **AAA** (parfois appelé **Given-
 | 2 | **Act** | "Qu'est-ce que j'exécute ?" | Appeler la méthode à tester |
 | 3 | **Assert** | "Qu'est-ce que je vérifie ?" | Vérifier que le résultat est conforme |
 
+Voici un exemple concret du pattern AAA avec une classe Calculatrice qui additionne deux entiers. Chaque phase est séparée par un commentaire pour bien visualiser la structure :
+
 Exemple :
 
 ```java
@@ -408,7 +410,9 @@ JUnit 5 fournit quatre annotations pour contrôler le cycle de vie de vos tests.
 
 ### Schema textuel du cycle de vie
 
-Voici l'ordre d'execution pour une classe contenant 3 tests :
+Voici l'ordre d'exécution pour une classe contenant 3 tests :
+
+Ce diagramme de séquence montre que JUnit crée une nouvelle instance de la classe de test avant chaque @Test. Cela garantit l'isolation totale entre les tests — aucun champ modifié par un test ne peut affecter un autre test.
 
 ```mermaid
 sequenceDiagram
@@ -714,6 +718,8 @@ Le rapport affiche :
 ### 2.2 La classe Calculatrice
 
 > `labs/lab01-fondamentaux/src/main/java/com/nexa/fondamentaux/Calculatrice.java`
+
+Voici la classe Calculatrice que nous allons tester. Elle contient 7 méthodes : addition, soustraction, multiplication, division, modulo, estPair et valeurAbsolue. Chaque méthode sera analysée individuellement ci-dessous avec ses cas de test.
 
 ### Code complet
 
@@ -1296,6 +1302,8 @@ void testTableaux() {
 ### 2.5 Le cycle de vie en pratique
 
 > `labs/lab01-fondamentaux/src/test/java/com/nexa/fondamentaux/CycleDeVieTest.java`
+
+Cette classe de test ne teste aucune logique métier — elle sert UNIQUEMENT à démontrer le cycle de vie. Les annotations @BeforeAll, @BeforeEach, @AfterEach et @AfterAll sont utilisées avec des System.out.println pour visualiser l'ordre d'exécution.
 
 ### Code complet et explication
 
