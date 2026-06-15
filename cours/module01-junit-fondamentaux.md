@@ -47,18 +47,20 @@ Autrement dit : au lieu de lancer votre application et de cliquer partout pour v
 
 ### La pyramide des tests
 
-Imaginez une pyramide à trois niveaux :
+La répartition recommandée des tests suit la forme d'une pyramide :
 
-```
- /\ ← Tests End-to-End (E2E) : peu nombreux, lents, coûteux
- / \ (ex: Selenium, Cypress)
- / \
- /------\ ← Tests d'intégration : vérifient l'interaction entre composants
- / \ (ex: test d'une API REST, test avec base de données)
- / \
- /------------\ ← Tests unitaires : très nombreux, rapides, peu coûteux
- / \ (ex: tester une méthode de calcul)
- /________________\
+```mermaid
+graph BT
+    subgraph "Tests unitaires (70-80%)"
+        U["JUnit + Mockito<br/>Très nombreux, rapides, millisecondes"]
+    end
+    subgraph "Tests d'intégration (15-25%)"
+        I["Spring Boot Test<br/>API REST, base de données, secondes"]
+    end
+    subgraph "Tests E2E (5-10%)"
+        E["Selenium, Cypress<br/>Peu nombreux, lents, coûteux"]
+    end
+    U --> I --> E
 ```
 
 **Règle d'or** : plus on descend dans la pyramide, plus il doit y avoir de tests. 70-80% de vos tests devraient être des tests unitaires.

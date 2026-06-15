@@ -2426,13 +2426,12 @@ Request → JwtFilter → SecurityFilterChain → @PreAuthorize → Controller �
 
 ### La pyramide des tests
 
-```
- E2E (RestAssured)
- /
- / Intégration @SpringBootTest @WebMvcTest @DataJpaTest
- /
- / Unitaires JUnit + Mockito + Assertions
- /
+```mermaid
+graph BT
+    U["JUnit + Mockito + Assertions<br/>Tests unitaires (70-80%)"]
+    I["SpringBootTest + WebMvcTest + DataJpaTest<br/>Tests d'intégration (15-25%)"]
+    E["RestAssured<br/>Tests E2E (5-10%)"]
+    U --> I --> E
 ```
 
 ### Récapitulatif COMPLET des annotations (2 jours)
